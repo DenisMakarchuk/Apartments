@@ -16,9 +16,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TrainingProject.Common\TrainingProject.Common.csproj" />
-      <ProjectReference Include="..\TrainingProject.Domain.Logic\TrainingProject.Domain.Logic.csproj" />
-      <ProjectReference Include="..\TrainingProject.Domain\TrainingProject.Domain.csproj" />
+      <ProjectReference Include="..\Apartments.Common\Apartments.Common.csproj" />
+      <ProjectReference Include="..\Apartments.Domain.Logic\Apartments.Domain.Logic.csproj" />
+      <ProjectReference Include="..\Apartments.Domain\Apartments.Domain.csproj" />
     </ItemGroup>
 
 </Project>
