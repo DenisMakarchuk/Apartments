@@ -1,6 +1,6 @@
 using System;
 
-namespace TrainingProject.Web
+namespace Apartments.Web
 {
     public class WeatherForecast
     {

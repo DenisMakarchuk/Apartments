@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using TrainingProject.Data;
+using Apartments.Data;
 
-namespace TrainingProject.Domain.Logic
+namespace Apartments.Domain.Logic
 {
     public static class DomainLogicExtensions
     {

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace TrainingProject.Web.Controllers
+namespace Apartments.Web.Controllers
 {
     [ApiController]
     [Route("[controller]")]
