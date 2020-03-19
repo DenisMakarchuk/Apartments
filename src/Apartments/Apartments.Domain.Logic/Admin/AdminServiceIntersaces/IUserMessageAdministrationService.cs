@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
 {
-    interface IUserMessageAdministrationService
+    public interface IUserMessageAdministrationService
     {
     }
 }
