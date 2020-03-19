@@ -25,43 +25,39 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Send new message
         /// </summary>
-        /// <param name="ownAccountId"></param>
-        /// <param name="destinationId"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("{ownAccountId}")]
-        public async Task<IActionResult> SendMessageAsync(string ownAccountId, [FromBody] Message message)
+        [Route("")]
+        public async Task<IActionResult> SendMessageAsync([FromBody] Message message)
         {
-            if (string.IsNullOrEmpty(ownAccountId) || !Guid.TryParse(ownAccountId, out var _)) // todo: validate message
+            if (message is null || ModelState.IsValid) // todo: validate message
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            try
-            {
-                var result = await _adminOwnMessageService.SendMessage(ownAccountId, message);
+            var result = await _adminOwnMessageService.SendMessage(message); //will return Result<Message>
 
-                return result is null ? NotFound() : (IActionResult)Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
+        /// <summary>
+        /// Get all messages that are in the own account by account Id
+        /// </summary>
+        /// <param name="ownAccountId"></param>
+        /// <returns></returns>
         [HttpGet] 
-        [Route("{accountId}")]
-        public async Task<IActionResult> GetAllMessagesByAccountIdAsync(string accountId)
+        [Route("{ownAccountId}")]
+        public async Task<IActionResult> GetAllOwnMessagesByAccountIdAsync(string ownAccountId)
         {
-            if (string.IsNullOrEmpty(accountId) || !Guid.TryParse(accountId, out var _))
+            if (string.IsNullOrEmpty(ownAccountId) || !Guid.TryParse(ownAccountId, out var _))
             {
                 return BadRequest();
             }
 
             try
             {
-                var result = await _adminOwnMessageService.GetAllMessagesByAccountId(accountId);
+                var result = await _adminOwnMessageService.GetAllOwnMessagesByAccountId(ownAccountId);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -72,19 +68,23 @@ namespace Apartments.Web.Controllers.Admin
             }
         }
 
+        /// <summary>
+        /// Get message that is in the own account by message Id
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("{accountId}/{messageId}")]
-        public async Task<IActionResult> GetMessageByAccountIdAndMessageIdAsync(string accountId, string messageId)
+        [Route("{messageId}")]
+        public async Task<IActionResult> GetOwnMessageByMessageIdAsync(string messageId)
         {
-            if (string.IsNullOrEmpty(accountId) || string.IsNullOrEmpty(messageId) ||
-                !Guid.TryParse(accountId, out var _) || !Guid.TryParse(messageId, out var _))
+            if (string.IsNullOrEmpty(messageId) || !Guid.TryParse(messageId, out var _))
             {
                 return BadRequest();
             }
 
             try
             {
-                var result = await _adminOwnMessageService.GetMessageByAccountIdAndMessageId(accountId, messageId);
+                var result = await _adminOwnMessageService.GetOwnMessageByMessageId(messageId);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -95,50 +95,42 @@ namespace Apartments.Web.Controllers.Admin
             }
         }
 
+        /// <summary>
+        /// Update the message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         [HttpPut]
-        [Route("{ownAccountId}/{messageId}")]
-        public async Task<IActionResult> UpdateMessageByOwnAccountIdAndMessageIdAsync(string ownAccountId, string messageId)
+        [Route("")]
+        public async Task<IActionResult> UpdateOwnMessageAsync([FromBody] Message message)
         {
-            if (string.IsNullOrEmpty(ownAccountId) || string.IsNullOrEmpty(messageId) ||
-                !Guid.TryParse(ownAccountId, out var _) || !Guid.TryParse(messageId, out var _))
+            if (message is null || ModelState.IsValid) // todo: validate message
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            try
-            {
-                var result = await _adminOwnMessageService.UpdateMessageByOwnAccountIdAndMessageId(ownAccountId, messageId);
+            var result = await _adminOwnMessageService.UpdateOwnMessage(message); //will return Result<Message>
 
-                return result is null ? NotFound() : (IActionResult)Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
+        /// <summary>
+        /// Delete own message by message Id
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
         [HttpDelete]
-        [Route("{ownAccountId}/{messageId}")]
-        public async Task<IActionResult> DeleteMessageByOwnAccountIdAndMessageIdAsync(string ownAccountId, string messageId)
+        [Route("{messageId}")]
+        public async Task<IActionResult> DeleteOwnMessageByMessageIdAsync(string messageId)
         {
-            if (string.IsNullOrEmpty(ownAccountId) || string.IsNullOrEmpty(messageId) ||
-                !Guid.TryParse(ownAccountId, out var _) || !Guid.TryParse(messageId, out var _))
+            if (string.IsNullOrEmpty(messageId) || !Guid.TryParse(messageId, out var _))
             {
                 return BadRequest();
             }
 
-            try
-            {
-                var result = await _adminOwnMessageService.DeleteMessageByOwnAccountIdAndMessageId(ownAccountId, messageId);
+            var result = await _adminOwnMessageService.DeleteOwnMessageByMessageId(messageId); //will return Result
 
-                return result is null ? NotFound() : (IActionResult)Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }
     }
 }
