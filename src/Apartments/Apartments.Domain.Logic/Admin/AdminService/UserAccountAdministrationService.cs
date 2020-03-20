@@ -1,4 +1,4 @@
-﻿using Apartments.Domain.Logic.Admin.AdminServiceIntersaces;
+﻿using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
 {
-    class UserAccountAdministrationService : IUserAccountAdministrationService
+    public class UserAccountAdministrationService : IUserAccountAdministrationService
     {
         public Task<Result<User>> CreateUserAsync(User user)
         {

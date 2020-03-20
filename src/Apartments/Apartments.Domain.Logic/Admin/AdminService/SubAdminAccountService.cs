@@ -1,4 +1,4 @@
-﻿using Apartments.Domain.Logic.Admin.AdminServiceIntersaces;
+﻿using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
 {
-    class SubAdminAccountService : ISubAdminAccountService
+    public class SubAdminAccountService : ISubAdminAccountService
     {
         public Task<Result<SubAdmin>> CreateSubAdminAccountAsync(SubAdmin subAdmin)
         {

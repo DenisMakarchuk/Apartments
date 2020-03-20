@@ -1,4 +1,4 @@
-﻿using Apartments.Domain.Logic.Admin.AdminServiceIntersaces;
+﻿using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
 {
-    class AdminOwnMessageService : IAdminOwnMessageService
+    public class AdminOwnMessageService : IAdminOwnMessageService
     {
-        public Task<Result> DeleteOwnMessageByMessageIdAsync(string messageId)
+        public Task<Result<Message>> SendMessageAsync(Message message)
         {
             throw new NotImplementedException();
         }
@@ -23,12 +23,12 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             throw new NotImplementedException();
         }
 
-        public Task<Result<Message>> SendMessageAsync(Message message)
+        public Task<Result<Message>> UpdateOwnMessageAsync(Message message)
         {
             throw new NotImplementedException();
-        }
-
-        public Task<Result<Message>> UpdateOwnMessageAsync(Message message)
+        }        
+        
+        public Task<Result> DeleteOwnMessageByMessageIdAsync(string messageId)
         {
             throw new NotImplementedException();
         }
