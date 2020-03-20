@@ -11,7 +11,7 @@ namespace Apartments.Web.Controllers.Admin
     /// <summary>
     /// The controller for the administrator to work with own messages
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("api/[controller]")] // todo: change Rote
     [ApiController]
     public class AdminOwnMessageController : ControllerBase
     {
@@ -96,7 +96,7 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         /// <summary>
-        /// Update the message
+        /// Update own message
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
