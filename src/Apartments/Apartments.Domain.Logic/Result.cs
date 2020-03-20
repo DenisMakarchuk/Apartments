@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Apartments.Domain.Logic
 {
+    /// <summary>
+    /// The result of the process at the data access level
+    /// </summary>
     public class Result
     {
         protected Result(bool success, string message)
@@ -27,6 +30,10 @@ namespace Apartments.Domain.Logic
         }
     }
 
+    /// <summary>
+    /// The result of the process at the data access level
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class Result<T> : Result where T : class
     {
         protected Result(bool success, string message, T data) : base(success, message)

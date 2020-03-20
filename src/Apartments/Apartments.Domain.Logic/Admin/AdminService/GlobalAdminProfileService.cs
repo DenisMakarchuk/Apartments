@@ -1,0 +1,21 @@
+﻿using Apartments.Domain.Logic.Admin.AdminServiceIntersaces;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Apartments.Domain.Logic.Admin.AdminService
+{
+    class GlobalAdminProfileService : IGlobalAdminProfileService
+    {
+        public Task<GlobalAdmin> GetGlobalAdminAccountByIdAsync(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result<Message>> UpdateGlobalAdminAsync(GlobalAdmin globalAdmin)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
