@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Apartments.Domain.Logic.Admin.AdminServiceIntersaces;
+using Apartments.Domain;
 
 namespace Apartments.Web.Controllers.Admin
 {
