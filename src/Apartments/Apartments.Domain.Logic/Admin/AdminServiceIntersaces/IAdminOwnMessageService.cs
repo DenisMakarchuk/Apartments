@@ -20,9 +20,9 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
         /// <summary>
         /// Get all messages that are in the own account by account Id
         /// </summary>
-        /// <param name="ownAccountId"></param>
+        /// <param name="accountId"></param>
         /// <returns></returns>
-        Task<IEnumerable<Message>> GetAllOwnMessagesByAccountIdAsync(string ownAccountId);
+        Task<IEnumerable<Message>> GetAllOwnMessagesByAccountIdAsync(string accountId);
 
         /// <summary>
         /// Get message that is in the own account by message Id
