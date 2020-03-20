@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Apartments.Domain
 {
-    public class User
+    public class AddSubAdmin
     {
+        public string Name { get; set; }
     }
 }
