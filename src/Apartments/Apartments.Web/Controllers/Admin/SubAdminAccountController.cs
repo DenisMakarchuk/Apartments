@@ -9,7 +9,7 @@ using Apartments.Domain.Logic.Admin.AdminServiceIntersaces;
 namespace Apartments.Web.Controllers.Admin
 {
     /// <summary>
-    /// The controller for the GlobalAdmin to work with SubAdmin accounts
+    /// The controller for the administrator to work with SubAdmin accounts
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
@@ -94,7 +94,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Update the SubAdmin account
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="subAdminAccount"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("")]

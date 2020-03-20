@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
 {
     /// <summary>
-    /// The service for the GlobalAdmin to work with SubAdmin accounts
+    /// The service for the administrator to work with SubAdmin accounts
     /// </summary>
     public interface ISubAdminAccountService
     {
