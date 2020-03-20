@@ -36,7 +36,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _adminOwnMessageService.SendMessage(message); //will return Result<Message>
+            var result = await _adminOwnMessageService.SendMessageAsync(message); //will return Result<Message>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -44,20 +44,20 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Get all messages that are in the own account by account Id
         /// </summary>
-        /// <param name="ownAccountId"></param>
+        /// <param name="accountId"></param>
         /// <returns></returns>
         [HttpGet] 
-        [Route("{ownAccountId}")]
-        public async Task<IActionResult> GetAllOwnMessagesByAccountIdAsync(string ownAccountId)
+        [Route("{accountId}")]
+        public async Task<IActionResult> GetAllOwnMessagesByAccountIdAsync(string accountId)
         {
-            if (string.IsNullOrEmpty(ownAccountId) || !Guid.TryParse(ownAccountId, out var _))
+            if (string.IsNullOrEmpty(accountId) || !Guid.TryParse(accountId, out var _))
             {
                 return BadRequest();
             }
 
             try
             {
-                var result = await _adminOwnMessageService.GetAllOwnMessagesByAccountId(ownAccountId);
+                var result = await _adminOwnMessageService.GetAllOwnMessagesByAccountIdAsync(accountId);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -84,7 +84,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _adminOwnMessageService.GetOwnMessageByMessageId(messageId);
+                var result = await _adminOwnMessageService.GetOwnMessageByMessageIdAsync(messageId);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -109,7 +109,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _adminOwnMessageService.UpdateOwnMessage(message); //will return Result<Message>
+            var result = await _adminOwnMessageService.UpdateOwnMessageAsync(message); //will return Result<Message>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -128,7 +128,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest();
             }
 
-            var result = await _adminOwnMessageService.DeleteOwnMessageByMessageId(messageId); //will return Result
+            var result = await _adminOwnMessageService.DeleteOwnMessageByMessageIdAsync(messageId); //will return Result
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }

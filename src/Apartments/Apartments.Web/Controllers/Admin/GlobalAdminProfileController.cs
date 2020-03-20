@@ -38,7 +38,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _globalAdminProfileService.GetGlobalAdminById(id);
+                var result = await _globalAdminProfileService.GetGlobalAdminAccountByIdAsync(id);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -63,7 +63,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _globalAdminProfileService.UpdateGlobalAdminAccount(globalAdmin); //will return Result<GlobalAdmin>
+            var result = await _globalAdminProfileService.UpdateGlobalAdminAsync(globalAdmin); //will return Result<GlobalAdmin>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }

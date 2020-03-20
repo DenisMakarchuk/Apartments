@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
 {
     /// <summary>
-    /// The controller for the GlobalAdmin to work with own account
+    /// The service for the GlobalAdmin to work with own account
     /// </summary>
     public interface IGlobalAdminProfileService
     {

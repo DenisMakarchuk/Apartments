@@ -36,7 +36,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _userMessageAdministrationService.SendMessage(message); //will return Result<Message>
+            var result = await _userMessageAdministrationService.SendMessageAsync(message); //will return Result<Message>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -57,7 +57,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _userMessageAdministrationService.GetAllUserMessagesByAccountId(accountId);
+                var result = await _userMessageAdministrationService.GetAllUserMessagesByAccountIdAsync(accountId);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -84,7 +84,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _userMessageAdministrationService.GetUserMessageByMessageId(messageId);
+                var result = await _userMessageAdministrationService.GetUserMessageByMessageIdAsync(messageId);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -109,7 +109,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _userMessageAdministrationService.UpdateUserMessage(message); //will return Result<Message>
+            var result = await _userMessageAdministrationService.UpdateUserMessageAsync(message); //will return Result<Message>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -128,7 +128,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest();
             }
 
-            var result = await _userMessageAdministrationService.DeleteUserMessageByMessageId(messageId); //will return Result
+            var result = await _userMessageAdministrationService.DeleteUserMessageByMessageIdAsync(messageId); //will return Result
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }

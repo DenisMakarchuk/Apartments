@@ -25,7 +25,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Create new User account
         /// </summary>
-        /// <param name="subAdminAccount"></param>
+        /// <param name="user"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("")]
@@ -36,7 +36,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _userAccountAdministrationService.CreateUser(user); //will return Result<User>
+            var result = await _userAccountAdministrationService.CreateUserAsync(user); //will return Result<User>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -51,7 +51,7 @@ namespace Apartments.Web.Controllers.Admin
         {
             try
             {
-                var result = await _userAccountAdministrationService.GetAllUser();
+                var result = await _userAccountAdministrationService.GetAllUserAsync();
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -78,7 +78,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _userAccountAdministrationService.GetUserById(id);
+                var result = await _userAccountAdministrationService.GetUserByIdAsync(id);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -103,7 +103,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _userAccountAdministrationService.UpdateUser(user); //will return Result<User>
+            var result = await _userAccountAdministrationService.UpdateUserAsync(user); //will return Result<User>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -122,7 +122,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest();
             }
 
-            var result = await _userAccountAdministrationService.DeleteUser(id); //will return Result
+            var result = await _userAccountAdministrationService.DeleteUserByIdAsync(id); //will return Result
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }

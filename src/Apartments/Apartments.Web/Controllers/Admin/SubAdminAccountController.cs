@@ -27,18 +27,18 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Create new SubAdmin account
         /// </summary>
-        /// <param name="subAdminAccount"></param>
+        /// <param name="subAdmin"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> CreateSubAdminAccountAsync([FromBody] SubAdminAccount subAdminAccount)
+        public async Task<IActionResult> CreateSubAdminAccountAsync([FromBody] SubAdmin subAdmin)
         {
-            if (subAdminAccount is null || ModelState.IsValid) // todo: validate subAdminAccount
+            if (subAdmin is null || ModelState.IsValid) // todo: validate subAdmin
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _subAdminAccountService.CreateSubAdminAccount(subAdminAccount); //will return Result<SubAdminAccount>
+            var result = await _subAdminAccountService.CreateSubAdminAccountAsync(subAdmin); //will return Result<SubAdmin>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -53,7 +53,7 @@ namespace Apartments.Web.Controllers.Admin
         {
             try
             {
-                var result = await _subAdminAccountService.GetAllSubAdminAccounts();
+                var result = await _subAdminAccountService.GetAllSubAdminAccountsAsync();
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -80,7 +80,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _subAdminAccountService.GetSubAdminAccountById(id);
+                var result = await _subAdminAccountService.GetSubAdminAccountByIdAsync(id);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -94,18 +94,18 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Update the SubAdmin account
         /// </summary>
-        /// <param name="subAdminAccount"></param>
+        /// <param name="subAdmin"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("")]
-        public async Task<IActionResult> UpdateSubAdminAccountAsync([FromBody] SubAdminAccount subAdminAccount)
+        public async Task<IActionResult> UpdateSubAdminAccountAsync([FromBody] SubAdmin subAdmin)
         {
-            if (subAdminAccount is null || ModelState.IsValid) // todo: validate SubAdminAccount
+            if (subAdmin is null || ModelState.IsValid) // todo: validate subAdmin
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _subAdminAccountService.UpdateSubAdminAccount(subAdminAccount); //will return Result<SubAdminAccount>
+            var result = await _subAdminAccountService.UpdateSubAdminAccountAsync(subAdmin); //will return Result<SubAdmin>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -124,7 +124,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest();
             }
 
-            var result = await _subAdminAccountService.DeleteSubAdminAccountById(id); //will return Result
+            var result = await _subAdminAccountService.DeleteSubAdminAccountByIdAsync(id); //will return Result
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }
@@ -149,7 +149,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _subAdminAccountService.GetAllSubAdminMessagesByAccountId(id);
+                var result = await _subAdminAccountService.GetAllSubAdminMessagesByAccountIdAsync(id);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -176,7 +176,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _subAdminAccountService.GetSubAdminMessageByMessageId(id);
+                var result = await _subAdminAccountService.GetSubAdminMessageByMessageIdAsync(id);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -201,7 +201,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest(ModelState);
             }
 
-            var result = await _subAdminAccountService.UpdateSubAdminMessage(message); //will return Result<Message>
+            var result = await _subAdminAccountService.UpdateSubAdminMessageAsync(message); //will return Result<Message>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -220,7 +220,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest();
             }
 
-            var result = await _subAdminAccountService.DeleteSubAdminMessageByMessageId(id); //will return Result
+            var result = await _subAdminAccountService.DeleteSubAdminMessageByMessageIdAsync(id); //will return Result
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }

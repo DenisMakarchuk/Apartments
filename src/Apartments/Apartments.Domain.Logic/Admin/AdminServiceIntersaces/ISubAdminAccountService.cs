@@ -15,29 +15,29 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
         /// <summary>
         /// Create new SubAdmin account
         /// </summary>
-        /// <param name="subAdminAccount"></param>
+        /// <param name="subAdmin"></param>
         /// <returns></returns>
-        Task<Result<SubAdminAccount>> CreateSubAdminAccountAsync(SubAdminAccount subAdminAccount);
+        Task<Result<SubAdmin>> CreateSubAdminAccountAsync(SubAdmin subAdmin);
 
         /// <summary>
         /// Get all SubAdmin accounts
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<SubAdminAccount>> GetAllSubAdminAccountsAsync();
+        Task<IEnumerable<SubAdmin>> GetAllSubAdminAccountsAsync();
 
         /// <summary>
         /// Get SubAdmin account by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<SubAdminAccount> GetSubAdminAccountByIdAsync(string id);
+        Task<SubAdmin> GetSubAdminAccountByIdAsync(string id);
 
         /// <summary>
         /// Update the SubAdmin account
         /// </summary>
-        /// <param name="subAdminAccount"></param>
+        /// <param name="subAdmin"></param>
         /// <returns></returns>
-        Task<Result<SubAdminAccount>> UpdateSubAdminAccountAsync(SubAdminAccount subAdminAccount);
+        Task<Result<SubAdmin>> UpdateSubAdminAccountAsync(SubAdmin subAdmin);
 
         /// <summary>
         /// Delete SubAdmin account by Id
