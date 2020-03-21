@@ -2,57 +2,57 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Apartments.Domain;
+using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
-using Apartments.Domain;
 
-namespace Apartments.Web.Controllers.Admin
+namespace Apartments.Web.Controllers.Users
 {
     /// <summary>
-    /// The controller for the administrator to work with User accounts
+    /// The controller for the User to work with own Comments
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class UserAccountAdministrationController : ControllerBase
+    public class UserCommentController : ControllerBase
     {
-        private readonly IUserAccountAdministrationService _userAccountAdministrationService;
+        private readonly IUserCommentService _userCommentService;
 
-        public UserAccountAdministrationController(IUserAccountAdministrationService userAccountAdministrationService)
+        public UserCommentController(IUserCommentService userCommentService)
         {
-            _userAccountAdministrationService = userAccountAdministrationService;
+            _userCommentService = userCommentService;
         }
 
         /// <summary>
-        /// Create new User account
+        /// Create new User Comment
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="comment"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> CreateUserAsync([FromBody] User user)
+        public async Task<IActionResult> CreateCommentAsync([FromBody] AddComment comment)
         {
-            if (user is null || ModelState.IsValid) // todo: validate User
+            if (comment is null || ModelState.IsValid) // todo: validate Comment
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _userAccountAdministrationService.CreateUserAsync(user); //will return Result<User>
+            var result = await _userCommentService.CreateCommentAsync(comment); //will return Result<Comment>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
         /// <summary>
-        /// Get all User accounts
+        /// Get all User Comments
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> GetAllUserAsync()
+        public async Task<IActionResult> GetAllCommentsAsync()
         {
             try
             {
-                var result = await _userAccountAdministrationService.GetAllUserAsync();
+                var result = await _userCommentService.GetAllCommentsAsync();
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -64,13 +64,13 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         /// <summary>
-        /// Get User account by Id
+        /// Get User Comment by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetUserByIdAsync(string id)
+        public async Task<IActionResult> GetCommentByIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
@@ -79,7 +79,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _userAccountAdministrationService.GetUserByIdAsync(id);
+                var result = await _userCommentService.GetCommentByIdAsync(id);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -91,39 +91,39 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         /// <summary>
-        /// Update the User account
+        /// Update the User Comment
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="comment"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("")]
-        public async Task<IActionResult> UpdateUserAsync([FromBody] User user)
+        public async Task<IActionResult> UpdateCommentAsync([FromBody] Comment comment)
         {
-            if (user is null || ModelState.IsValid) // todo: validate User
+            if (comment is null || ModelState.IsValid) // todo: validate Comment
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _userAccountAdministrationService.UpdateUserAsync(user); //will return Result<User>
+            var result = await _userCommentService.UpdateCommentAsync(comment); //will return Result<Comment>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
         /// <summary>
-        /// Delete User account by Id
+        /// Delete User Comment by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]
-        public async Task<IActionResult> DeleteUserByIdAsync(string id)
+        public async Task<IActionResult> DeleteCommentByIdAsync(string id)
         {
             if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var _))
             {
                 return BadRequest();
             }
 
-            var result = await _userAccountAdministrationService.DeleteUserByIdAsync(id); //will return Result
+            var result = await _userCommentService.DeleteCommentByIdAsync(id); //will return Result
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }

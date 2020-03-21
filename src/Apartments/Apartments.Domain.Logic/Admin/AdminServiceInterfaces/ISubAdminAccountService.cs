@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
+namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
 {
     /// <summary>
     /// The service for the administrator to work with SubAdmin accounts

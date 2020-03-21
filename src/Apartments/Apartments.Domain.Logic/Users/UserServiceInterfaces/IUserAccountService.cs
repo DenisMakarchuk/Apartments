@@ -3,25 +3,19 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
+namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
 {
     /// <summary>
-    /// The service for the administrator to work with User accounts
+    /// The service for the User to work with own account
     /// </summary>
-    public interface IUserAccountAdministrationService
+    public interface IUserAccountService
     {
         /// <summary>
         /// Create new User account
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        Task<Result<User>> CreateUserAsync(User user);
-
-        /// <summary>
-        /// Get all User accounts
-        /// </summary>
-        /// <returns></returns>
-        Task<IEnumerable<User>> GetAllUserAsync();
+        Task<Result<User>> CreateUserAsync(AddUser user);
 
         /// <summary>
         /// Get User account by Id

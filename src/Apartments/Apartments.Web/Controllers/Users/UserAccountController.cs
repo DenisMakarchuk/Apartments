@@ -2,25 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Apartments.Domain;
+using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
-using Apartments.Domain;
 
-namespace Apartments.Web.Controllers.Admin
+namespace Apartments.Web.Controllers.Users
 {
     /// <summary>
-    /// The controller for the administrator to work with User accounts
+    /// The controller for the User to work with own account
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class UserAccountAdministrationController : ControllerBase
+    public class UserAccountController : ControllerBase
     {
-        private readonly IUserAccountAdministrationService _userAccountAdministrationService;
+        private readonly IUserAccountService _userAccountService;
 
-        public UserAccountAdministrationController(IUserAccountAdministrationService userAccountAdministrationService)
+        public UserAccountController(IUserAccountService userAccountService)
         {
-            _userAccountAdministrationService = userAccountAdministrationService;
+            _userAccountService = userAccountService;
         }
 
         /// <summary>
@@ -30,37 +30,16 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> CreateUserAsync([FromBody] User user)
+        public async Task<IActionResult> CreateUserAsync([FromBody] AddUser user)
         {
-            if (user is null || ModelState.IsValid) // todo: validate User
+            if (user is null || ModelState.IsValid) // todo: validate user
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _userAccountAdministrationService.CreateUserAsync(user); //will return Result<User>
+            var result = await _userAccountService.CreateUserAsync(user); //will return Result<User>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
-        }
-
-        /// <summary>
-        /// Get all User accounts
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("")]
-        public async Task<IActionResult> GetAllUserAsync()
-        {
-            try
-            {
-                var result = await _userAccountAdministrationService.GetAllUserAsync();
-
-                return result is null ? NotFound() : (IActionResult)Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
         }
 
         /// <summary>
@@ -79,7 +58,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _userAccountAdministrationService.GetUserByIdAsync(id);
+                var result = await _userAccountService.GetUserByIdAsync(id);
 
                 return result is null ? NotFound() : (IActionResult)Ok(result);
             }
@@ -99,12 +78,12 @@ namespace Apartments.Web.Controllers.Admin
         [Route("")]
         public async Task<IActionResult> UpdateUserAsync([FromBody] User user)
         {
-            if (user is null || ModelState.IsValid) // todo: validate User
+            if (user is null || ModelState.IsValid) // todo: validate user
             {
                 return BadRequest(ModelState);
             }
 
-            var result = await _userAccountAdministrationService.UpdateUserAsync(user); //will return Result<User>
+            var result = await _userAccountService.UpdateUserAsync(user); //will return Result<User>
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
@@ -123,7 +102,7 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest();
             }
 
-            var result = await _userAccountAdministrationService.DeleteUserByIdAsync(id); //will return Result
+            var result = await _userAccountService.DeleteUserByIdAsync(id); //will return Result
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }

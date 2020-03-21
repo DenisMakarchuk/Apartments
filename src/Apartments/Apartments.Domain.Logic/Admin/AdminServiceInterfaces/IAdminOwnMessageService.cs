@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
+namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
 {
     /// <summary>
-    /// The service for the administrator to work with User messages
+    /// The service for the administrator to work with own messages
     /// </summary>
-    public interface IUserMessageAdministrationService
+    public interface IAdminOwnMessageService
     {
         /// <summary>
         /// Send new message
@@ -18,31 +18,31 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceIntersaces
         Task<Result<Message>> SendMessageAsync(Message message);
 
         /// <summary>
-        /// Get all messages that are in the User account by account Id
+        /// Get all messages that are in the own account by account Id
         /// </summary>
         /// <param name="accountId"></param>
         /// <returns></returns>
-        Task<IEnumerable<Message>> GetAllUserMessagesByAccountIdAsync(string accountId);
+        Task<IEnumerable<Message>> GetAllOwnMessagesByAccountIdAsync(string accountId);
 
         /// <summary>
-        /// Get message that is in the User account by message Id
+        /// Get message that is in the own account by message Id
         /// </summary>
         /// <param name="messageId"></param>
         /// <returns></returns>
-        Task<Message> GetUserMessageByMessageIdAsync(string messageId);
+        Task<Message> GetOwnMessageByMessageIdAsync(string messageId);
 
         /// <summary>
-        /// Update User message
+        /// Update the message
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        Task<Result<Message>> UpdateUserMessageAsync(Message message);
+        Task<Result<Message>> UpdateOwnMessageAsync(Message message);
 
         /// <summary>
-        ///  Delete User message by message Id
+        /// Delete own message by message Id
         /// </summary>
         /// <param name="messageId"></param>
         /// <returns></returns>
-        Task<Result> DeleteUserMessageByMessageIdAsync(string messageId);
+        Task<Result> DeleteOwnMessageByMessageIdAsync(string messageId);
     }
 }
