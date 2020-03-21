@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Apartments.Domain
 {
-    class AddApartment
+    public class AddApartment
     {
         public string OwnerId { get; set; }
         public bool IsOpen { get; set; }
