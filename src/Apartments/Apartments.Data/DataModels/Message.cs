@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Apartments.Data.DataModels
 {
-    class Message
+    public class Message
     {
         public string Id { get; set; }
 
