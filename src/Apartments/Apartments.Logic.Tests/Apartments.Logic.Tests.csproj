@@ -21,4 +21,8 @@
       <ProjectReference Include="..\Apartments.Domain\Apartments.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="AdminTests\" />
+    </ItemGroup>
+
 </Project>

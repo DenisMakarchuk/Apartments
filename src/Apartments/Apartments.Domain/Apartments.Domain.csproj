@@ -8,4 +8,9 @@
       <ProjectReference Include="..\Apartments.Common\Apartments.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ModelsForCteate\" />
+      <Folder Include="Models\" />
+    </ItemGroup>
+
 </Project>
