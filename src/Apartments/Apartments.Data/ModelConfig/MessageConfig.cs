@@ -19,11 +19,11 @@ namespace Apartments.Data.ModelConfig
             builder.HasKey(_ => _.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
 
-            builder.HasOne(_ => _.Destination).WithMany(_ => _.Messages)
+            builder.HasOne(_ => _.Destination).WithMany(_ => _.ReceivedMessages)
                 .HasForeignKey(_ => _.DestinationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(_ => _.Author).WithMany(_ => _.Messages)
+            builder.HasOne(_ => _.Author).WithMany(_ => _.SentMessages)
                 .HasForeignKey(_ => _.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
