@@ -6,10 +6,13 @@ namespace Apartments.Data.DataModels
 {
     public class Order
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
-        public string ApartmentId { get; set; }
-        public string CustomerId { get; set; }
+        public Guid ApartmentId { get; set; }
+        public Apartment Apartment { get; set; }
+
+        public Guid CustomerId { get; set; }
+        public User Customer { get; set; }
 
         public HashSet<DateTime> Dates { get; set; }
 

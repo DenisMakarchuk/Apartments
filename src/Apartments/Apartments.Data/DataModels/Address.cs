@@ -6,13 +6,17 @@ namespace Apartments.Data.DataModels
 {
     public class Address
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
-        public string CountryId { get; set; }
+        public Guid CountryId { get; set; }
+        public Country Country { get; set; }
+
+        public Guid ApartmentId { get; set; }
+        public Apartment Apartment { get; set; }
 
         public string City { get; set; }
         public string Street { get; set; }
-        public int? HomeNumber { get; set; }
+        public string Home { get; set; }
         public int? NumberOfApartment { get; set; }
     }
 }

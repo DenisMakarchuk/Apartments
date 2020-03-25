@@ -6,11 +6,14 @@ namespace Apartments.Data.DataModels
 {
     public class Apartment
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
-        public string AddressId { get; set; }
+        public Guid AddressId { get; set; }
+        public Address Address { get; set; }
 
-        public string OwnerId { get; set; }
+        public Guid OwnerId { get; set; }
+        public User Owner { get; set; }
+
         public bool? IsOpen { get; set; } = false;
         public int? Price { get; set; }
 

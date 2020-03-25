@@ -6,7 +6,7 @@ namespace Apartments.Data.DataModels
 {
     public class User
     {
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 
@@ -14,7 +14,8 @@ namespace Apartments.Data.DataModels
 
         public HashSet<Order> Orders { get; set; }
 
-        public HashSet<Message> Messages { get; set; }
+        public HashSet<Message> ReceivedMessages { get; set; }
+        public HashSet<Message> SentMessages { get; set; }
 
         public HashSet<Comment> Comments { get; set; }
 
