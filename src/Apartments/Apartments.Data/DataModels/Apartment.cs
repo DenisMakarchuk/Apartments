@@ -8,6 +8,8 @@ namespace Apartments.Data.DataModels
     {
         public string Id { get; set; }
 
+        public string AddressId { get; set; }
+
         public string OwnerId { get; set; }
         public bool? IsOpen { get; set; } = false;
         public int? Price { get; set; }

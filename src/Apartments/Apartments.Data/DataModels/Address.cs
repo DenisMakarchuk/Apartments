@@ -8,8 +8,11 @@ namespace Apartments.Data.DataModels
     {
         public string Id { get; set; }
 
-        public string Country { get; set; }
+        public string CountryId { get; set; }
 
-        public HashSet<AddressPart> AddressParts { get; set; }
+        public string City { get; set; }
+        public string Street { get; set; }
+        public int? HomeNumber { get; set; }
+        public int? NumberOfApartment { get; set; }
     }
 }
