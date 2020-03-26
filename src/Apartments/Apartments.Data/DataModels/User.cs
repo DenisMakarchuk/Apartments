@@ -14,9 +14,6 @@ namespace Apartments.Data.DataModels
 
         public HashSet<Order> Orders { get; set; }
 
-        public HashSet<Message> ReceivedMessages { get; set; }
-        public HashSet<Message> SentMessages { get; set; }
-
         public HashSet<Comment> Comments { get; set; }
 
         public DateTime? Update { get; set; } = DateTime.Now;

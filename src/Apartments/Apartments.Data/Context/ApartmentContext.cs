@@ -22,8 +22,6 @@ namespace Apartments.Data.Context
 
         public DbSet<Country> Countries { get; set; }
 
-        public DbSet<Message> Messages { get; set; }
-
         public DbSet<Order> Orders { get; set; }
 
         public DbSet<User> Users { get; set; }
@@ -34,7 +32,6 @@ namespace Apartments.Data.Context
             modelBuilder.ApplyConfiguration(new ApartmentConfig());
             modelBuilder.ApplyConfiguration(new CommentConfig());
             modelBuilder.ApplyConfiguration(new CountryConfig());
-            modelBuilder.ApplyConfiguration(new MessageConfig());
             modelBuilder.ApplyConfiguration(new OrderConfig());
             modelBuilder.ApplyConfiguration(new UserConfig());
         }

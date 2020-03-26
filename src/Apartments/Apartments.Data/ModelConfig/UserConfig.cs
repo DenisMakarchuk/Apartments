@@ -29,14 +29,6 @@ namespace Apartments.Data.ModelConfig
                 .HasForeignKey(_ => _.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasMany(_ => _.SentMessages).WithOne(_ => _.Author)
-                .HasForeignKey(_ => _.AuthorId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasMany(_ => _.ReceivedMessages).WithOne(_ => _.Destination)
-                .HasForeignKey(_ => _.DestinationId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasMany(_ => _.Comments).WithOne(_ => _.Author)
                 .HasForeignKey(_ => _.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
