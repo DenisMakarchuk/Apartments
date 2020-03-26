@@ -17,9 +17,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Admin\AdminServiceInterfaces\" />
       <Folder Include="Admin\AdminService\" />
-      <Folder Include="Users\UserServiceInterfaces\" />
+      <Folder Include="Search\SearchServices\" />
       <Folder Include="Users\UserService\" />
     </ItemGroup>
 
