@@ -11,10 +11,6 @@ namespace Apartments.Domain.User.DTO
     {
         public string Id { get; set; }
 
-        public string ApartmentId { get; set; }
-
-        public string AuthorId { get; set; }
-
         public string Title { get; set; }
         public string Text { get; set; }
 
