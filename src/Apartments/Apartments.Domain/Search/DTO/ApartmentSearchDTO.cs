@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.DTO
+namespace Apartments.Domain.Search.DTO
 {
-    /// <summary>
-    /// Model for working with an existing comment
-    /// </summary>
-    public class CommentDTO
+    public class ApartmentSearchDTO
     {
         public string Id { get; set; }
 
-        public string AuthorId { get; set; }
+        public bool IsOpen { get; set; }
+        public int Price { get; set; }
+
+        public int NumberOfRooms { get; set; }
+        public int Area { get; set; }
 
         public string Title { get; set; }
         public string Text { get; set; }

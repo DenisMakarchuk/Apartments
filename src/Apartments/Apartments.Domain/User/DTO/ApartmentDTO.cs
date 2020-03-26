@@ -11,6 +11,8 @@ namespace Apartments.Domain.User.DTO
     {
         public string Id { get; set; }
 
+        public string OwnerId { get; set; }
+
         public bool IsOpen { get; set; }
         public int Price { get; set; }
 
