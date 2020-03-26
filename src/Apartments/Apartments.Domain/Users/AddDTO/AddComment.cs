@@ -2,20 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.DTO
+namespace Apartments.Domain.Users.AddDTO
 {
     /// <summary>
-    /// Model for working with an existing comment
+    /// Model for adding a comment
     /// </summary>
-    public class CommentDTO
+    public class AddComment
     {
-        public string Id { get; set; }
+        public string ApartmentId { get; set; }
 
         public string AuthorId { get; set; }
 
         public string Title { get; set; }
         public string Text { get; set; }
-
-        public DateTime Update { get; set; }
     }
 }

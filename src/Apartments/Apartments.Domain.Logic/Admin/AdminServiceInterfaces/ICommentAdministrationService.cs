@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
 {
+    /// <summary>
+    /// Methods of Administrator work with User Comments
+    /// </summary>
     public interface ICommentAdministrationService
     {
         Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByUserId(string userId);

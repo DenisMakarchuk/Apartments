@@ -1,6 +1,6 @@
 ﻿using Apartments.Common;
-using Apartments.Domain.User.AddDTO;
-using Apartments.Domain.User.DTO;
+using Apartments.Domain.Users.AddDTO;
+using Apartments.Domain.Users.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;

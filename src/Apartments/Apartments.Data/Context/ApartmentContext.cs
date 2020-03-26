@@ -9,6 +9,11 @@ namespace Apartments.Data.Context
 {
     public class ApartmentContext : DbContext
     {
+        public ApartmentContext()
+        {
+
+        }
+
         public ApartmentContext(DbContextOptions<ApartmentContext> options) : base(options)
         {
             Database.EnsureCreated();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.AddDTO
+namespace Apartments.Domain.Users.AddDTO
 {
     /// <summary>
     /// Model for adding an address

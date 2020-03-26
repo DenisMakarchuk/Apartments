@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.DTO
+namespace Apartments.Domain.Users.DTO
 {
     /// <summary>
     /// Model for working with an existing address

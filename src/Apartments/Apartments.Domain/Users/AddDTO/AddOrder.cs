@@ -2,21 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.DTO
+namespace Apartments.Domain.Users.AddDTO
 {
     /// <summary>
-    /// Model for working with an existing order
+    /// Model for order adding
     /// </summary>
-    public class OrderDTO
+    public class AddOrder
     {
-        public string Id { get; set; }
-
         public string ApartmentId { get; set; }
 
         public string CustomerId { get; set; }
 
         public IEnumerable<DateTime> Dates { get; set; }
-
-        public DateTime Update { get; set; }
     }
 }

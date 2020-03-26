@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.DTO
+namespace Apartments.Domain.Users.AddDTO
 {
     /// <summary>
-    /// Model for working with an existing apartment
+    /// Model for adding an apartment
     /// </summary>
-    public class ApartmentDTO
+    public class AddApartment
     {
-        public string Id { get; set; }
+        public string AddressId { get; set; }
 
         public string OwnerId { get; set; }
 
@@ -21,7 +21,5 @@ namespace Apartments.Domain.User.DTO
 
         public string Title { get; set; }
         public string Text { get; set; }
-
-        public DateTime Update { get; set; }
     }
 }

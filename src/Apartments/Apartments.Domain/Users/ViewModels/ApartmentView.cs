@@ -1,14 +1,12 @@
-﻿using Apartments.Domain.User.DTO;
+﻿using Apartments.Domain.Users.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.ViewModels
+namespace Apartments.Domain.Users.ViewModels
 {
-    public class OrderView
+    public class ApartmentView
     {
-        public OrderDTO Order { get; set; }
-
         public ApartmentDTO Apartment { get; set; }
 
         public AddressDTO Address { get; set; }

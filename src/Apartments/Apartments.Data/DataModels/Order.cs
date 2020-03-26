@@ -14,7 +14,7 @@ namespace Apartments.Data.DataModels
         public Guid CustomerId { get; set; }
         public User Customer { get; set; }
 
-        public HashSet<DateTime> Dates { get; set; }
+        ///public HashSet<DateTime> Dates { get; set; }
 
         public DateTime? Update { get; set; } = DateTime.Now;
     }

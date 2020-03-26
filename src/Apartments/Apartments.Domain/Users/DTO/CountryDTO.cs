@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.User.AddDTO
+namespace Apartments.Domain.Users.DTO
 {
     /// <summary>
-    /// Model for user adding
+    /// Model for working with an existing country
     /// </summary>
-    public class AddUser
+    public class CountryDTO
     {
+        public string Id { get; set; }
+
         public string Name { get; set; }
     }
 }
