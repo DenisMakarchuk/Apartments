@@ -17,6 +17,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
     public class UserAdministrationService_Tests
     {
         static Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+        List<User> _users;
         IMapper _mapper;
 
         public UserAdministrationService_Tests()
@@ -27,29 +28,96 @@ namespace Apartments.Logic.Tests.AdminServiceTests
             });
 
             _mapper = new Mapper(mapperConfig);
+
+            _users = _fakeUser.Generate(3);
         }
 
         [Fact]
-        public void GetAllUsersTest()
+        public void GetAllUsersAsync_Positive_Test()
         {
             var options = new DbContextOptionsBuilder<ApartmentContext>()
-                .UseInMemoryDatabase(databaseName: "GetAllUsersTest")
+                .UseInMemoryDatabase(databaseName: "GetAllUsersAsync_Positive_Test")
                 .Options;
 
-            // Run the test against one instance of the context
             using (var context = new ApartmentContext(options))
             {
-                context.AddRange(_fakeUser.Generate(3));
+                context.AddRange(_users);
                 context.SaveChanges();
             }
 
-            // Use a separate instance of the context to verify correct data was saved to database
             using (var context = new ApartmentContext(options))
             {
                 var service = new UserAdministrationService(context, _mapper);
-                var result = service.GetAll();
 
-                result.Result.ToList().Should().NotBeNull();
+                var result = service.GetAllUsersAsync();
+
+                foreach (var item in _users)
+                {
+                    var itemFromResult = result.Result.Where(_ => _.Name.Equals(item.Name)).Select(_ => _).FirstOrDefault();
+
+                    itemFromResult.Should().NotBeNull();
+                    Guid.TryParse(itemFromResult.Id.ToString(), out var _).Should().BeTrue();
+                }
+            }
+        }
+
+        [Fact]
+        public void GetUserByIdAsync_PositiveAndNegative_Test()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetUserByIdAsync_PositiveAndNegative_Test")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_users);
+                context.SaveChanges();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var user = _users.FirstOrDefault();
+
+                var service = new UserAdministrationService(context, _mapper);
+
+                var resultPositive = service.GetUserByIdAsync(user.Id.ToString());
+                var resultNegative = service.GetUserByIdAsync(new Guid().ToString());
+
+                resultPositive.Result.IsSuccess.Should().BeTrue();
+                resultPositive.Result.Data.Name.Should().BeEquivalentTo(user.Name);
+
+                resultNegative.Result.IsSuccess.Should().BeFalse();
+                resultNegative.Result.Data.Should().BeNull();
+            }
+        }
+
+        [Fact]
+        public void DeleteUserByIdAsync_PositiveAndNegative_Test()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "DeleteUserByIdAsync_PositiveAndNegative_Test")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_users);
+                context.SaveChanges();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var user = _users.FirstOrDefault();
+
+                var service = new UserAdministrationService(context, _mapper);
+
+                var resultPositive = service.DeleteUserByIdAsync(user.Id.ToString());
+                var resultNegative = service.DeleteUserByIdAsync(new Guid().ToString());
+
+                resultPositive.Result.IsSuccess.Should().BeTrue();
+                resultPositive.Result.Message.Should().BeNull();
+
+                resultNegative.Result.IsSuccess.Should().BeFalse();
+                resultNegative.Result.Message.Should().Contain("User was not found");
             }
         }
     }
