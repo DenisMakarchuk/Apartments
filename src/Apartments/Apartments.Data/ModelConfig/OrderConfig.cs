@@ -27,7 +27,9 @@ namespace Apartments.Data.ModelConfig
                 .HasForeignKey(_ => _.CustomerId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            //builder.Property(_ => _.Dates).IsRequired();
+            builder.HasMany(_ => _.Dates).WithOne(_ => _.Order)
+                .HasForeignKey(_ => _.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

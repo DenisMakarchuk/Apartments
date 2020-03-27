@@ -31,6 +31,8 @@ namespace Apartments.Data.Context
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<BusyDate> BusyDates { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new AddressConfig());
@@ -39,6 +41,7 @@ namespace Apartments.Data.Context
             modelBuilder.ApplyConfiguration(new CountryConfig());
             modelBuilder.ApplyConfiguration(new OrderConfig());
             modelBuilder.ApplyConfiguration(new UserConfig());
+            modelBuilder.ApplyConfiguration(new DatesConfig());
         }
     }
 }
