@@ -10,11 +10,11 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
 {
     public interface ICommentUserService
     {
-        Task<Result<CommentDTO>> CreateComment(AddComment comment);
-        Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByUserId(string userId);
-        Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByApartmentId(string apartmentId);
-        Task<Result<CommentDTO>> GetCommentById(string orderId);
-        Task<Result<CommentDTO>> UpdateComment(CommentDTO comment);
-        Task<Result> DeleteCommentById(string id);
+        Task<Result<CommentDTO>> CreateCommentAsync(AddComment comment);
+        Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByUserIdAsync(string userId);
+        Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByApartmentIdAsync(string apartmentId);
+        Task<Result<CommentDTO>> GetCommentByIdAsync(string orderId);
+        Task<Result<CommentDTO>> UpdateCommentAsync(CommentDTO comment);
+        Task<Result> DeleteCommentByIdAsync(string id);
     }
 }

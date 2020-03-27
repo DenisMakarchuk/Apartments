@@ -16,20 +16,20 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Get all Users from the database
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<UserDTOAdministration>> GetAll();
+        Task<IEnumerable<UserDTOAdministration>> GetAllUsersAsync();
 
         /// <summary>
         /// Get User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result<UserDTOAdministration>> GetUserById(string id);
+        Task<Result<UserDTOAdministration>> GetUserByIdAsync(string id);
 
         /// <summary>
         /// Delete User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteUserById(string id);
+        Task<Result> DeleteUserByIdAsync(string id);
     }
 }

@@ -9,7 +9,7 @@ namespace Apartments.Domain.Logic.Search.SearchServiceInterfaces
 {
     public interface IApartmentSearchService
     {
-        Task<Result<IEnumerable<ApartmentSearchView>>> GetAllApartments();
-        Task<Result<ApartmentSearchView>> GetApartmentById(string apartmentId);
+        Task<Result<IEnumerable<ApartmentSearchView>>> GetAllApartmentsAsync();
+        Task<Result<ApartmentSearchView>> GetApartmentByIdAsync(string apartmentId);
     }
 }

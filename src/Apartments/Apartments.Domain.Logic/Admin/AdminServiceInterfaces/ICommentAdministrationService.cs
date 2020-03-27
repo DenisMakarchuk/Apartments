@@ -12,10 +12,10 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
     /// </summary>
     public interface ICommentAdministrationService
     {
-        Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByUserId(string userId);
-        Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentId(string apartmentId);
-        Task<Result<CommentDTOAdministration>> GetCommentById(string commentId);
-        Task<Result<CommentDTOAdministration>> UpdateComment(CommentDTOAdministration comment);
-        Task<Result> DeleteCommentById(string id);
+        Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByUserIdAsync(string userId);
+        Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentIdAsync(string apartmentId);
+        Task<Result<CommentDTOAdministration>> GetCommentByIdAsync(string commentId);
+        Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment);
+        Task<Result> DeleteCommentByIdAsync(string id);
     }
 }

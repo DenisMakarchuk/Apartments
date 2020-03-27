@@ -10,9 +10,13 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using System.Collections.Generic;
+using Apartments.Data.DataModels;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
 {
+    /// <summary>
+    /// Methods of Administrator work with Users
+    /// </summary>
     public class UserAdministrationService : IUserAdministrationService
     {
         private readonly ApartmentContext _db;
@@ -24,21 +28,78 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UserDTOAdministration>> GetAll()
+        /// <summary>
+        /// Get all Users from the database
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<UserDTOAdministration>> GetAllUsersAsync()
         {
             var users = await _db.Users.AsNoTracking().ToListAsync().ConfigureAwait(false);
 
             return _mapper.Map<IEnumerable<UserDTOAdministration>>(users);
         }
 
-        public Task<Result<UserDTOAdministration>> GetUserById(string id)
+        /// <summary>
+        /// Get User by User Id. Id must be verified to convert to Guid at the web level 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Result<UserDTOAdministration>> GetUserByIdAsync(string id)
         {
-            throw new NotImplementedException();
-        }        
-        
-        public Task<Result> DeleteUserById(string id)
+            Guid userId = Guid.Parse(id);
+
+            try
+            {
+                var user = await _db.Users.Where(_ => _.Id == userId).FirstOrDefaultAsync().ConfigureAwait(false);
+
+                if (user is null)
+                {
+                    return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
+                        .Fail($"User was not found");
+
+                }
+
+                return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
+                    .Ok(_mapper.Map<UserDTOAdministration>(user));
+            }
+            catch (NullReferenceException ex)
+            {
+                return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
+                    .Fail($"Source is null. {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Delete User by User Id. Id must be verified to convert to Guid at the web level
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<Result> DeleteUserByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            Guid userId = Guid.Parse(id);
+
+            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_=>_.Id == userId);
+
+            if (user is null)
+            {
+                return await Task.FromResult(Result.Fail("User was not found"));
+            }
+
+            try
+            {
+                _db.Users.Remove(user);
+                await _db.SaveChangesAsync().ConfigureAwait(false);
+
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete model. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete model. {ex.Message}"));
+            }
         }
     }
 }
