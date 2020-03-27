@@ -24,19 +24,19 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UserDTOAdministration>> GetAll()
+        public async Task<IEnumerable<UserDTOAdministration>> GetAllUsersAsync()
         {
             var users = await _db.Users.AsNoTracking().ToListAsync().ConfigureAwait(false);
 
             return _mapper.Map<IEnumerable<UserDTOAdministration>>(users);
         }
 
-        public Task<Result<UserDTOAdministration>> GetUserById(string id)
+        public Task<Result<UserDTOAdministration>> GetUserByIdAsync(string id)
         {
             throw new NotImplementedException();
         }        
         
-        public Task<Result> DeleteUserById(string id)
+        public Task<Result> DeleteUserByIdAsync(string id)
         {
             throw new NotImplementedException();
         }

@@ -11,11 +11,11 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
 {
     public interface IOrderUserService
     {
-        Task<Result<OrderView>> CreateOrder(AddOrder order);
-        Task<Result<IEnumerable<OrderView>>> GetAllOrdersByUserId(string userId);
-        Task<Result<IEnumerable<OrderView>>> GetAllOrdersByApartmentId(string apartmentId);
-        Task<Result<OrderView>> GetOrderById(string orderId);
-        Task<Result<OrderView>> UpdateOrder(OrderView order);
-        Task<Result> DeleteOrderById(string id);
+        Task<Result<OrderView>> CreateOrderAsync(AddOrder order);
+        Task<Result<IEnumerable<OrderView>>> GetAllOrdersByUserIdAsync(string userId);
+        Task<Result<IEnumerable<OrderView>>> GetAllOrdersByApartmentIdAsync(string apartmentId);
+        Task<Result<OrderView>> GetOrderByIdAsync(string orderId);
+        Task<Result<OrderView>> UpdateOrderAsync(OrderView order);
+        Task<Result> DeleteOrderByIdAsync(string id);
     }
 }

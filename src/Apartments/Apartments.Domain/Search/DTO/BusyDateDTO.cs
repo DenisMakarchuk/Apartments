@@ -4,10 +4,10 @@ using System.Text;
 
 namespace Apartments.Domain.Search.DTO
 {
-    public class OrderSearchDTO
+    public class BusyDateDTO
     {
         public string Id { get; set; }
 
-        public IEnumerable<BusyDateDTO> Dates { get; set; }
+        public DateTime Date { get; set; }
     }
 }

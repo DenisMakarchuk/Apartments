@@ -10,9 +10,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
 {
     public interface IUserService
     {
-        Task<Result<UserDTO>> CreateUser(AddUser user);
-        Task<Result<UserDTO>> GetUserById(string id);
-        Task<Result<UserDTO>> UpdateUser(UserDTO user);
-        Task<Result> DeleteUserById(string id);
+        Task<Result<UserDTO>> CreateUserAsync(AddUser user);
+        Task<Result<UserDTO>> GetUserByIdAsync(string id);
+        Task<Result<UserDTO>> UpdateUserAsync(UserDTO user);
+        Task<Result> DeleteUserByIdAsync(string id);
     }
 }
