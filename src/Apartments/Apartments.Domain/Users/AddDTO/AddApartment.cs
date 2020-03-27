@@ -14,7 +14,7 @@ namespace Apartments.Domain.Users.AddDTO
         public string OwnerId { get; set; }
 
         public bool IsOpen { get; set; }
-        public int Price { get; set; }
+        public decimal Price { get; set; }
 
         public int NumberOfRooms { get; set; }
         public int Area { get; set; }

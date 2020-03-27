@@ -16,7 +16,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 {
     public class UserAdministrationService_Tests
     {
-        static Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
         List<User> _users;
         IMapper _mapper;
 
