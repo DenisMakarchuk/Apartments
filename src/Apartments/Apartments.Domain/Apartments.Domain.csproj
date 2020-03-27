@@ -5,6 +5,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <Compile Remove="ModelsForCteate\**" />
+      <Compile Remove="Models\**" />
+      <EmbeddedResource Remove="ModelsForCteate\**" />
+      <EmbeddedResource Remove="Models\**" />
+      <None Remove="ModelsForCteate\**" />
+      <None Remove="Models\**" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Apartments.Common\Apartments.Common.csproj" />
     </ItemGroup>
 
