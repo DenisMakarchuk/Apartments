@@ -34,7 +34,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <returns></returns>
         public async Task<IEnumerable<UserDTOAdministration>> GetAllUsersAsync()
         {
-            var users = await _db.Users.AsNoTracking().ToListAsync().ConfigureAwait(false);
+            var users = await _db.Users.AsNoTracking().ToListAsync();
 
             return _mapper.Map<IEnumerable<UserDTOAdministration>>(users);
         }
@@ -50,7 +50,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             try
             {
-                var user = await _db.Users.Where(_ => _.Id == userId).FirstOrDefaultAsync().ConfigureAwait(false);
+                var user = await _db.Users.Where(_ => _.Id == userId).AsNoTracking().FirstOrDefaultAsync();
 
                 if (user is null)
                 {
@@ -88,17 +88,17 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             try
             {
                 _db.Users.Remove(user);
-                await _db.SaveChangesAsync().ConfigureAwait(false);
+                await _db.SaveChangesAsync();
 
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete model. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete model. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
             }
         }
     }

@@ -15,7 +15,7 @@ namespace Apartments.Data.DataModels
         public User Owner { get; set; }
 
         public bool? IsOpen { get; set; } = false;
-        public int? Price { get; set; }
+        public decimal? Price { get; set; }
 
         public int? NumberOfRooms { get; set; }
         public int? Area { get; set; }

@@ -11,7 +11,9 @@ namespace Apartments.Domain.Logic
     {
         public MapperLogicModule()
         {
-            CreateMap<UserDTOAdministration, User>();
+            CreateMap<UserDTOAdministration, User>().ReverseMap();
+
+            CreateMap<CommentDTOAdministration, Comment>().ReverseMap();
         }
     }
 }
