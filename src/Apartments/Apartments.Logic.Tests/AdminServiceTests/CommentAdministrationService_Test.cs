@@ -47,7 +47,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
         }
 
         [Fact]
-        public void GetAllCommentsByUserIdAsync_PositiveAndNegative_Test()
+        public async void GetAllCommentsByUserIdAsync_PositiveAndNegative_TestAsync()
         {
             var options = new DbContextOptionsBuilder<ApartmentContext>()
                 .UseInMemoryDatabase(databaseName: "GetAllCommentsByUserIdAsync_PositiveAndNegative_Test")
@@ -58,7 +58,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
             using (var context = new ApartmentContext(options))
             {
                 context.AddRange(_users);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 userWithComments = context.Users.AsNoTracking().FirstOrDefault();
 
@@ -68,28 +68,175 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 }
 
                 context.AddRange(_comments);
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
 
             using (var context = new ApartmentContext(options))
             {
                 var service = new CommentAdministrationService(context, _mapper);
 
-                var commentsInBase = context.Comments.AsNoTracking().ToList();
-                var userWithoutComments = context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefault();
+                var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
+                var userWithoutComments = await context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefaultAsync();
 
-                var resultPositive = service.GetAllCommentsByUserIdAsync(userWithComments.Id.ToString());
-                var resultNegative = service.GetAllCommentsByUserIdAsync(userWithoutComments.Id.ToString());
+                var resultPositive = await service.GetAllCommentsByUserIdAsync(userWithComments.Id.ToString());
+                //var resultNegative = await service.GetAllCommentsByUserIdAsync(userWithoutComments.Id.ToString());
 
                 foreach (var item in commentsInBase)
                 {
-                    resultPositive.Result.Data
+                    resultPositive.Data
                         .Where(_=>_.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
 
-                resultNegative.Result.IsSuccess.Should().BeFalse();
+                //resultNegative.IsSuccess.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async void GetAllCommentsByApartmentIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetAllCommentsByApartmentIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            Apartment apartmentWithComments;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
+
+                apartmentWithComments = context.Apartments.AsNoTracking().FirstOrDefault();
+
+                foreach (var item in _comments)
+                {
+                    item.ApartmentId = apartmentWithComments.Id;
+                }
+
+                context.AddRange(_comments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new CommentAdministrationService(context, _mapper);
+
+                var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
+                var apartmentWithoutComments = context.Apartments.Where(_ => _.Id != apartmentWithComments.Id).FirstOrDefault();
+
+                var resultPositive = await service.GetAllCommentsByApartmentIdAsync(apartmentWithComments.Id.ToString());
+                //var resultNegative = await service.GetAllCommentsByApartmentIdAsync(apartmentWithoutComments.Id.ToString());
+
+                foreach (var item in commentsInBase)
+                {
+                    resultPositive.Data
+                        .Where(_ => _.Id == item.Id.ToString())
+                        .FirstOrDefault()
+                        .Should().NotBeNull();
+                }
+
+                //resultNegative.IsSuccess.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async void GetCommentByIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetCommentByIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_comments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
+
+                var service = new CommentAdministrationService(context, _mapper);
+
+                var resultPositive = await service.GetCommentByIdAsync(comment.Id.ToString());
+                //var resultNegative = await service.GetCommentByIdAsync(new Guid().ToString());
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.Title.Should().BeEquivalentTo(comment.Title);
+
+                //resultNegative.IsSuccess.Should().BeFalse();
+                //resultNegative.Data.Should().BeNull();
+            }
+        }
+
+        [Fact]
+        public async void UpdateCommentAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "UpdateCommentAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_comments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
+
+                var service = new CommentAdministrationService(context, _mapper);
+
+                CommentDTOAdministration newComment = new CommentDTOAdministration()
+                {
+                    Id = comment.Id.ToString(),
+                    Title = "newTitle",
+                    Text = "newText"
+                };
+
+
+
+                var resultPositive = await service.UpdateCommentAsync(newComment);
+                //var resultNegative = await service.UpdateCommentAsync(new Guid().ToString());
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.Title.Should().BeEquivalentTo(newComment.Title);
+                resultPositive.Data.Title.Should().NotBeEquivalentTo(comment.Title);
+
+                //resultNegative.IsSuccess.Should().BeFalse();
+                //resultNegative.Data.Should().BeNull();
+            }
+        }
+
+        [Fact]
+        public async void DeleteCommentByIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "DeleteCommentByIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_comments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
+
+                var service = new CommentAdministrationService(context, _mapper);
+
+                var resultPositive = await service.DeleteCommentByIdAsync(comment.Id.ToString());
+                var resultNegative = await service.DeleteCommentByIdAsync(new Guid().ToString());
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Message.Should().BeNull();
+
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Message.Should().Contain("Comment was not found");
             }
         }
     }

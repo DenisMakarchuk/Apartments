@@ -16,6 +16,6 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentIdAsync(string apartmentId);
         Task<Result<CommentDTOAdministration>> GetCommentByIdAsync(string commentId);
         Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment);
-        Task<Result> DeleteCommentByIdAsync(string id);
+        Task<Result> DeleteCommentByIdAsync(string commentId);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Apartments.Common;
 using Apartments.Data.Context;
+using Apartments.Data.DataModels;
 using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using AutoMapper;
@@ -30,7 +31,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             try
             {
                 var comments = await _db.Comments.Where(_ => _.AuthorId == athorId).Select(_ => _)
-                    .AsNoTracking().ToListAsync().ConfigureAwait(false);
+                    .AsNoTracking().ToListAsync();
 
                 if (!comments.Any())
                 {
@@ -48,24 +49,112 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             }
         }
 
-        public Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentIdAsync(string apartmentId)
+        public async Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentIdAsync(string apartmentId)
         {
-            throw new NotImplementedException();
+            Guid id = Guid.Parse(apartmentId);
+
+            try
+            {
+                var comments = await _db.Comments.Where(_ => _.ApartmentId == id).Select(_ => _)
+                    .AsNoTracking().ToListAsync();
+
+                if (!comments.Any())
+                {
+                    return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
+                        .Fail("This Apartment haven't Comments");
+                }
+
+                return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
+                    .Ok(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments));
+            }
+            catch (NullReferenceException ex)
+            {
+                return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
+                    .Fail($"Source is null. {ex.Message}");
+            }
         }
 
-        public Task<Result<CommentDTOAdministration>> GetCommentByIdAsync(string commentId)
+        public async Task<Result<CommentDTOAdministration>> GetCommentByIdAsync(string commentId)
         {
-            throw new NotImplementedException();
+            Guid id = Guid.Parse(commentId);
+
+            try
+            {
+                var user = await _db.Comments.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+
+                if (user is null)
+                {
+                    return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
+                        .Fail($"Comment was not found");
+                }
+
+                return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
+                    .Ok(_mapper.Map<CommentDTOAdministration>(user));
+            }
+            catch (NullReferenceException ex)
+            {
+                return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
+                    .Fail($"Source is null. {ex.Message}");
+            }
         }
 
-        public Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment)
+        public async Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment)
         {
-            throw new NotImplementedException();
-        }       
-        
-        public Task<Result> DeleteCommentByIdAsync(string id)
+            comment.Update = DateTime.Now;
+            Comment commentForUpdate = _mapper.Map<Comment>(comment);
+
+            _db.Comments.Attach(commentForUpdate);
+
+            _db.Entry(commentForUpdate).Property(c => c.Title).IsModified = true;
+            _db.Entry(commentForUpdate).Property(c => c.Text).IsModified = true;
+
+            _db.Entry(commentForUpdate).Property(c => c.Update).IsModified = true;
+
+            try
+            {
+                await _db.SaveChangesAsync();
+
+                return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
+                    .Ok(comment);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
+                    .Fail($"Cannot delete model. {ex.Message}");
+            }
+            catch (DbUpdateException ex)
+            {
+                return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
+                    .Fail($"Cannot delete model. {ex.Message}");
+            }
+        }
+
+        public async Task<Result> DeleteCommentByIdAsync(string commentId)
         {
-            throw new NotImplementedException();
+            Guid id = Guid.Parse(commentId);
+
+            var comment = await _db.Comments.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+
+            if (comment is null)
+            {
+                return await Task.FromResult(Result.Fail("Comment was not found"));
+            }
+
+            try
+            {
+                _db.Comments.Remove(comment);
+                await _db.SaveChangesAsync();
+
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete Comment. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot delete Comment. {ex.Message}"));
+            }
         }
     }
 }
