@@ -79,7 +79,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 var userWithoutComments = await context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefaultAsync();
 
                 var resultPositive = await service.GetAllCommentsByUserIdAsync(userWithComments.Id.ToString());
-                //var resultNegative = await service.GetAllCommentsByUserIdAsync(userWithoutComments.Id.ToString());
+                var resultNegative = await service.GetAllCommentsByUserIdAsync(userWithoutComments.Id.ToString());
 
                 foreach (var item in commentsInBase)
                 {
@@ -89,7 +89,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                         .Should().NotBeNull();
                 }
 
-                //resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.IsSuccess.Should().BeFalse();
             }
         }
 
@@ -126,7 +126,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 var apartmentWithoutComments = context.Apartments.Where(_ => _.Id != apartmentWithComments.Id).FirstOrDefault();
 
                 var resultPositive = await service.GetAllCommentsByApartmentIdAsync(apartmentWithComments.Id.ToString());
-                //var resultNegative = await service.GetAllCommentsByApartmentIdAsync(apartmentWithoutComments.Id.ToString());
+                var resultNegative = await service.GetAllCommentsByApartmentIdAsync(apartmentWithoutComments.Id.ToString());
 
                 foreach (var item in commentsInBase)
                 {
@@ -136,7 +136,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                         .Should().NotBeNull();
                 }
 
-                //resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.IsSuccess.Should().BeFalse();
             }
         }
 
@@ -160,13 +160,13 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 var service = new CommentAdministrationService(context, _mapper);
 
                 var resultPositive = await service.GetCommentByIdAsync(comment.Id.ToString());
-                //var resultNegative = await service.GetCommentByIdAsync(new Guid().ToString());
+                var resultNegative = await service.GetCommentByIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.Title.Should().BeEquivalentTo(comment.Title);
 
-                //resultNegative.IsSuccess.Should().BeFalse();
-                //resultNegative.Data.Should().BeNull();
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeNull();
             }
         }
 
@@ -189,24 +189,28 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
                 var service = new CommentAdministrationService(context, _mapper);
 
-                CommentDTOAdministration newComment = new CommentDTOAdministration()
+                CommentDTOAdministration updateComment = new CommentDTOAdministration()
                 {
                     Id = comment.Id.ToString(),
                     Title = "newTitle",
                     Text = "newText"
                 };
 
+                CommentDTOAdministration failComment = new CommentDTOAdministration()
+                {
+                    Id = new Guid().ToString(),
+                    Title = "newTitle",
+                    Text = "newText"
+                };
 
-
-                var resultPositive = await service.UpdateCommentAsync(newComment);
-                //var resultNegative = await service.UpdateCommentAsync(new Guid().ToString());
+                var resultPositive = await service.UpdateCommentAsync(updateComment);
+                var resultNegative = await service.UpdateCommentAsync(failComment);
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Title.Should().BeEquivalentTo(newComment.Title);
+                resultPositive.Data.Title.Should().BeEquivalentTo(updateComment.Title);
                 resultPositive.Data.Title.Should().NotBeEquivalentTo(comment.Title);
 
-                //resultNegative.IsSuccess.Should().BeFalse();
-                //resultNegative.Data.Should().BeNull();
+                resultNegative.IsSuccess.Should().BeFalse();
             }
         }
 

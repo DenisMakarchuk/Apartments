@@ -36,7 +36,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .Fail("This User haven't Comments");
+                        .Fail<IEnumerable<CommentDTOAdministration>>("This User haven't Comments");
                 }
 
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
@@ -45,7 +45,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             catch (NullReferenceException ex)
             {
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                    .Fail($"Source is null. {ex.Message}");
+                    .Fail<IEnumerable<CommentDTOAdministration>>($"Source is null. {ex.Message}");
             }
         }
 
@@ -61,7 +61,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .Fail("This Apartment haven't Comments");
+                        .Fail<IEnumerable<CommentDTOAdministration>>("This Apartment haven't Comments");
                 }
 
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
@@ -70,7 +70,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             catch (NullReferenceException ex)
             {
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                    .Fail($"Source is null. {ex.Message}");
+                    .Fail<IEnumerable<CommentDTOAdministration>>($"Source is null. {ex.Message}");
             }
         }
 
@@ -85,7 +85,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (user is null)
                 {
                     return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
-                        .Fail($"Comment was not found");
+                        .Fail<CommentDTOAdministration>($"Comment was not found");
                 }
 
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
@@ -94,7 +94,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             catch (NullReferenceException ex)
             {
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
-                    .Fail($"Source is null. {ex.Message}");
+                    .Fail<CommentDTOAdministration>($"Source is null. {ex.Message}");
             }
         }
 
@@ -102,8 +102,6 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         {
             comment.Update = DateTime.Now;
             Comment commentForUpdate = _mapper.Map<Comment>(comment);
-
-            _db.Comments.Attach(commentForUpdate);
 
             _db.Entry(commentForUpdate).Property(c => c.Title).IsModified = true;
             _db.Entry(commentForUpdate).Property(c => c.Text).IsModified = true;
@@ -120,12 +118,12 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             catch (DbUpdateConcurrencyException ex)
             {
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
-                    .Fail($"Cannot delete model. {ex.Message}");
+                    .Fail<CommentDTOAdministration>($"Cannot update model. {ex.Message}");
             }
             catch (DbUpdateException ex)
             {
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
-                    .Fail($"Cannot delete model. {ex.Message}");
+                    .Fail<CommentDTOAdministration>($"Cannot update model. {ex.Message}");
             }
         }
 

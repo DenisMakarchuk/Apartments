@@ -32,11 +32,19 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get all Users from the database
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<UserDTOAdministration>> GetAllUsersAsync()
+        public async Task<Result<IEnumerable<UserDTOAdministration>>> GetAllUsersAsync()
         {
             var users = await _db.Users.AsNoTracking().ToListAsync();
 
-            return _mapper.Map<IEnumerable<UserDTOAdministration>>(users);
+            if (!users.Any())
+            {
+                return (Result<IEnumerable<UserDTOAdministration>>)Result<IEnumerable<UserDTOAdministration>>
+                    .Fail<IEnumerable<UserDTOAdministration>>("No Users found");
+
+            }
+
+            return (Result<IEnumerable<UserDTOAdministration>>)Result<IEnumerable<UserDTOAdministration>>
+                .Ok(_mapper.Map<IEnumerable<UserDTOAdministration>>(users));
         }
 
         /// <summary>
@@ -55,7 +63,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (user is null)
                 {
                     return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
-                        .Fail($"User was not found");
+                        .Fail<UserDTOAdministration>($"User was not found");
 
                 }
 
@@ -65,7 +73,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             catch (NullReferenceException ex)
             {
                 return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
-                    .Fail($"Source is null. {ex.Message}");
+                    .Fail<UserDTOAdministration>($"Source is null. {ex.Message}");
             }
         }
 
