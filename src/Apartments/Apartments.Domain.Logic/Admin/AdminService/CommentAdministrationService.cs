@@ -13,6 +13,9 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
 {
+    /// <summary>
+    /// Methods of Administrator work with Comments
+    /// </summary>
     public class CommentAdministrationService : ICommentAdministrationService
     {
         private readonly ApartmentContext _db;
@@ -24,6 +27,11 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all User Comments by User Id. Id must be verified to convert to Guid at the web level
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public async Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByUserIdAsync(string userId)
         {
             Guid athorId = Guid.Parse(userId);
@@ -49,6 +57,11 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             }
         }
 
+        /// <summary>
+        /// Get all Apartment Comments by Apartment Id. Id must be verified to convert to Guid at the web level
+        /// </summary>
+        /// <param name="apartmentId"></param>
+        /// <returns></returns>
         public async Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);
@@ -74,6 +87,11 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             }
         }
 
+        /// <summary>
+        /// Get Comment by Comment Id. Id must be verified to convert to Guid at the web level
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
         public async Task<Result<CommentDTOAdministration>> GetCommentByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
@@ -98,6 +116,11 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             }
         }
 
+        /// <summary>
+        /// Update Comment in DataBase
+        /// </summary>
+        /// <param name="comment"></param>
+        /// <returns></returns>
         public async Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment)
         {
             comment.Update = DateTime.Now;
@@ -127,6 +150,11 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             }
         }
 
+        /// <summary>
+        /// Delete Comment by Comment Id. Id must be verified to convert to Guid at the web level
+        /// </summary>
+        /// <param name="commentId"></param>
+        /// <returns></returns>
         public async Task<Result> DeleteCommentByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
