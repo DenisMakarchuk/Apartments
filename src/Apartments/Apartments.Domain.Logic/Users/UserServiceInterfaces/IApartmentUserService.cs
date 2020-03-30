@@ -29,7 +29,7 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByUserIdAsync(string userId);
 
         /// <summary>
-        /// Get all Apartment by Apartment Id
+        /// Get Apartment by Apartment Id
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>

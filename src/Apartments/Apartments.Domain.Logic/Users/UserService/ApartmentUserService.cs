@@ -36,26 +36,26 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <returns></returns>
         public async Task<Result<ApartmentView>> CreateApartmentAsync(AddApartment apartment)
         {
-            var addingApartment = _mapper.Map<Apartment>(apartment);
+            var addedApartment = _mapper.Map<Apartment>(apartment);
 
-            _db.Apartments.Add(addingApartment);
+            _db.Apartments.Add(addedApartment);
 
             try
             {
                 await _db.SaveChangesAsync();
 
-                Apartment addedApartment = await _db.Apartments.Where(_ => _.OwnerId == addingApartment.OwnerId)
+                Apartment apartmentAfterAdding = await _db.Apartments.Where(_ => _.OwnerId == addedApartment.OwnerId)
                     .Select(_ => _).Include(_ => _.Address.Country).Include(_ => _.Address)
                     .AsNoTracking().FirstOrDefaultAsync();
 
                 ApartmentView view = new ApartmentView()
                 {
 
-                    Apartment = _mapper.Map<ApartmentDTO>(addedApartment),
+                    Apartment = _mapper.Map<ApartmentDTO>(apartmentAfterAdding),
 
-                    Address = _mapper.Map<AddressDTO>(addedApartment.Address),
+                    Address = _mapper.Map<AddressDTO>(apartmentAfterAdding.Address),
 
-                    Country = _mapper.Map<CountryDTO>(addedApartment.Address.Country)
+                    Country = _mapper.Map<CountryDTO>(apartmentAfterAdding.Address.Country)
                 };
 
                 return (Result<ApartmentView>)Result<ApartmentView>
@@ -79,7 +79,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get all Apartments by User Id. Id must be verified to convert to Guid at the web level
+        /// Get all User Apartments by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
@@ -111,7 +111,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get all Apartment by Apartment Id. Id must be verified to convert to Guid at the web level
+        /// Get Apartment by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
