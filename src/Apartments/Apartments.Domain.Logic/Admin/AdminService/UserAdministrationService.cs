@@ -70,7 +70,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
                     .Ok(_mapper.Map<UserDTOAdministration>(user));
             }
-            catch (NullReferenceException ex)
+            catch (ArgumentNullException ex)
             {
                 return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
                     .Fail<UserDTOAdministration>($"Source is null. {ex.Message}");

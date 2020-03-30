@@ -43,7 +43,7 @@ namespace Apartments.Data.Context
             modelBuilder.ApplyConfiguration(new UserConfig());
             modelBuilder.ApplyConfiguration(new DatesConfig());
 
-            modelBuilder.Entity<Country>().HasData(GetCountries());
+            //modelBuilder.Entity<Country>().HasData(GetCountries());
         }
 
         private List<Country> GetCountries()

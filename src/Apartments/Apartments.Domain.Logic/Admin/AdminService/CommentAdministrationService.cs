@@ -50,7 +50,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
                     .Ok(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments));
             }
-            catch (NullReferenceException ex)
+            catch (ArgumentNullException ex)
             {
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
                     .Fail<IEnumerable<CommentDTOAdministration>>($"Source is null. {ex.Message}");
@@ -80,7 +80,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
                     .Ok(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments));
             }
-            catch (NullReferenceException ex)
+            catch (ArgumentNullException ex)
             {
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
                     .Fail<IEnumerable<CommentDTOAdministration>>($"Source is null. {ex.Message}");
@@ -109,7 +109,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
                     .Ok(_mapper.Map<CommentDTOAdministration>(user));
             }
-            catch (NullReferenceException ex)
+            catch (ArgumentNullException ex)
             {
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
                     .Fail<CommentDTOAdministration>($"Source is null. {ex.Message}");

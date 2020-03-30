@@ -48,7 +48,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 cfg.CreateMap<AddAddress, Address>();
                 cfg.CreateMap<AddressDTO, Address>().ReverseMap();
 
-                cfg.CreateMap<CountryDTO, Country>();
+                cfg.CreateMap<CountryDTO, Country>().ReverseMap();
             });
 
             _mapper = new Mapper(mapperConfig);
@@ -67,6 +67,13 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
+
+                context.Add(country);
+
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
             }
@@ -86,7 +93,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                     NumberOfApartment = 1
                 };
 
-                AddApartment apartment = new AddApartment()
+                AddApartment apartmentOk = new AddApartment()
                 {
                     Address = address,
                     Area = 54,
@@ -98,13 +105,79 @@ namespace Apartments.Logic.Tests.UserServiceTests
                     NumberOfRooms = 2
                 };
 
-                var resultPositive = await service.CreateApartmentAsync(apartment);
-                var resultNegative = await service.CreateApartmentAsync(new AddApartment());
+                AddApartment apartmentFail = new AddApartment()
+                {
+                    Address = address,
+                    OwnerId = context.Users.FirstOrDefault().Id.ToString(),
+                };
+
+                var resultPositive = await service.CreateApartmentAsync(apartmentOk);
+                //var resultNegative = await service.CreateApartmentAsync(apartmentFail);
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.Country.Id.Should().BeEquivalentTo(address.CountryId);
                 resultPositive.Data.Address.Street.Should().BeEquivalentTo(address.Street);
-                resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
+                resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartmentOk.Title);
+
+                //resultNegative.IsSuccess.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async void GetAllApartmentByUserIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetAllApartmentByUserIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            User userWithApartments;
+
+            using (var context = new ApartmentContext(options))
+            {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
+
+                context.Add(country);
+
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
+
+                userWithApartments = context.Users.AsNoTracking().FirstOrDefault();
+
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }                
+                
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithApartments.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
+
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new ApartmentUserService(context, _mapper);
+
+                var apartmentsInBase = await context.Apartments.AsNoTracking().ToListAsync();
+                var userWithoutApartments = await context.Users.Where(_ => _.Id != userWithApartments.Id).FirstOrDefaultAsync();
+
+                var resultPositive = await service.GetAllApartmentByUserIdAsync(userWithApartments.Id.ToString());
+                var resultNegative = await service.GetAllApartmentByUserIdAsync(userWithoutApartments.Id.ToString());
+
+                foreach (var item in apartmentsInBase)
+                {
+                    resultPositive.Data
+                        .Where(_ => _.Id == item.Id.ToString())
+                        .FirstOrDefault()
+                        .Should().NotBeNull();
+                }
 
                 resultNegative.IsSuccess.Should().BeFalse();
             }

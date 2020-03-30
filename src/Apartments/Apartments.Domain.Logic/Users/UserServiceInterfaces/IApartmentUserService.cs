@@ -1,5 +1,6 @@
 ﻿using Apartments.Common;
 using Apartments.Domain.Users.AddDTO;
+using Apartments.Domain.Users.DTO;
 using Apartments.Domain.Users.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<ApartmentView>>> GetAllApartmentByUserIdAsync(string userId);
+        Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByUserIdAsync(string userId);
 
         /// <summary>
         /// Get all Apartment by Apartment Id
