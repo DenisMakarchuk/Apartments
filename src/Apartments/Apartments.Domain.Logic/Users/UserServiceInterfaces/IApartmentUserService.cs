@@ -47,6 +47,6 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteApartmentByIdAsync(string id);
+        Task<Result> DeleteApartmentByIdAsync(string apartmentId);
     }
 }

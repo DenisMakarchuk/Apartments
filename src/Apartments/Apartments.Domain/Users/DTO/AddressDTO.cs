@@ -17,7 +17,5 @@ namespace Apartments.Domain.Users.DTO
         public string Street { get; set; }
         public string Home { get; set; }
         public int NumberOfApartment { get; set; }
-
-        public DateTime Update { get; set; }
     }
 }

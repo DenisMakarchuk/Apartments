@@ -3,6 +3,7 @@ using Apartments.Data.DataModels;
 using Apartments.Domain.Logic.Users.UserService;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.DTO;
+using Apartments.Domain.Users.ViewModels;
 using AutoMapper;
 using Bogus;
 using FluentAssertions;
@@ -180,6 +181,193 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 }
 
                 resultNegative.IsSuccess.Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async void GetApartmentByIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetApartmentByIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
+
+                context.Add(country);
+
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
+
+                var userWithApartments = context.Users.AsNoTracking().FirstOrDefault();
+
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithApartments.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
+
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var apartment = await context.Apartments.AsNoTracking().FirstOrDefaultAsync();
+
+                var service = new ApartmentUserService(context, _mapper);
+
+                var resultPositive = await service.GetApartmentByIdAsync(apartment.Id.ToString());
+                var resultNegative = await service.GetApartmentByIdAsync(new Guid().ToString());
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
+                resultPositive.Data.Country.Name.Should().BeEquivalentTo("Litva");
+
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeNull();
+            }
+        }
+
+        [Fact]
+        public async void UpdateApartmentAsync_Positive_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "UpdateApartmentAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                Country[] countries = 
+                {
+                    new Country() { Name = "Litva"},
+                    new Country() { Name = "Poland" }
+                };
+
+                await context.AddRangeAsync(countries);
+
+                await context.AddRangeAsync(_users);
+                await context.SaveChangesAsync();
+
+                var userWithApartments = context.Users.AsNoTracking().FirstOrDefault();
+
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithApartments.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
+
+                await context.AddRangeAsync(_apartments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var apartment = await context.Apartments
+                    .Include(_ => _.Address.Country).Include(_ => _.Address)
+                    .AsNoTracking().FirstOrDefaultAsync();
+
+                var newCountry = await context.Countries.Where(_ => _.Id != apartment.Address.CountryId).FirstOrDefaultAsync();
+
+                ApartmentView view = new ApartmentView()
+                {
+
+                    Apartment = _mapper.Map<ApartmentDTO>(apartment),
+
+                    Address = _mapper.Map<AddressDTO>(apartment.Address),
+
+                    Country = _mapper.Map<CountryDTO>(apartment.Address.Country)
+                };
+
+                view.Address.City = "Updated";
+                view.Apartment.Title = "Updated";
+                view.Country = _mapper.Map<CountryDTO>(newCountry);
+
+                var service = new ApartmentUserService(context, _mapper);
+
+                var resultPositive = await service.UpdateApartmentAsync(view);
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.Apartment.Title.Should().BeEquivalentTo("Updated");
+                resultPositive.Data.Address.City.Should().BeEquivalentTo("Updated");
+                resultPositive.Data.Country.Name.Should().BeEquivalentTo(newCountry.Name);
+            }
+        }
+
+        [Fact]
+        public async void DeleteApartmentByIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "DeleteApartmentByIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                Country[] countries =
+                {
+                    new Country() { Name = "Litva"},
+                    new Country() { Name = "Poland" }
+                };
+
+                await context.AddRangeAsync(countries);
+
+                await context.AddRangeAsync(_users);
+                await context.SaveChangesAsync();
+
+                var userWithApartments = context.Users.AsNoTracking().FirstOrDefault();
+
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithApartments.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
+
+                await context.AddRangeAsync(_apartments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var apartmenr = await context.Apartments.AsNoTracking().FirstOrDefaultAsync();
+
+                var service = new ApartmentUserService(context, _mapper);
+
+                var resultPositive = await service.DeleteApartmentByIdAsync(apartmenr.Id.ToString());
+                var resultNegative = await service.DeleteApartmentByIdAsync(new Guid().ToString());
+
+                var apartmentAfterDelete = await context.Apartments.Where(_=>_.Id == apartmenr.Id)
+                    .AsNoTracking().FirstOrDefaultAsync();
+
+                //var addressAfterDelete = await context.Adresses.Where(_ => _.ApartmentId == apartmenr.Id)
+                 //   .AsNoTracking().FirstOrDefaultAsync();
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Message.Should().BeNull();
+
+                apartmentAfterDelete.Should().BeNull();
+                //addressAfterDelete.Should().BeNull();
+
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Message.Should().Contain("Apartment was not found");
             }
         }
     }
