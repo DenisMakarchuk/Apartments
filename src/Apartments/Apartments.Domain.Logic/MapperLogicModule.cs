@@ -27,6 +27,9 @@ namespace Apartments.Domain.Logic
 
             CreateMap<CommentDTO, Comment>().ReverseMap();
             CreateMap<AddComment, Comment>();
+
+            CreateMap<UserDTO, User>().ReverseMap();
+            CreateMap<AddUser, User>();
         }
     }
 }
