@@ -16,7 +16,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Get all Users from the database
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<UserDTOAdministration>> GetAllUsersAsync();
+        Task<Result<IEnumerable<UserDTOAdministration>>> GetAllUsersAsync();
 
         /// <summary>
         /// Get User by User Id

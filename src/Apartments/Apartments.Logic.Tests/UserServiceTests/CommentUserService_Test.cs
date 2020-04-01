@@ -1,30 +1,31 @@
 ﻿using Apartments.Data.Context;
 using Apartments.Data.DataModels;
+using Apartments.Domain.Logic.Users.UserService;
+using Apartments.Domain.Users.AddDTO;
+using Apartments.Domain.Users.DTO;
+using Apartments.Domain.Users.ViewModels;
+using AutoMapper;
 using Bogus;
+using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
-using System.Linq;
-using AutoMapper;
-using Apartments.Domain.Admin.DTO;
-using Apartments.Domain.Logic.Admin.AdminService;
-using FluentAssertions;
 
-namespace Apartments.Logic.Tests.AdminServiceTests
+namespace Apartments.Logic.Tests.UserServiceTests
 {
-    public class CommentAdministrationService_Test
+    public class CommentUserService_Test
     {
         private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
         private Faker<Apartment> _fakeApartment = new Faker<Apartment>().RuleFor(x => x.IsOpen, true)
-            .RuleFor(x=>x.Price, y=>y.Random.Decimal(5M,15M))
+            .RuleFor(x => x.Price, y => y.Random.Decimal(5M, 15M))
             .RuleFor(x => x.Title, y => y.Name.JobTitle())
             .RuleFor(x => x.Text, y => y.Name.JobDescriptor());
         private Faker<Comment> _fakeComment = new Faker<Comment>()
             .RuleFor(x => x.Title, y => y.Name.JobTitle())
             .RuleFor(x => x.Text, y => y.Name.JobDescriptor());
-
 
         List<User> _users;
         List<Apartment> _apartments;
@@ -32,11 +33,12 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
         IMapper _mapper;
 
-        public CommentAdministrationService_Test()
+        public CommentUserService_Test()
         {
             var mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<CommentDTOAdministration, Comment>().ReverseMap();
+                cfg.CreateMap<CommentDTO, Comment>().ReverseMap();
+                cfg.CreateMap<AddComment, Comment>();
             });
 
             _mapper = new Mapper(mapperConfig);
@@ -44,6 +46,43 @@ namespace Apartments.Logic.Tests.AdminServiceTests
             _users = _fakeUser.Generate(2);
             _apartments = _fakeApartment.Generate(2);
             _comments = _fakeComment.Generate(2);
+        }
+
+        [Fact]
+        public async void CreateCommentAsync_Positive_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "CreateCommentAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_users);
+                context.AddRange(_apartments);
+
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var user = context.Users.AsNoTracking().FirstOrDefault(); ;
+                var apartment = context.Apartments.AsNoTracking().FirstOrDefault(); ;
+
+                AddComment comment = new AddComment()
+                {
+                    ApartmentId = apartment.Id.ToString(),
+                    AuthorId = user.Id.ToString(),
+                    Title = "Title",
+                    Text = "Text"
+                };
+
+                var service = new CommentUserService(context, _mapper);
+
+                var resultPositive = await service.CreateCommentAsync(comment);
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.Title.Should().BeEquivalentTo(comment.Title);
+            }
         }
 
         [Fact]
@@ -73,7 +112,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                var service = new CommentAdministrationService(context, _mapper);
+                var service = new CommentUserService(context, _mapper);
 
                 var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
                 var userWithoutComments = await context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefaultAsync();
@@ -84,7 +123,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 foreach (var item in commentsInBase)
                 {
                     resultPositive.Data
-                        .Where(_=>_.Id == item.Id.ToString())
+                        .Where(_ => _.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
@@ -120,7 +159,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                var service = new CommentAdministrationService(context, _mapper);
+                var service = new CommentUserService(context, _mapper);
 
                 var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
                 var apartmentWithoutComments = context.Apartments.Where(_ => _.Id != apartmentWithComments.Id).FirstOrDefault();
@@ -157,7 +196,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
             {
                 var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
 
-                var service = new CommentAdministrationService(context, _mapper);
+                var service = new CommentUserService(context, _mapper);
 
                 var resultPositive = await service.GetCommentByIdAsync(comment.Id.ToString());
                 var resultNegative = await service.GetCommentByIdAsync(new Guid().ToString());
@@ -187,16 +226,16 @@ namespace Apartments.Logic.Tests.AdminServiceTests
             {
                 var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
 
-                var service = new CommentAdministrationService(context, _mapper);
+                var service = new CommentUserService(context, _mapper);
 
-                CommentDTOAdministration updateComment = new CommentDTOAdministration()
+                CommentDTO updateComment = new CommentDTO()
                 {
                     Id = comment.Id.ToString(),
                     Title = "newTitle",
                     Text = "newText"
                 };
 
-                CommentDTOAdministration failComment = new CommentDTOAdministration()
+                CommentDTO failComment = new CommentDTO()
                 {
                     Id = new Guid().ToString(),
                     Title = "newTitle",
@@ -231,7 +270,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
             {
                 var comment = await context.Comments.AsNoTracking().FirstOrDefaultAsync();
 
-                var service = new CommentAdministrationService(context, _mapper);
+                var service = new CommentUserService(context, _mapper);
 
                 var resultPositive = await service.DeleteCommentByIdAsync(comment.Id.ToString());
                 var resultNegative = await service.DeleteCommentByIdAsync(new Guid().ToString());

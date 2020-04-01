@@ -53,10 +53,27 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
                 foreach (var item in _users)
                 {
-                    var itemFromResult = result.Where(_ => _.Name.Equals(item.Name)).Select(_ => _).FirstOrDefault();
+                    var itemFromResult = result.Data.Where(_ => _.Name.Equals(item.Name)).Select(_ => _).FirstOrDefault();
 
                     itemFromResult.Should().NotBeNull();
                 }
+            }
+        }
+
+        [Fact]
+        public async void GetAllUsersAsync_Negative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetAllUsersAsync_Negative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new UserAdministrationService(context, _mapper);
+
+                var result = await service.GetAllUsersAsync();
+
+                result.IsSuccess.Should().BeFalse();
             }
         }
 
@@ -80,13 +97,13 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 var service = new UserAdministrationService(context, _mapper);
 
                 var resultPositive = await service.GetUserByIdAsync(user.Id.ToString());
-                //var resultNegative = await service.GetUserByIdAsync(new Guid().ToString());
+                var resultNegative = await service.GetUserByIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.Name.Should().BeEquivalentTo(user.Name);
 
-                //resultNegative.IsSuccess.Should().BeFalse();
-                //resultNegative.Data.Should().BeNull();
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeNull();
             }
         }
 

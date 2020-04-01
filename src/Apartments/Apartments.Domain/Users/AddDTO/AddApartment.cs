@@ -9,7 +9,7 @@ namespace Apartments.Domain.Users.AddDTO
     /// </summary>
     public class AddApartment
     {
-        public string AddressId { get; set; }
+        public AddAddress Address { get; set; }
 
         public string OwnerId { get; set; }
 
