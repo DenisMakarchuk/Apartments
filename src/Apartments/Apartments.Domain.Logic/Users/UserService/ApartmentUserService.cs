@@ -107,7 +107,6 @@ namespace Apartments.Domain.Logic.Users.UserService
                 return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
                     .Fail<IEnumerable<ApartmentDTO>>($"Source is null. {ex.Message}");
             }
-
         }
 
         /// <summary>

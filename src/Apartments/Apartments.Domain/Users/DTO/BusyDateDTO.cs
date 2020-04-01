@@ -8,8 +8,6 @@ namespace Apartments.Domain.Users.DTO
     {
         public string Id { get; set; }
 
-        public string OrderId { get; set; }
-
         public DateTime Date { get; set; }
     }
 }

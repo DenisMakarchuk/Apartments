@@ -15,7 +15,7 @@ namespace Apartments.Domain.Users.DTO
 
         public string CustomerId { get; set; }
 
-        public IEnumerable<BusyDateDTO> Dates { get; set; }
+        public IEnumerable<DateTime> Dates { get; set; }
 
         public DateTime Update { get; set; }
     }

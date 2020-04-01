@@ -6,7 +6,7 @@ namespace Apartments.Domain.Users.AddDTO
 {
     public class AddBusyDate
     {
-        public string OrderId { get; set; }
+        public string ApartmentId { get; set; }
 
         public DateTime Date { get; set; }
     }

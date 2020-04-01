@@ -27,6 +27,8 @@ namespace Apartments.Data.DataModels
 
         public HashSet<Comment> Comments { get; set; }
 
+        public HashSet<BusyDate> Dates { get; set; }
+
         public DateTime? Update { get; set; } = DateTime.Now;
     }
 }

@@ -43,6 +43,10 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasMany(_ => _.Orders).WithOne(_ => _.Apartment).HasForeignKey(_ => _.ApartmentId);
             builder.HasMany(_ => _.Comments).WithOne(_ => _.Apartment).HasForeignKey(_ => _.ApartmentId);
+
+            builder.HasMany(_ => _.Dates).WithOne(_ => _.Apartment)
+                .HasForeignKey(_ => _.ApartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

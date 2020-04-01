@@ -30,6 +30,14 @@ namespace Apartments.Domain.Logic
 
             CreateMap<UserDTO, User>().ReverseMap();
             CreateMap<AddUser, User>();
+
+            CreateMap<AddOrder, Order>()
+            .ForMember(_ => _.Dates, _ => _.Ignore());
+
+            CreateMap<OrderDTO, Order>()
+            .ForMember(_ => _.Dates, _ => _.Ignore())
+            .ReverseMap()
+            .ForMember(_ => _.Dates, _ => _.Ignore());
         }
     }
 }
