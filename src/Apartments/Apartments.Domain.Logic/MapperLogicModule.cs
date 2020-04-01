@@ -1,5 +1,7 @@
 ﻿using Apartments.Data.DataModels;
 using Apartments.Domain.Admin.DTO;
+using Apartments.Domain.Users.AddDTO;
+using Apartments.Domain.Users.DTO;
 using AutoMapper;
 using System;
 using System.Collections.Generic;
@@ -14,6 +16,28 @@ namespace Apartments.Domain.Logic
             CreateMap<UserDTOAdministration, User>().ReverseMap();
 
             CreateMap<CommentDTOAdministration, Comment>().ReverseMap();
+
+            CreateMap<AddApartment, Apartment>();
+            CreateMap<ApartmentDTO, Apartment>().ReverseMap();
+
+            CreateMap<AddAddress, Address>();
+            CreateMap<AddressDTO, Address>().ReverseMap();
+
+            CreateMap<CountryDTO, Country>().ReverseMap();
+
+            CreateMap<CommentDTO, Comment>().ReverseMap();
+            CreateMap<AddComment, Comment>();
+
+            CreateMap<UserDTO, User>().ReverseMap();
+            CreateMap<AddUser, User>();
+
+            CreateMap<AddOrder, Order>()
+            .ForMember(_ => _.Dates, _ => _.Ignore());
+
+            CreateMap<OrderDTO, Order>()
+            .ForMember(_ => _.Dates, _ => _.Ignore())
+            .ReverseMap()
+            .ForMember(_ => _.Dates, _ => _.Ignore());
         }
     }
 }

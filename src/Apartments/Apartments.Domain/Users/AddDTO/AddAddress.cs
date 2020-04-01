@@ -11,8 +11,6 @@ namespace Apartments.Domain.Users.AddDTO
     {
         public string CountryId { get; set; }
 
-        public string ApartmentId { get; set; }
-
         public string City { get; set; }
         public string Street { get; set; }
         public string Home { get; set; }

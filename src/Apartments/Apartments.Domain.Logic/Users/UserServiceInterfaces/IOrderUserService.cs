@@ -13,9 +13,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
     {
         Task<Result<OrderView>> CreateOrderAsync(AddOrder order);
         Task<Result<IEnumerable<OrderView>>> GetAllOrdersByUserIdAsync(string userId);
-        Task<Result<IEnumerable<OrderView>>> GetAllOrdersByApartmentIdAsync(string apartmentId);
+        Task<Result<IEnumerable<OrderDTO>>> GetAllOrdersByApartmentIdAsync(string apartmentId);
         Task<Result<OrderView>> GetOrderByIdAsync(string orderId);
-        Task<Result<OrderView>> UpdateOrderAsync(OrderView order);
-        Task<Result> DeleteOrderByIdAsync(string id);
+        Task<Result<OrderView>> UpdateOrderAsync(OrderDTO order);
+        Task<Result> DeleteOrderByIdAsync(string orderId);
     }
 }

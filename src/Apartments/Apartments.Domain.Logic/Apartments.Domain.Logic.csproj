@@ -30,7 +30,6 @@
 
     <ItemGroup>
       <Folder Include="Search\SearchServices\" />
-      <Folder Include="Users\UserService\" />
     </ItemGroup>
 
 </Project>
