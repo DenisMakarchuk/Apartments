@@ -22,10 +22,5 @@
       <PackageReference Include="Serilog.Sinks.Debug" Version="1.0.1" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Controllers\Admin\" />
-      <Folder Include="Controllers\Users\" />
-    </ItemGroup>
-
 
 </Project>
