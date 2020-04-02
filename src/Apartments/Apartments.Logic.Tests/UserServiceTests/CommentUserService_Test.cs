@@ -231,7 +231,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 CommentDTO updateComment = new CommentDTO()
                 {
                     Id = comment.Id.ToString(),
-                    Title = "newTitle",
+                    Title = "Title",
                     Text = "newText"
                 };
 

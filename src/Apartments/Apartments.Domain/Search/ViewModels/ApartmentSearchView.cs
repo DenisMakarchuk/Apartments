@@ -12,7 +12,5 @@ namespace Apartments.Domain.Search.ViewModels
         public AddressSearchDTO Address { get; set; }
 
         public CountrySearchDTO Country { get; set; }
-
-        public IEnumerable<DateTime> WhenOrdered { get; set; }
     }
 }
