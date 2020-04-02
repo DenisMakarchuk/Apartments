@@ -141,7 +141,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 };
 
                 return (Result<ApartmentView>)Result<ApartmentView>
-                    .Ok(_mapper.Map<ApartmentView>(view));
+                    .Ok(view);
             }
             catch (ArgumentNullException ex)
             {
