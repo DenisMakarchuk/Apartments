@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Apartments.Web.Controllers.Users
 {
+    /// <summary>
+    /// Work with own Apartments
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ApartmentUserController : ControllerBase
@@ -21,8 +24,16 @@ namespace Apartments.Web.Controllers.Users
             _service = service;
         }
 
+        /// <summary>
+        /// Put Apartment to the DB
+        /// </summary>
+        /// <param name="apartment"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateApartmentAsync([FromBody]AddApartment apartment)
         {
             if (apartment is null || ModelState.IsValid) // todo: validate apartment
@@ -30,13 +41,29 @@ namespace Apartments.Web.Controllers.Users
                 return BadRequest(ModelState);
             }
 
-            var result = await _service.CreateApartmentAsync(apartment);
+            try
+            {
+                var result = await _service.CreateApartmentAsync(apartment);
 
-            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
+        /// <summary>
+        /// Get all own Apartments by User Id
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("user/{userId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAllApartmentByUserIdAsync(string userId)
         {
             if (!Guid.TryParse(userId, out var _))
@@ -56,8 +83,17 @@ namespace Apartments.Web.Controllers.Users
             }
         }
 
+        /// <summary>
+        /// Get Apartment by Id
+        /// </summary>
+        /// <param name="apartmentId"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("apartment/{apartmentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetApartmentByIdAsync(string apartmentId)
         {
             if (!Guid.TryParse(apartmentId, out var _))
@@ -77,8 +113,16 @@ namespace Apartments.Web.Controllers.Users
             }
         }
 
+        /// <summary>
+        /// Update own Apartment
+        /// </summary>
+        /// <param name="apartment"></param>
+        /// <returns></returns>
         [HttpPut]
         [Route("")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateApartmentAsync([FromBody] ApartmentView apartment)
         {
             if (apartment is null || ModelState.IsValid) // todo: validate comment
@@ -91,8 +135,17 @@ namespace Apartments.Web.Controllers.Users
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
+        /// <summary>
+        /// Delete Apartment by Id
+        /// </summary>
+        /// <param name="apartmentId"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{apartmentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteApartmentByIdAsync(string apartmentId)
         {
             if (!Guid.TryParse(apartmentId, out var _))
@@ -102,7 +155,7 @@ namespace Apartments.Web.Controllers.Users
 
             var result = await _service.DeleteApartmentByIdAsync(apartmentId);
 
-            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+            return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }
 
     }

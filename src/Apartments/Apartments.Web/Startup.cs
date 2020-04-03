@@ -29,7 +29,22 @@ namespace Apartments.Web
         {
             services.AddDomainServices(Configuration);
             
-            services.AddOpenApiDocument();
+            services.AddOpenApiDocument(config =>
+            {
+                config.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "RENT APARTMENTS";
+                    document.Info.Description = "A simple ASP.NET Core web API";
+                    document.Info.Contact = new NSwag.OpenApiContact
+                    {
+                        Name = "Denis Makarchuk",
+                        Email = string.Empty,
+                        Url = "https://www.linkedin.com/in/denis-makarchuk-1816b0177/"
+                    };
+                };
+            });
+
             services.AddControllers();
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
