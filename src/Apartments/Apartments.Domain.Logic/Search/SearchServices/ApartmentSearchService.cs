@@ -29,7 +29,6 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
 
-
             if (search.CountryId != null)
             {
                 Guid id = Guid.Parse(search.CountryId);
@@ -66,7 +65,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             {
                 foreach (var item in search.NeedDates)
                 {
-                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date.Date == item.Date).First() == null);
+                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date.Date == item.Date).FirstOrDefault() == null);
                 }
             }
 

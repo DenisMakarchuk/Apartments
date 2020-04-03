@@ -44,7 +44,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 await _db.SaveChangesAsync();
 
-                Apartment apartmentAfterAdding = await _db.Apartments.Where(_ => _.OwnerId == addedApartment.OwnerId)
+                Apartment apartmentAfterAdding = await _db.Apartments.Where(_ => _.Title == addedApartment.Title)
                     .Select(_ => _).Include(_ => _.Address.Country).Include(_ => _.Address)
                     .AsNoTracking().FirstOrDefaultAsync();
 
