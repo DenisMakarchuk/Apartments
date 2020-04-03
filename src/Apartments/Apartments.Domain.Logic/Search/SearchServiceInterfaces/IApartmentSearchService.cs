@@ -10,14 +10,7 @@ namespace Apartments.Domain.Logic.Search.SearchServiceInterfaces
 {
     public interface IApartmentSearchService
     {
-        Task<Result<IEnumerable<ApartmentSearchDTO>>> GetAllApartmentsAsync(
-            string countryId,
-            string cityName,
-            int roomsFrom,
-            int roomsTill,
-            decimal priceFrom,
-            decimal priceTill,
-            IEnumerable<DateTime> needDates);
+        Task<Result<IEnumerable<ApartmentSearchDTO>>> GetAllApartmentsAsync(SearchParameters search);
 
         Task<Result<ApartmentSearchView>> GetApartmentByIdAsync(string apartmentId);
 

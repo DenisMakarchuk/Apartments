@@ -25,53 +25,46 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<ApartmentSearchDTO>>> GetAllApartmentsAsync(
-            string countryId,
-            string cityName,
-            int roomsFrom,
-            int roomsTill,
-            decimal priceFrom,
-            decimal priceTill,
-            IEnumerable<DateTime> needDates)
+        public async Task<Result<IEnumerable<ApartmentSearchDTO>>> GetAllApartmentsAsync(SearchParameters search)
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
 
 
-            if (countryId != null)
+            if (search.CountryId != null)
             {
-                Guid id = Guid.Parse(countryId);
+                Guid id = Guid.Parse(search.CountryId);
 
                 apartments = apartments.Where(_ => _.Address.CountryId == id);
             }
 
-            if (cityName != null)
+            if (search.CityName != null)
             {
-                apartments = apartments.Where(_ => _.Address.City.Contains(cityName));
+                apartments = apartments.Where(_ => _.Address.City.Contains(search.CityName));
             }
 
-            if (roomsFrom > 0)
+            if (search.RoomsFrom > 0)
             {
-                apartments = apartments.Where(_ => _.NumberOfRooms >= roomsFrom);
+                apartments = apartments.Where(_ => _.NumberOfRooms >= search.RoomsFrom);
             }
 
-            if (roomsTill > 0 && roomsTill >= roomsFrom)
+            if (search.RoomsTill > 0 && search.RoomsTill >= search.RoomsFrom)
             {
-                apartments = apartments.Where(_ => _.NumberOfRooms <= roomsTill);
+                apartments = apartments.Where(_ => _.NumberOfRooms <= search.RoomsTill);
             }
 
-            if (priceFrom > 0)
+            if (search.PriceFrom > 0)
             {
-                apartments = apartments.Where(_ => _.Price >= priceFrom);
+                apartments = apartments.Where(_ => _.Price >= search.PriceFrom);
             }
 
-            if (priceTill > 0 && priceTill >= priceFrom)
+            if (search.PriceTill > 0 && search.PriceTill >= search.PriceFrom)
             {
-                apartments = apartments.Where(_ => _.Price <= priceTill);
+                apartments = apartments.Where(_ => _.Price <= search.PriceTill);
             }
 
-            if (needDates!=null && needDates.Any())
+            if (search.NeedDates != null && search.NeedDates.Any())
             {
-                foreach (var item in needDates)
+                foreach (var item in search.NeedDates)
                 {
                     apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date.Date == item.Date).First() == null);
                 }

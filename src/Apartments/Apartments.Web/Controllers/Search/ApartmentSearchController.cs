@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Apartments.Domain.Logic.Search.SearchServiceInterfaces;
+using Apartments.Domain.Search.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,31 +21,17 @@ namespace Apartments.Web.Controllers.Search
         }
 
         [HttpGet]
-        [Route("")]
-        public async Task<IActionResult> GetAllApartmentsAsync(
-            [FromBody] string countryId = null,
-            [FromBody] string cityName = null,
-            [FromBody] int roomsFrom = 0,
-            [FromBody] int roomsTill = 0,
-            [FromBody] decimal priceFrom = 0m,
-            [FromBody] decimal priceTill = 0m,
-            [FromBody] IEnumerable<DateTime> needDates = null)
+        [Route("apartments")]
+        public async Task<IActionResult> GetAllApartmentsAsync([FromBody] SearchParameters search)
         {
-            if (countryId != null && !Guid.TryParse(countryId, out var _))
+            if (search is null)
             {
                 return BadRequest();
             }
 
             try
             {
-                var result = await _service.GetAllApartmentsAsync(
-                        countryId,
-                        cityName,
-                        roomsFrom,
-                        roomsTill,
-                        priceFrom,
-                        priceTill,
-                        needDates);
+                var result = await _service.GetAllApartmentsAsync(search);
 
                 return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
             }
@@ -55,7 +42,7 @@ namespace Apartments.Web.Controllers.Search
         }
 
         [HttpGet]
-        [Route("{apartmentId}")]
+        [Route("apartment/{apartmentId}")]
         public async Task<IActionResult> GetApartmentByIdAsync(string apartmentId)
         {
             if (!Guid.TryParse(apartmentId, out var _))
@@ -76,7 +63,7 @@ namespace Apartments.Web.Controllers.Search
         }
 
         [HttpGet]
-        [Route("")]
+        [Route("countries")]
         public async Task<IActionResult> GetAllCountriesAsync()
         {
             try
@@ -92,7 +79,7 @@ namespace Apartments.Web.Controllers.Search
         }
 
         [HttpGet]
-        [Route("{countryId}")]
+        [Route("country/{countryId}")]
         public async Task<IActionResult> GetCountryByIdAsync(string countryId)
         {
             if (!Guid.TryParse(countryId, out var _))

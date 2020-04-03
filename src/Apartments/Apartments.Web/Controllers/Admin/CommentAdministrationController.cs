@@ -21,7 +21,7 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         [HttpGet]
-        [Route("{userId}")]
+        [Route("user/{userId}")]
         public async Task<IActionResult> GetAllCommentsByUserIdAsync(string userId)
         {
             if (!Guid.TryParse(userId, out var _))
@@ -42,7 +42,7 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         [HttpGet]
-        [Route("{userId}")]
+        [Route("apartment/{apartmentId}")]
         public async Task<IActionResult> GetAllCommentsByApartmentIdAsync(string apartmentId)
         {
             if (!Guid.TryParse(apartmentId, out var _))
@@ -63,7 +63,7 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         [HttpGet]
-        [Route("{userId}")]
+        [Route("comment/{commentId}")]
         public async Task<IActionResult> GetCommentByIdAsync(string commentId)
         {
             if (!Guid.TryParse(commentId, out var _))
@@ -98,7 +98,7 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{commentId}")]
         public async Task<IActionResult> DeleteCommentByIdAsync(string commentId)
         {
             if (!Guid.TryParse(commentId, out var _))

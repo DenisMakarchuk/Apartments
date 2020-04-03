@@ -36,7 +36,7 @@ namespace Apartments.Web.Controllers.Users
         }
 
         [HttpGet]
-        [Route("{userId}")]
+        [Route("user/{userId}")]
         public async Task<IActionResult> GetAllOrdersByUserIdAsync(string userId)
         {
             if (!Guid.TryParse(userId, out var _))
@@ -57,7 +57,7 @@ namespace Apartments.Web.Controllers.Users
         }
 
         [HttpGet]
-        [Route("{userId}")]
+        [Route("apartment/{apartmentId}")]
         public async Task<IActionResult> GetAllOrdersByApartmentIdAsync(string apartmentId)
         {
             if (!Guid.TryParse(apartmentId, out var _))
@@ -78,7 +78,7 @@ namespace Apartments.Web.Controllers.Users
         }
 
         [HttpGet]
-        [Route("{userId}")]
+        [Route("order/{orderId}")]
         public async Task<IActionResult> GetOrderByIdAsync(string orderId)
         {
             if (!Guid.TryParse(orderId, out var _))
@@ -113,7 +113,7 @@ namespace Apartments.Web.Controllers.Users
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{orderId}")]
         public async Task<IActionResult> DeleteOrderByIdAsync(string orderId)
         {
             if (!Guid.TryParse(orderId, out var _))
