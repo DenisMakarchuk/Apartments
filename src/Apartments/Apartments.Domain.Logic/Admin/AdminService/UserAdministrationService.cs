@@ -40,7 +40,6 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             {
                 return (Result<IEnumerable<UserDTOAdministration>>)Result<IEnumerable<UserDTOAdministration>>
                     .Fail<IEnumerable<UserDTOAdministration>>("No Users found");
-
             }
 
             return (Result<IEnumerable<UserDTOAdministration>>)Result<IEnumerable<UserDTOAdministration>>
