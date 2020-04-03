@@ -3,6 +3,7 @@ using Apartments.Data.DataModels;
 using Apartments.Domain.Logic.Search.SearchServices;
 using Apartments.Domain.Logic.Users.UserService;
 using Apartments.Domain.Search.DTO;
+using Apartments.Domain.Search.ViewModels;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.DTO;
 using Apartments.Domain.Users.ViewModels;
@@ -150,29 +151,22 @@ namespace Apartments.Logic.Tests.SearchServiceTest
 
                 var apartmentsInBase = await context.Apartments.AsNoTracking().ToListAsync();
 
-                var resultPositive = await service.GetAllApartmentsAsync(
-                    null,
-                    null,
-                    3,
-                    0,
-                    0,
-                    0,
-                    null
-                    );
+                SearchParameters positineParameters = new SearchParameters()
+                {
+                     RoomsFrom = 3
+                };
 
+                SearchParameters negativeParameters = new SearchParameters()
+                {
+                    RoomsTill = 2
+                };
+
+                var resultPositive = await service.GetAllApartmentsAsync(positineParameters);
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.FirstOrDefault().Title.Should().BeEquivalentTo("Open");
 
-                var resultNegative = await service.GetAllApartmentsAsync(
-                    null,
-                    null,
-                    0,
-                    2,
-                    0,
-                    0,
-                    null
-                    );
+                var resultNegative = await service.GetAllApartmentsAsync(negativeParameters);
 
                 resultNegative.IsSuccess.Should().BeFalse();
             }
