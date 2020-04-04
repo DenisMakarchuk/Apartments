@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Apartments.Domain.Logic;
+using FluentValidation.AspNetCore;
+using Apartments.Web.Validation;
 
 namespace Apartments.Web
 {
@@ -45,7 +47,21 @@ namespace Apartments.Web
                 };
             });
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(fv =>
+                {
+                    fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                    fv.RegisterValidatorsFromAssemblyContaining<AddApartmentValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<AddCommentValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<AddOrderValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<AddUserValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<ApartmentViewValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<CommentDTOAdministrationValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<CommentDTOValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<OrderDTOValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<UserDTOValidator>();
+                });
+            ;
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
 
