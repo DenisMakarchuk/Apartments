@@ -31,7 +31,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateOrderAsync([FromBody]AddOrder order)
