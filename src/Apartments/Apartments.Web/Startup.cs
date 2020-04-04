@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Apartments.Domain.Logic;
+using FluentValidation.AspNetCore;
+using Apartments.Web.Validation;
 
 namespace Apartments.Web
 {
@@ -29,8 +31,37 @@ namespace Apartments.Web
         {
             services.AddDomainServices(Configuration);
             
-            services.AddOpenApiDocument();
-            services.AddControllers();
+            services.AddOpenApiDocument(config =>
+            {
+                config.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "RENT APARTMENTS";
+                    document.Info.Description = "A simple ASP.NET Core web API";
+                    document.Info.Contact = new NSwag.OpenApiContact
+                    {
+                        Name = "Denis Makarchuk",
+                        Email = string.Empty,
+                        Url = "https://www.linkedin.com/in/denis-makarchuk-1816b0177/"
+                    };
+                };
+            });
+
+            services.AddControllers()
+                .AddFluentValidation(fv =>
+                {
+                    fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                    fv.RegisterValidatorsFromAssemblyContaining<AddApartmentValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<AddCommentValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<AddOrderValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<AddUserValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<ApartmentViewValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<CommentDTOAdministrationValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<CommentDTOValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<OrderDTOValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<UserDTOValidator>();
+                });
+            ;
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
 
