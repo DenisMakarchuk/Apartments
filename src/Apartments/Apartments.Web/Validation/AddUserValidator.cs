@@ -11,7 +11,7 @@ namespace Apartments.Web.Validation
     {
         public AddUserValidator()
         {
-            RuleFor(_ => _.Name).NotEmpty();
+            RuleFor(_ => _.Name).NotEmpty().WithMessage("You must write the name");
         }
     }
 }

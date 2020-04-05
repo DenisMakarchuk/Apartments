@@ -11,9 +11,11 @@ namespace Apartments.Web.Validation
     {
         public ApartmentViewValidator()
         {
-            RuleFor(_ => _.Country).NotNull();
+            RuleFor(_ => _.Country).NotNull()
+                .WithMessage("You must choose the country");
 
-            RuleFor(_ => _.Apartment).NotNull().WithMessage("Apartment must not be NULL")
+            RuleFor(_ => _.Apartment).NotNull()
+                .WithMessage("Apartment must not be NULL")
                 .Must(apartment=> Guid.TryParse(apartment.Id, out var _))
                 .WithMessage("Apartment Id must can parse to Guid type");
 
@@ -27,7 +29,9 @@ namespace Apartments.Web.Validation
                 .WithMessage("Number of Rooms must be greater than 0");
 
             RuleFor(_ => _.Address.CountryId).Must(id => Guid.TryParse(id, out var _))
-                .WithMessage("CountryId can't parse to Guid type");
+                .WithMessage("CountryId must can parse to Guid type");
+            RuleFor(_=>_.Address.Id).Must(id => Guid.TryParse(id, out var _))
+                .WithMessage("Address Id must can parse to Guid type");
             RuleFor(_ => _.Address.City).NotEmpty()
                 .WithMessage("City must not be empty");
             RuleFor(_ => _.Address.Street).NotEmpty()
