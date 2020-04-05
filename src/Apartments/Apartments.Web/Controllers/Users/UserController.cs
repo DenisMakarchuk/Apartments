@@ -36,7 +36,7 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateUserAsync([FromBody]AddUser user)
         {
-            if (user is null || ModelState.IsValid) // todo: validate user
+            if (user is null || !ModelState.IsValid) // todo: validate user
             {
                 return BadRequest(ModelState);
             }
@@ -95,7 +95,7 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateUserAsync([FromBody]  UserDTO user)
         {
-            if (user is null || ModelState.IsValid) // todo: validate user
+            if (user is null || !ModelState.IsValid) // todo: validate user
             {
                 return BadRequest(ModelState);
             }

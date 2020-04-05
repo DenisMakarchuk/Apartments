@@ -29,15 +29,15 @@ namespace Apartments.Domain.Logic
             CreateMap<AddComment, Comment>();
 
             CreateMap<UserDTO, User>().ReverseMap();
-            CreateMap<AddUser, User>();
+            CreateMap<AddUser, User>().ReverseMap();
 
             CreateMap<AddOrder, Order>()
-            .ForMember(_ => _.Dates, _ => _.Ignore());
+            .ForMember(_ => _.Dates, _ => _.Ignore()).ReverseMap();
 
             CreateMap<OrderDTO, Order>()
             .ForMember(_ => _.Dates, _ => _.Ignore())
             .ReverseMap()
-            .ForMember(_ => _.Dates, _ => _.Ignore());
+            .ForMember(_ => _.Dates, _ => _.Ignore()).ReverseMap();
         }
     }
 }

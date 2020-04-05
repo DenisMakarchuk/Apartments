@@ -79,7 +79,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
 
             try
             {
-                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(apartments.ToList());
+                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync());
 
                 if (!result.Any())
                 {
