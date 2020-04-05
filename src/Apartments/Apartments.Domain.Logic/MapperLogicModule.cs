@@ -1,5 +1,6 @@
 ﻿using Apartments.Data.DataModels;
 using Apartments.Domain.Admin.DTO;
+using Apartments.Domain.Search.DTO;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.DTO;
 using AutoMapper;
@@ -38,6 +39,12 @@ namespace Apartments.Domain.Logic
             .ForMember(_ => _.Dates, _ => _.Ignore())
             .ReverseMap()
             .ForMember(_ => _.Dates, _ => _.Ignore()).ReverseMap();
+
+            CreateMap<Apartment, ApartmentSearchDTO>().ReverseMap();
+
+            CreateMap<Address, AddressSearchDTO>().ReverseMap();
+
+            CreateMap<Country, CountrySearchDTO>().ReverseMap();
         }
     }
 }

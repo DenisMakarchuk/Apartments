@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -123,9 +124,9 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateCommentAsync([FromBody]  CommentDTOAdministration comment)
+        public async Task<IActionResult> UpdateCommentAsync([FromBody, CustomizeValidator]  CommentDTOAdministration comment)
         {
-            if (comment is null || ModelState.IsValid) // todo: validate comment
+            if (comment is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }

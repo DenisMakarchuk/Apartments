@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.DTO;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,9 +35,9 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateOrderAsync([FromBody]AddOrder order)
+        public async Task<IActionResult> CreateOrderAsync([FromBody, CustomizeValidator]AddOrder order)
         {
-            if (order is null || ModelState.IsValid) // todo: validate order
+            if (order is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -153,9 +154,9 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateOrderAsync([FromBody] OrderDTO order)
+        public async Task<IActionResult> UpdateOrderAsync([FromBody, CustomizeValidator] OrderDTO order)
         {
-            if (order is null || ModelState.IsValid) // todo: validate order
+            if (order is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
