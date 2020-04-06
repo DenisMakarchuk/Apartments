@@ -68,13 +68,6 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                Country country = new Country()
-                {
-                    Name = "Litva"
-                };
-
-                context.Add(country);
-
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
             }
@@ -135,13 +128,6 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                Country country = new Country()
-                {
-                    Name = "Litva"
-                };
-
-                context.Add(country);
-
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
 
@@ -193,13 +179,6 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                Country country = new Country()
-                {
-                    Name = "Litva"
-                };
-
-                context.Add(country);
-
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
 
@@ -222,7 +201,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                var apartment = await context.Apartments.AsNoTracking().FirstOrDefaultAsync();
+                var apartment = await context.Apartments.AsNoTracking()
+                    .Include(_=>_.Address.Country).FirstOrDefaultAsync();
 
                 var service = new ApartmentUserService(context, _mapper);
 
@@ -231,7 +211,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
-                resultPositive.Data.Country.Name.Should().BeEquivalentTo("Litva");
+                resultPositive.Data.Country.Name.Should().BeEquivalentTo(apartment.Address.Country.Name);
 
                 resultNegative.IsSuccess.Should().BeFalse();
                 resultNegative.Data.Should().BeNull();
@@ -247,14 +227,6 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                Country[] countries = 
-                {
-                    new Country() { Name = "Litva"},
-                    new Country() { Name = "Poland" }
-                };
-
-                await context.AddRangeAsync(countries);
-
                 await context.AddRangeAsync(_users);
                 await context.SaveChangesAsync();
 
@@ -317,14 +289,6 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                Country[] countries =
-                {
-                    new Country() { Name = "Litva"},
-                    new Country() { Name = "Poland" }
-                };
-
-                await context.AddRangeAsync(countries);
-
                 await context.AddRangeAsync(_users);
                 await context.SaveChangesAsync();
 

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Apartments.Common;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.DTO;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,9 +36,10 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CreateCommentAsync([FromBody]AddComment comment)
+        [LogAttribute]
+        public async Task<IActionResult> CreateCommentAsync([FromBody, CustomizeValidator]AddComment comment)
         {
-            if (comment is null || ModelState.IsValid) // todo: validate comment
+            if (comment is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -64,6 +67,7 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetAllCommentsByUserIdAsync(string userId)
         {
             if (!Guid.TryParse(userId, out var _))
@@ -94,6 +98,7 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetAllCommentsByApartmentIdAsync(string apartmentId)
         {
             if (!Guid.TryParse(apartmentId, out var _))
@@ -124,6 +129,7 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetCommentByIdAsync(string commentId)
         {
             if (!Guid.TryParse(commentId, out var _))
@@ -153,9 +159,10 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateCommentAsync([FromBody] CommentDTO comment)
+        [LogAttribute]
+        public async Task<IActionResult> UpdateCommentAsync([FromBody, CustomizeValidator] CommentDTO comment)
         {
-            if (comment is null || ModelState.IsValid) // todo: validate comment
+            if (comment is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -183,6 +190,7 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> DeleteCommentByIdAsync(string commentId)
         {
             if (!Guid.TryParse(commentId, out var _))

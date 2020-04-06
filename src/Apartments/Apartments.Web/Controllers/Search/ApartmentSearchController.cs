@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Apartments.Common;
 using Apartments.Domain.Logic.Search.SearchServiceInterfaces;
 using Apartments.Domain.Search.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -34,6 +35,7 @@ namespace Apartments.Web.Controllers.Search
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetAllApartmentsAsync([FromBody] SearchParameters search)
         {
             if (search is null)
@@ -64,6 +66,7 @@ namespace Apartments.Web.Controllers.Search
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetApartmentByIdAsync(string apartmentId)
         {
             if (!Guid.TryParse(apartmentId, out var _))
@@ -92,6 +95,7 @@ namespace Apartments.Web.Controllers.Search
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetAllCountriesAsync()
         {
             try
@@ -117,6 +121,7 @@ namespace Apartments.Web.Controllers.Search
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetCountryByIdAsync(string countryId)
         {
             if (!Guid.TryParse(countryId, out var _))

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Apartments.Common;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +32,7 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetAllUsersAsync()
         {
             try
@@ -57,6 +59,7 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetUserByIdAsync(string id)
         {
             if (!Guid.TryParse(id, out var _))
@@ -87,6 +90,7 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> DeleteUserByIdAsync(string id)
         {
             if (!Guid.TryParse(id, out var _))

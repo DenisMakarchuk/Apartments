@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Text;
+using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Apartments.Data;
-using Microsoft.Extensions.Configuration;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using Apartments.Domain.Logic.Admin.AdminService;
 using Apartments.Domain.Logic.Search.SearchServiceInterfaces;
@@ -17,6 +19,8 @@ namespace Apartments.Domain.Logic
         {
             services.AddDataServices(config);
             //configure your Domain Logic Layer services here
+
+            services.AddAutoMapper(typeof(MapperLogicModule));
 
             services.AddScoped<IUserAdministrationService, UserAdministrationService>();
             services.AddScoped<ICommentAdministrationService, CommentAdministrationService>();

@@ -33,6 +33,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// </summary>
         /// <param name="search"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<ApartmentSearchDTO>>> GetAllApartmentsAsync(SearchParameters search)
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
@@ -79,7 +80,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
 
             try
             {
-                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(apartments.ToList());
+                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync());
 
                 if (!result.Any())
                 {
@@ -102,6 +103,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<ApartmentSearchView>> GetApartmentByIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);
@@ -142,6 +144,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// Get all countries from DB
         /// </summary>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<CountrySearchDTO>>> GetAllCountriesAsync()
         {
             var countries = await _db.Countries.AsNoTracking().ToListAsync();
@@ -161,6 +164,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// </summary>
         /// <param name="countryId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<CountrySearchDTO>> GetCountryByIdAsync(string countryId)
         {
             Guid id = Guid.Parse(countryId);
