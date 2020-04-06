@@ -71,21 +71,6 @@ namespace Apartments.Logic.Tests.SearchServiceTest
 
             using (var context = new ApartmentContext(options))
             {
-                Country[] countries = new Country[]
-                {
-                    new Country()
-                    {
-                        Name = "Litva"
-                    },
-
-                    new Country()
-                    {
-                        Name = "Poland"
-                    }
-                };
-
-                context.AddRange(countries);
-
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
 
@@ -181,13 +166,6 @@ namespace Apartments.Logic.Tests.SearchServiceTest
 
             using (var context = new ApartmentContext(options))
             {
-                Country country = new Country()
-                {
-                    Name = "Litva"
-                };
-
-                context.Add(country);
-
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
 
@@ -210,7 +188,8 @@ namespace Apartments.Logic.Tests.SearchServiceTest
 
             using (var context = new ApartmentContext(options))
             {
-                var apartment = await context.Apartments.AsNoTracking().FirstOrDefaultAsync();
+                var apartment = await context.Apartments
+                    .Include(_ => _.Address.Country).AsNoTracking().FirstOrDefaultAsync();
 
                 var service = new ApartmentSearchService(context, _mapper);
 
@@ -219,7 +198,7 @@ namespace Apartments.Logic.Tests.SearchServiceTest
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
-                resultPositive.Data.Country.Name.Should().BeEquivalentTo("Litva");
+                resultPositive.Data.Country.Name.Should().BeEquivalentTo(apartment.Address.Country.Name);
 
                 resultNegative.IsSuccess.Should().BeFalse();
                 resultNegative.Data.Should().BeNull();

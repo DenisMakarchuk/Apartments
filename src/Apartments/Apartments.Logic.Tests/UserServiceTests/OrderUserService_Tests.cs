@@ -75,13 +75,6 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
-                Country country = new Country()
-                {
-                    Name = "Litva"
-                };
-
-                context.Add(country);
-
                 context.AddRange(_users);
                 await context.SaveChangesAsync();
 
@@ -108,7 +101,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 User user = await context.Users.FirstOrDefaultAsync();
 
-                Apartment apartment = await context.Apartments.FirstOrDefaultAsync();
+                Apartment apartment = await context.Apartments
+                    .Include(_ => _.Address.Country).FirstOrDefaultAsync();
 
                 IEnumerable<DateTime> dateTimes = new List<DateTime>()
                 {
@@ -133,7 +127,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 //var resultNegative = await service.CreateOrderAsync(failOrder);
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Country.Name.Should().BeEquivalentTo("Litva");
+                resultPositive.Data.Country.Name.Should().BeEquivalentTo(apartment.Address.Country.Name);
                 resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
                 resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(dateTimes.First());
 

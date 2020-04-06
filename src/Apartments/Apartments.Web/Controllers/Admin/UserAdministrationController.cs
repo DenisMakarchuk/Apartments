@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Apartments.Common;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Apartments.Web.Controllers.Admin
 {
+    /// <summary>
+    /// Administrator work with Users
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class UserAdministrationController : ControllerBase
@@ -19,8 +23,16 @@ namespace Apartments.Web.Controllers.Admin
             _service = service;
         }
 
+        /// <summary>
+        /// Get all Users from the DB
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetAllUsersAsync()
         {
             try
@@ -36,8 +48,18 @@ namespace Apartments.Web.Controllers.Admin
             }
         }
 
+        /// <summary>
+        /// Get User by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> GetUserByIdAsync(string id)
         {
             if (!Guid.TryParse(id, out var _))
@@ -57,8 +79,18 @@ namespace Apartments.Web.Controllers.Admin
             }
         }
 
+        /// <summary>
+        /// Delete User by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
         public async Task<IActionResult> DeleteUserByIdAsync(string id)
         {
             if (!Guid.TryParse(id, out var _))
@@ -66,9 +98,16 @@ namespace Apartments.Web.Controllers.Admin
                 return BadRequest();
             }
 
-            var result = await _service.DeleteUserByIdAsync(id);
+            try
+            {
+                var result = await _service.DeleteUserByIdAsync(id);
 
-            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

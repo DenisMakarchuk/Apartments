@@ -32,6 +32,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByUserIdAsync(string userId)
         {
             Guid athorId = Guid.Parse(userId);
@@ -62,6 +63,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);
@@ -92,6 +94,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// </summary>
         /// <param name="commentId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<CommentDTOAdministration>> GetCommentByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
@@ -121,6 +124,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment)
         {
             comment.Update = DateTime.Now;
@@ -155,6 +159,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// </summary>
         /// <param name="commentId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteCommentByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);

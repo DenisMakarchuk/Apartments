@@ -32,7 +32,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Put User to the DataBase
         /// </summary>
         /// <param name="user"></param>
-        /// <returns></returns>
+        /// <returns></returns>        
+        [LogAttribute]
         public async Task<Result<UserDTO>> CreateUserAsync(AddUser user)
         {
             var addedUser = _mapper.Map<User>(user);
@@ -72,6 +73,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<UserDTO>> GetUserByIdAsync(string id)
         {
             Guid userId = Guid.Parse(id);
@@ -102,6 +104,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<UserDTO>> UpdateUserAsync(UserDTO user)
         {
             user.Update = DateTime.Now;
@@ -135,6 +138,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteUserByIdAsync(string id)
         {
             Guid userId = Guid.Parse(id);

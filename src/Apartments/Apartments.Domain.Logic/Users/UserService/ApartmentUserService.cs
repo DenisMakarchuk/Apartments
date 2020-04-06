@@ -34,6 +34,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="apartment"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<ApartmentView>> CreateApartmentAsync(AddApartment apartment)
         {
             var addedApartment = _mapper.Map<Apartment>(apartment);
@@ -44,7 +45,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 await _db.SaveChangesAsync();
 
-                Apartment apartmentAfterAdding = await _db.Apartments.Where(_ => _.OwnerId == addedApartment.OwnerId)
+                Apartment apartmentAfterAdding = await _db.Apartments.Where(_ => _.Title == addedApartment.Title)
                     .Select(_ => _).Include(_ => _.Address.Country).Include(_ => _.Address)
                     .AsNoTracking().FirstOrDefaultAsync();
 
@@ -83,6 +84,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByUserIdAsync(string userId)
         {
             Guid ownerId = Guid.Parse(userId);
@@ -114,6 +116,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<ApartmentView>> GetApartmentByIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);
@@ -155,6 +158,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="apartment"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<ApartmentView>> UpdateApartmentAsync(ApartmentView apartment)
         {
             apartment.Address.CountryId = apartment.Country.Id;
@@ -202,6 +206,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteApartmentByIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);

@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Search.SearchServices
 {
+    /// <summary>
+    /// Apartment Search methods
+    /// </summary>
     public class ApartmentSearchService : IApartmentSearchService
     {
         private readonly ApartmentContext _db;
@@ -25,10 +28,15 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all Apartments by Parameters
+        /// </summary>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<ApartmentSearchDTO>>> GetAllApartmentsAsync(SearchParameters search)
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
-
 
             if (search.CountryId != null)
             {
@@ -66,13 +74,13 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             {
                 foreach (var item in search.NeedDates)
                 {
-                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date.Date == item.Date).First() == null);
+                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date.Date == item.Date).FirstOrDefault() == null);
                 }
             }
 
             try
             {
-                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(apartments.ToList());
+                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync());
 
                 if (!result.Any())
                 {
@@ -90,6 +98,12 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             }
         }
 
+        /// <summary>
+        /// Get Apartment by Id
+        /// </summary>
+        /// <param name="apartmentId"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<ApartmentSearchView>> GetApartmentByIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);
@@ -126,6 +140,11 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             }
         }
 
+        /// <summary>
+        /// Get all countries from DB
+        /// </summary>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<CountrySearchDTO>>> GetAllCountriesAsync()
         {
             var countries = await _db.Countries.AsNoTracking().ToListAsync();
@@ -140,6 +159,12 @@ namespace Apartments.Domain.Logic.Search.SearchServices
                 .Ok(_mapper.Map<IEnumerable<CountrySearchDTO>>(countries));
         }
 
+        /// <summary>
+        /// Get Country by Id
+        /// </summary>
+        /// <param name="countryId"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<CountrySearchDTO>> GetCountryByIdAsync(string countryId)
         {
             Guid id = Guid.Parse(countryId);
