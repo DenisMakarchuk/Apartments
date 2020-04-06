@@ -14,6 +14,10 @@ using Microsoft.Extensions.Logging;
 using Apartments.Domain.Logic;
 using FluentValidation.AspNetCore;
 using Apartments.Web.Validation;
+using Apartments.Web.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Apartments.Web
 {
@@ -29,6 +33,31 @@ namespace Apartments.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var jwtSettings = new JwtSettings();
+            Configuration.Bind(nameof(jwtSettings), jwtSettings);
+            services.AddSingleton(jwtSettings);
+
+            services.AddAuthentication(a => 
+            { 
+                a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                a.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(b=>
+                {
+                    b.SaveToken = true;
+                    b.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        RequireExpirationTime = false,
+                        ValidateLifetime = true
+                    };
+                });
+
+
             services.AddDomainServices(Configuration);
             
             services.AddOpenApiDocument(config =>
@@ -44,6 +73,21 @@ namespace Apartments.Web
                         Email = string.Empty,
                         Url = "https://www.linkedin.com/in/denis-makarchuk-1816b0177/"
                     };
+
+                    var security = new Dictionary<string, IEnumerable<string>>
+                    {
+                        {"Bearer",new string[0] }
+                    };
+
+                    document.SecurityDefinitions.Add("Bearer", new NSwag.OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the bearer scheme",
+                        Name = "Authorization",
+                        In = NSwag.OpenApiSecurityApiKeyLocation.Header,
+                        Type = NSwag.OpenApiSecuritySchemeType.ApiKey
+                    });
+
+                    document.Security.Add(security as NSwag.OpenApiSecurityRequirement);
                 };
             });
 
@@ -61,8 +105,10 @@ namespace Apartments.Web
                     fv.RegisterValidatorsFromAssemblyContaining<OrderDTOValidator>();
                     fv.RegisterValidatorsFromAssemblyContaining<UserDTOValidator>();
                 });
-            ;
+
             services.AddAutoMapper(typeof(Startup).Assembly);
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -77,6 +123,8 @@ namespace Apartments.Web
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
