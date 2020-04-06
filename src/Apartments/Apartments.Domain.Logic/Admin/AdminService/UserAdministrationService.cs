@@ -32,6 +32,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get all Users from the database
         /// </summary>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<UserDTOAdministration>>> GetAllUsersAsync()
         {
             var users = await _db.Users.AsNoTracking().ToListAsync();
@@ -51,6 +52,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<UserDTOAdministration>> GetUserByIdAsync(string id)
         {
             Guid userId = Guid.Parse(id);
@@ -81,6 +83,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteUserByIdAsync(string id)
         {
             Guid userId = Guid.Parse(id);

@@ -33,6 +33,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<CommentDTO>> CreateCommentAsync(AddComment comment)
         {
             var addedComment = _mapper.Map<Comment>(comment);
@@ -72,6 +73,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByUserIdAsync(string userId)
         {
             Guid athorId = Guid.Parse(userId);
@@ -102,6 +104,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByApartmentIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);
@@ -132,6 +135,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<CommentDTO>> GetCommentByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);
@@ -161,6 +165,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<CommentDTO>> UpdateCommentAsync(CommentDTO comment)
         {
             comment.Update = DateTime.Now;
@@ -195,6 +200,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteCommentByIdAsync(string commentId)
         {
             Guid id = Guid.Parse(commentId);

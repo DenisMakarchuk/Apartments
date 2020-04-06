@@ -29,6 +29,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             _mapper = mapper;
         }
 
+        [LogAttribute]
         private async Task<bool> IsApartmentFree(IEnumerable<DateTime> dates, Guid apartmentId)
         {
             foreach (var item in dates)
@@ -51,6 +52,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<OrderView>> CreateOrderAsync(AddOrder order)
         {
             var addedOrder = _mapper.Map<Order>(order);
@@ -128,6 +130,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<OrderView>>> GetAllOrdersByUserIdAsync(string userId)
         {
             Guid customerId = Guid.Parse(userId);
@@ -189,6 +192,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<OrderDTO>>> GetAllOrdersByApartmentIdAsync(string apartmentId)
         {
             Guid id = Guid.Parse(apartmentId);
@@ -238,6 +242,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<OrderView>> GetOrderByIdAsync(string orderId)
         {
             Guid id = Guid.Parse(orderId);
@@ -292,6 +297,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<OrderView>> UpdateOrderAsync(OrderDTO order)
         {
             var updatedOrder = _mapper.Map<Order>(order);
@@ -369,6 +375,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteOrderByIdAsync(string orderId)
         {
             Guid id = Guid.Parse(orderId);
