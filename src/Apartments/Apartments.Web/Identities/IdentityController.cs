@@ -22,9 +22,9 @@ namespace Apartments.Web.Identities
         [Route("")]
         public async Task<IActionResult> Register([FromBody]UserRegistrationRequest request)
         {
-            var result = await _identityService.RegisterAsync(request.Email, request.Password); 
+            var result = await _identityService.RegisterAsync(request.Email, request.Password);
 
-            return Ok();
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
     }
 }

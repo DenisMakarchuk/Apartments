@@ -21,6 +21,10 @@ using System.Text;
 using Apartments.Web.Identities;
 using Microsoft.AspNetCore.Identity;
 using LinqToDB;
+using Microsoft.EntityFrameworkCore;
+using NSwag;
+using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
 
 namespace Apartments.Web
 {
@@ -63,9 +67,14 @@ namespace Apartments.Web
             services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddDomainServices(Configuration);
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<DataContext>;
-            
+
+            services.AddDbContext<IdentityContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetSection("ConnectionString:IdentityConnection").Value));
+
+            services.AddIdentityCore<IdentityUser>()
+                .AddEntityFrameworkStores<IdentityContext>();
+
             services.AddOpenApiDocument(config =>
             {
                 config.PostProcess = document =>
@@ -79,22 +88,18 @@ namespace Apartments.Web
                         Email = string.Empty,
                         Url = "https://www.linkedin.com/in/denis-makarchuk-1816b0177/"
                     };
+                };
 
-                    var security = new Dictionary<string, IEnumerable<string>>
-                    {
-                        {"Bearer",new string[0] }
-                    };
-
-                    document.SecurityDefinitions.Add("Bearer", new NSwag.OpenApiSecurityScheme
+                config.DocumentProcessors.Add(
+                    new SecurityDefinitionAppender("Bearer",
+                    new OpenApiSecurityScheme
                     {
                         Description = "JWT Authorization header using the bearer scheme",
                         Name = "Authorization",
-                        In = NSwag.OpenApiSecurityApiKeyLocation.Header,
-                        Type = NSwag.OpenApiSecuritySchemeType.ApiKey
-                    });
-
-                    document.Security.Add(security as NSwag.OpenApiSecurityRequirement);
-                };
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Type = OpenApiSecuritySchemeType.ApiKey
+                    }));
+                config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
             });
 
             services.AddControllers()
