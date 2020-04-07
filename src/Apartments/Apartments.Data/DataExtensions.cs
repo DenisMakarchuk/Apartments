@@ -15,6 +15,7 @@ namespace Apartments.Data
 
             services.AddDbContext<ApartmentContext>(options =>
                 options.UseSqlServer(config.GetSection("ConnectionString:ApartmentConnection").Value));
+            services.AddDefaultIdentity
 
             return services;
         }

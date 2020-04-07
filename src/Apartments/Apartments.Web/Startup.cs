@@ -18,6 +18,9 @@ using Apartments.Web.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Apartments.Web.Identities;
+using Microsoft.AspNetCore.Identity;
+using LinqToDB;
 
 namespace Apartments.Web
 {
@@ -57,8 +60,11 @@ namespace Apartments.Web
                     };
                 });
 
+            services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddDomainServices(Configuration);
+            services.AddDefaultIdentity<IdentityUser>()
+                .AddEntityFrameworkStores<DataContext>;
             
             services.AddOpenApiDocument(config =>
             {
@@ -107,8 +113,6 @@ namespace Apartments.Web
                 });
 
             services.AddAutoMapper(typeof(Startup).Assembly);
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
