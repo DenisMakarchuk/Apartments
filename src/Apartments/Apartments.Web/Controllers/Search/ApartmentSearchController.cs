@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Logic.Search.SearchServiceInterfaces;
 using Apartments.Domain.Search.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,6 +14,7 @@ namespace Apartments.Web.Controllers.Search
     /// <summary>
     /// Apartment Search
     /// </summary>
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class ApartmentSearchController : ControllerBase
