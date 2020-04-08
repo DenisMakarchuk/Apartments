@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +14,7 @@ namespace Apartments.Web.Controllers.Admin
     /// <summary>
     /// Administrator work with Users
     /// </summary>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class UserAdministrationController : ControllerBase

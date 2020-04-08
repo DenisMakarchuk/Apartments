@@ -14,6 +14,17 @@ using Microsoft.Extensions.Logging;
 using Apartments.Domain.Logic;
 using FluentValidation.AspNetCore;
 using Apartments.Web.Validation;
+using Apartments.Web.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Apartments.Web.Identities;
+using Microsoft.AspNetCore.Identity;
+using LinqToDB;
+using Microsoft.EntityFrameworkCore;
+using NSwag;
+using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
 
 namespace Apartments.Web
 {
@@ -29,8 +40,41 @@ namespace Apartments.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var jwtSettings = new JwtSettings();
+            Configuration.Bind(nameof(jwtSettings), jwtSettings);
+            services.AddSingleton(jwtSettings);
+
+            services.AddAuthentication(a => 
+            { 
+                a.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                a.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                a.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(b=>
+                {
+                    b.SaveToken = true;
+                    b.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        RequireExpirationTime = false,
+                        ValidateLifetime = true
+                    };
+                });
+
+            services.AddScoped<IIdentityService, IdentityService>();
+
             services.AddDomainServices(Configuration);
-            
+
+            services.AddDbContext<IdentityContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetSection("ConnectionString:IdentityConnection").Value));
+
+            services.AddIdentityCore<IdentityUser>()
+                .AddEntityFrameworkStores<IdentityContext>();
+
             services.AddOpenApiDocument(config =>
             {
                 config.PostProcess = document =>
@@ -45,6 +89,17 @@ namespace Apartments.Web
                         Url = "https://www.linkedin.com/in/denis-makarchuk-1816b0177/"
                     };
                 };
+
+                config.DocumentProcessors.Add(
+                    new SecurityDefinitionAppender("Bearer",
+                    new OpenApiSecurityScheme
+                    {
+                        Description = "JWT Authorization header using the bearer scheme",
+                        Name = "Authorization",
+                        In = OpenApiSecurityApiKeyLocation.Header,
+                        Type = OpenApiSecuritySchemeType.ApiKey
+                    }));
+                config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Bearer"));
             });
 
             services.AddControllers()
@@ -61,7 +116,7 @@ namespace Apartments.Web
                     fv.RegisterValidatorsFromAssemblyContaining<OrderDTOValidator>();
                     fv.RegisterValidatorsFromAssemblyContaining<UserDTOValidator>();
                 });
-            ;
+
             services.AddAutoMapper(typeof(Startup).Assembly);
         }
 
@@ -77,6 +132,8 @@ namespace Apartments.Web
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
