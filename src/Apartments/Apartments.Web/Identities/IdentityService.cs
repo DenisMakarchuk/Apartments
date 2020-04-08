@@ -22,13 +22,38 @@ namespace Apartments.Web.Identities
             _userManager = userManager;
             _jwtSettings = jwtSettings;
         }
+
+        private Result<string> GenerateAuthanticationResult(IdentityUser user)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                    new Claim("id", user.Id),
+                }),
+                Expires = DateTime.UtcNow.AddHours(2),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
+                                                            SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return (Result<string>)Result<string>.Ok(tokenHandler.WriteToken(token));
+        }
+
         public async Task<Result<string>> RegisterAsync(string email, string password)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
 
             if (existingUser != null)
             {
-                return (Result<string>)Result<string>.Fail<string>("User with this Emai already exista");
+                return (Result<string>)Result<string>.Fail<string>("User with this Emai already exist");
             }
 
             var newUser = new IdentityUser
@@ -47,26 +72,26 @@ namespace Apartments.Web.Identities
                                                 .Join("\n"));
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+            return GenerateAuthanticationResult(newUser);
+        }
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+        public async Task<Result<string>> LoginAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, newUser.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, newUser.Email),
-                    new Claim("id", newUser.Id),
-                }),
-                Expires = DateTime.UtcNow.AddHours(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
-                                                            SecurityAlgorithms.HmacSha256Signature)
-            };
+                return (Result<string>)Result<string>.Fail<string>("User with this Emai does not exist");
+            }
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var hasUserValidPassvord = await _userManager.CheckPasswordAsync(user, password);
 
-            return (Result<string>)Result<string>.Ok(tokenHandler.WriteToken(token));
+            if (!hasUserValidPassvord)
+            {
+                return (Result<string>)Result<string>.Fail<string>("User/password combination is wrong");
+            }
+
+            return GenerateAuthanticationResult(user);
         }
     }
 }

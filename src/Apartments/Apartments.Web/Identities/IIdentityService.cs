@@ -9,5 +9,7 @@ namespace Apartments.Web.Identities
     public interface IIdentityService
     {
         Task<Result<string>> RegisterAsync(string email, string password);
+
+        Task<Result<string>> LoginAsync(string email, string password);
     }
 }
