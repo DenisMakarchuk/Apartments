@@ -11,5 +11,7 @@ namespace Apartments.Web.Identities
         Task<Result<string>> RegisterAsync(string email, string password);
 
         Task<Result<string>> LoginAsync(string email, string password);
+
+        Task<Result> DeleteAsync(string email, string password);
     }
 }

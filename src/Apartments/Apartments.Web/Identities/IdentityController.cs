@@ -22,7 +22,7 @@ namespace Apartments.Web.Identities
 
         [HttpPost]
         [Route("")]
-        public async Task<IActionResult> Register([FromBody]UserRegistrationRequest request)
+        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistrationRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -39,12 +39,30 @@ namespace Apartments.Web.Identities
         }
 
         [HttpPost]
-        [Route("login")]
-        public async Task<IActionResult> Login([FromBody]UserLoginRequest request)
+        [Route("logIn")]
+        public async Task<IActionResult> LoginAsync([FromBody]UserLoginRequest request)
         {
             var result = await _identityService.LoginAsync(request.Email, request.Password);
 
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+        }
+
+        [HttpPost]
+        [Route("logOut")]
+        public async Task<IActionResult> LogOut()
+        {
+            HttpContext.Session.Clear();
+
+            return (IActionResult)Ok(await Task.FromResult(Result.Ok()));
+        }
+
+        [HttpDelete]
+        [Route("delete")]
+        public async Task<IActionResult> DeleteAsync([FromBody]UserLoginRequest request)
+        {
+            var result = await _identityService.DeleteAsync(request.Email, request.Password);
+
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }
     }
 }

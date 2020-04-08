@@ -6,6 +6,8 @@ using Apartments.Common;
 using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +16,7 @@ namespace Apartments.Web.Controllers.Admin
     /// <summary>
     /// Administrator work with User Comments
     /// </summary>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class CommentAdministrationController : ControllerBase

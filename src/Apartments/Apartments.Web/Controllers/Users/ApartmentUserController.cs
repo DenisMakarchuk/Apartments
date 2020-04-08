@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.ViewModels;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +18,7 @@ namespace Apartments.Web.Controllers.Users
     /// <summary>
     /// Work with own Apartments
     /// </summary>
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class ApartmentUserController : ControllerBase
