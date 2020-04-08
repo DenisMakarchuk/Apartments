@@ -35,12 +35,12 @@ namespace Apartments.Web.Controllers.Admin
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getusers")]
+        [Route("getusers/{role}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllUsersInRoleAsync([FromBody]string role)
+        public async Task<IActionResult> GetAllUsersInRoleAsync(string role)
         {
             try
             {

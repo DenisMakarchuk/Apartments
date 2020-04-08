@@ -1,4 +1,5 @@
 ﻿using Apartments.Common;
+using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Admin.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -10,7 +11,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
 {
     public interface IIdentityUserAdministrationService
     {
-        Task<Result<IEnumerable<IdentityUser>>> GetAllUsersInRoleAsync(string role);
+        Task<Result<IEnumerable<IdentityUserAdministrationDTO>>> GetAllUsersInRoleAsync(string role);
 
         Task<Result<UserAdministrationView>> GetUserByIdAsync(string id);
 

@@ -10,6 +10,6 @@ namespace Apartments.Domain.Admin.ViewModel
     {
         public UserDTOAdministration Profile { get; set; }
 
-        public IdentityUser UserIdentity { get; set; }
+        public IdentityUserAdministrationDTO IdentityUser { get; set; }
     }
 }

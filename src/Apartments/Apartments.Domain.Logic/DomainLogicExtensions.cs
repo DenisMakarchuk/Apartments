@@ -23,6 +23,9 @@ namespace Apartments.Domain.Logic
             services.AddAutoMapper(typeof(MapperLogicModule));
 
             services.AddScoped<IIdentityUserService, IdentityUserService>();
+            services.AddScoped<IIdentityUserAdministrationService, IdentityUserAdministrationService>();
+
+            
 
             services.AddScoped<IUserAdministrationService, UserAdministrationService>();
             services.AddScoped<ICommentAdministrationService, CommentAdministrationService>();

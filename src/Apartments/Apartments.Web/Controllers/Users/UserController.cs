@@ -36,6 +36,7 @@ namespace Apartments.Web.Controllers.Users
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost]
         [Route("")]
         [LogAttribute]
@@ -55,6 +56,7 @@ namespace Apartments.Web.Controllers.Users
             return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [Route("logIn")]
         public async Task<IActionResult> LoginAsync([FromBody]UserLoginRequest request)

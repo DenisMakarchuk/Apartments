@@ -1,4 +1,5 @@
 ﻿using Apartments.Common;
+using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Admin.ViewModel;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using Apartments.Domain.Logic.Options;
@@ -27,18 +28,30 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             _service = service;
         }
 
-        public async Task<Result<IEnumerable<IdentityUser>>> GetAllUsersInRoleAsync(string role)
+        public async Task<Result<IEnumerable<IdentityUserAdministrationDTO>>> GetAllUsersInRoleAsync(string role)
         {
             var users = await _userManager.GetUsersInRoleAsync(role);
 
-            if (users == null)
+            List<IdentityUserAdministrationDTO> result = new List<IdentityUserAdministrationDTO>();
+
+            foreach (var item in users)
             {
-                return (Result<IEnumerable<IdentityUser>>)Result<IEnumerable<IdentityUser>>
-                    .Fail<IEnumerable<IdentityUser>>("Not found");
+                result.Add(
+                    new IdentityUserAdministrationDTO()
+                    {
+                        IdentityId = item.Id,
+                        Email = item.Email
+                    });
             }
 
-            return (Result<IEnumerable<IdentityUser>>)Result<IEnumerable<IdentityUser>>
-                .Ok(users as IEnumerable<IdentityUser>);
+            if (users == null)
+            {
+                return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
+                    .Fail<IEnumerable<IdentityUserAdministrationDTO>>("Not found");
+            }
+
+            return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
+                .Ok(result as IEnumerable<IdentityUserAdministrationDTO>);
         }
 
         public async Task<Result<UserAdministrationView>> GetUserByIdAsync(string id)
@@ -53,10 +66,16 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id);
 
+            IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
+            {
+                IdentityId = user.Id,
+                Email = user.Email
+            };
+
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                UserIdentity = user
+                IdentityUser = identityUser
             };
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -73,14 +92,20 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                     .Fail<UserAdministrationView>("Not found");
             }
 
-            await _userManager.RemoveFromRoleAsync(user,"User");
+            await _userManager.AddToRoleAsync(user,"Admin");
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id);
+
+            IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
+            {
+                IdentityId = user.Id,
+                Email = user.Email
+            };
 
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                UserIdentity = user
+                IdentityUser = identityUser
             };
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -101,10 +126,16 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id);
 
+            IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
+            {
+                IdentityId = user.Id,
+                Email = user.Email
+            };
+
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                UserIdentity = user
+                IdentityUser = identityUser
             };
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
