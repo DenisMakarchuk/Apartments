@@ -29,39 +29,18 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         }
 
         /// <summary>
-        /// Get all Users from the database
-        /// </summary>
-        /// <returns></returns>
-        [LogAttribute]
-        public async Task<Result<IEnumerable<UserDTOAdministration>>> GetAllUsersAsync()
-        {
-            var users = await _db.Users.AsNoTracking().ToListAsync();
-
-            if (!users.Any())
-            {
-                return (Result<IEnumerable<UserDTOAdministration>>)Result<IEnumerable<UserDTOAdministration>>
-                    .Fail<IEnumerable<UserDTOAdministration>>("No Users found");
-            }
-
-            return (Result<IEnumerable<UserDTOAdministration>>)Result<IEnumerable<UserDTOAdministration>>
-                .Ok(_mapper.Map<IEnumerable<UserDTOAdministration>>(users));
-        }
-
-        /// <summary>
         /// Get User by User Id. Id must be verified to convert to Guid at the web level 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserDTOAdministration>> GetUserByIdAsync(string id)
+        public async Task<Result<UserDTOAdministration>> GetUserProfileByIdentityIdAsync(string id)
         {
-            Guid userId = Guid.Parse(id);
-
             try
             {
-                var user = await _db.Users.Where(_ => _.Id == userId).AsNoTracking().FirstOrDefaultAsync();
+                var profile = await _db.Users.Where(_ => _.IdentityId == id).AsNoTracking().FirstOrDefaultAsync();
 
-                if (user is null)
+                if (profile is null)
                 {
                     return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
                         .Fail<UserDTOAdministration>($"User was not found");
@@ -69,7 +48,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 }
 
                 return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
-                    .Ok(_mapper.Map<UserDTOAdministration>(user));
+                    .Ok(_mapper.Map<UserDTOAdministration>(profile));
             }
             catch (ArgumentNullException ex)
             {
@@ -84,31 +63,29 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteUserByIdAsync(string id)
+        public async Task<Result> DeleteUserProfileByIdentityIdAsync(string id)
         {
-            Guid userId = Guid.Parse(id);
+            var profile = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_=>_.IdentityId == id);
 
-            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_=>_.Id == userId);
-
-            if (user is null)
+            if (profile is null)
             {
-                return await Task.FromResult(Result.Fail("User was not found"));
+                return await Task.FromResult(Result.Fail("Not found"));
             }
 
             try
             {
-                _db.Users.Remove(user);
+                _db.Users.Remove(profile);
                 await _db.SaveChangesAsync();
 
                 return await Task.FromResult(Result.Ok());
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete profile. {ex.Message}"));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete profile. {ex.Message}"));
             }
         }
     }

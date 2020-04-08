@@ -19,8 +19,8 @@ namespace Apartments.Data.ModelConfig
             builder.HasKey(_ => _.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
 
-            builder.Property(_ => _.Name).IsRequired().HasMaxLength(50);
-            builder.HasIndex(_ => _.Name).IsUnique();
+            builder.Property(_ => _.IdentityId).IsRequired();
+            builder.HasIndex(_ => _.IdentityId).IsUnique();
 
             builder.HasMany(_ => _.Apartments).WithOne(_ => _.Owner)
                 .HasForeignKey(_ => _.OwnerId)

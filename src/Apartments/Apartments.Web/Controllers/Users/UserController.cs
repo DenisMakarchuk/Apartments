@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Apartments.Web.Identities;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Apartments.Web.Controllers.Users
 {
@@ -22,9 +24,9 @@ namespace Apartments.Web.Controllers.Users
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserService _service;
+        private readonly IIdentityUserService _service;
 
-        public UserController(IUserService service)
+        public UserController(IIdentityUserService service)
         {
             _service = service;
         }
@@ -36,119 +38,48 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> CreateUserAsync([FromBody, CustomizeValidator]AddUser user)
+        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistrationRequest request)
         {
-            if (user is null || !ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest((Result<string>)Result<string>
+                            .Fail<string>(ModelState.Values
+                                .SelectMany(x => x.Errors
+                                    .Select(xx => xx.ErrorMessage))
+                                .Join("\n")));
             }
 
-            try
-            {
-                var result = await _service.CreateUserAsync(user);
+            var result = await _service.RegisterAsync(request.Email, request.Password);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
-        /// <summary>
-        /// Get User by User Id
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("{userId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [LogAttribute]
-        public async Task<IActionResult> GetUserByIdAsync(string userId)
+        [HttpPost]
+        [Route("logIn")]
+        public async Task<IActionResult> LoginAsync([FromBody]UserLoginRequest request)
         {
-            if (!Guid.TryParse(userId, out var _))
-            {
-                return BadRequest();
-            }
+            var result = await _service.LoginAsync(request.Email, request.Password);
 
-            try
-            {
-                var result = await _service.GetUserByIdAsync(userId);
-
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
         }
 
-        /// <summary>
-        /// Update User
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [LogAttribute]
-        public async Task<IActionResult> UpdateUserAsync([FromBody, CustomizeValidator]  UserDTO user)
+        [HttpPost]
+        [Route("logOut")]
+        public async Task<IActionResult> LogOut()
         {
-            if (user is null || !ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            HttpContext.Session.Clear();
 
-            try
-            {
-                var result = await _service.UpdateUserAsync(user);
-
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return (IActionResult)Ok(await Task.FromResult(Result.Ok()));
         }
 
-        /// <summary>
-        /// Delete User by User Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         [HttpDelete]
-        [Route("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [LogAttribute]
-        public async Task<IActionResult> DeleteUserByIdAsync(string id)
+        [Route("delete")]
+        public async Task<IActionResult> DeleteAsync([FromBody]UserLoginRequest request)
         {
-            if (!Guid.TryParse(id, out var _))
-            {
-                return BadRequest();
-            }
+            var result = await _service.DeleteAsync(request.Email, request.Password);
 
-            try
-            {
-                var result = await _service.DeleteUserByIdAsync(id);
-
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
         }
     }
 }

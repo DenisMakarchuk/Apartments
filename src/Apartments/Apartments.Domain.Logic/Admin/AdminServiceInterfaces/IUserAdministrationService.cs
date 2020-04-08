@@ -13,23 +13,17 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
     public interface IUserAdministrationService
     {
         /// <summary>
-        /// Get all Users from the database
-        /// </summary>
-        /// <returns></returns>
-        Task<Result<IEnumerable<UserDTOAdministration>>> GetAllUsersAsync();
-
-        /// <summary>
         /// Get User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result<UserDTOAdministration>> GetUserByIdAsync(string id);
+        Task<Result<UserDTOAdministration>> GetUserProfileByIdentityIdAsync(string id);
 
         /// <summary>
         /// Delete User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteUserByIdAsync(string id);
+        Task<Result> DeleteUserProfileByIdentityIdAsync(string id);
     }
 }

@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Apartments.Domain.Logic;
 using FluentValidation.AspNetCore;
 using Apartments.Web.Validation;
-using Apartments.Web.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -25,6 +24,9 @@ using Microsoft.EntityFrameworkCore;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
+using Apartments.Domain.Logic.Options;
+using Apartments.Domain.Logic.Users.UserServiceInterfaces;
+using Apartments.Domain.Logic.Users.UserService;
 
 namespace Apartments.Web
 {
@@ -63,8 +65,6 @@ namespace Apartments.Web
                         ValidateLifetime = true
                     };
                 });
-
-            services.AddScoped<IIdentityService, IdentityService>();
 
             services.AddDomainServices(Configuration);
 

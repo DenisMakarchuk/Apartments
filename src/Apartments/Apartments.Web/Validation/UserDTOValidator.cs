@@ -14,7 +14,7 @@ namespace Apartments.Web.Validation
             RuleFor(_=>_.Id).Must(id => Guid.TryParse(id, out var _))
                 .WithMessage("User Id must can parse to Guid type");
 
-            RuleFor(_ => _.Name).NotEmpty().WithMessage("You must write the name");
+            RuleFor(_ => _.IdentityId).NotEmpty().WithMessage("You must write the name");
         }
     }
 }

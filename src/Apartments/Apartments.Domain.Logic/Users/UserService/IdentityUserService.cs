@@ -1,5 +1,7 @@
 ﻿using Apartments.Common;
-using Apartments.Web.Options;
+using Apartments.Domain.Logic.Options;
+using Apartments.Domain.Logic.Users.UserServiceInterfaces;
+using Apartments.Domain.Users.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
@@ -11,16 +13,21 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Apartments.Web.Identities
+namespace Apartments.Domain.Logic.Users.UserService
 {
-    public class IdentityService : IIdentityService
+    public class IdentityUserService : IIdentityUserService
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly JwtSettings _jwtSettings;
-        public IdentityService(UserManager<IdentityUser> userManager, JwtSettings jwtSettings)
+
+        IUserService _service;
+
+        public IdentityUserService(UserManager<IdentityUser> userManager, JwtSettings jwtSettings, IUserService service)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings;
+
+            _service = service;
         }
 
         private Result<string> GenerateAuthanticationResult(IdentityUser user)
@@ -47,13 +54,13 @@ namespace Apartments.Web.Identities
             return (Result<string>)Result<string>.Ok(tokenHandler.WriteToken(token));
         }
 
-        public async Task<Result<string>> RegisterAsync(string email, string password)
+        public async Task<Result<UserViewModel>> RegisterAsync(string email, string password)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
 
             if (existingUser != null)
             {
-                return (Result<string>)Result<string>.Fail<string>("User with this Emai already exist");
+                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>("User with this Emai already exist");
             }
 
             var newUser = new IdentityUser
@@ -66,34 +73,66 @@ namespace Apartments.Web.Identities
 
             if (!createUser.Succeeded)
             {
-                return (Result<string>)Result<string>
-                    .Fail<string>(createUser.Errors
+                return (Result<UserViewModel>)Result<UserViewModel>
+                    .Fail<UserViewModel>(createUser.Errors
                                                 .Select(_ => _.Description)
                                                 .Join("\n"));
             }
 
             await _userManager.AddToRoleAsync(newUser, "User");
 
-            return GenerateAuthanticationResult(newUser);
+            var profile = await _service.CreateUserProfileAsync(newUser.Id);
+
+            string token = GenerateAuthanticationResult(newUser).Data;
+
+            if (profile.IsError || string.IsNullOrEmpty(token))
+            {
+                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>($"{profile.Message}\n" +
+                    $"or token is null");
+            }
+
+            UserViewModel result = new UserViewModel()
+            {
+                Profile = profile.Data,
+                Token = token
+            };
+
+            return (Result<UserViewModel>)Result<UserViewModel>.Ok(result);
         }
 
-        public async Task<Result<string>> LoginAsync(string email, string password)
+        public async Task<Result<UserViewModel>> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
-                return (Result<string>)Result<string>.Fail<string>("User with this Emai does not exist");
+                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>("User with this Emai does not exist");
             }
 
             var hasUserValidPassvord = await _userManager.CheckPasswordAsync(user, password);
 
             if (!hasUserValidPassvord)
             {
-                return (Result<string>)Result<string>.Fail<string>("User/password combination is wrong");
+                return (Result<UserViewModel>)Result<string>.Fail<UserViewModel>("User/password combination is wrong");
             }
 
-            return GenerateAuthanticationResult(user);
+            var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id);
+
+            string token = GenerateAuthanticationResult(user).Data;
+
+            if (profile.IsError || string.IsNullOrEmpty(token))
+            {
+                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>($"{profile.Message}\n" +
+                    $"or token is null");
+            }
+
+            UserViewModel result = new UserViewModel()
+            {
+                Profile = profile.Data,
+                Token = token
+            };
+
+            return (Result<UserViewModel>)Result<UserViewModel>.Ok(result);
         }
 
         public async Task<Result> DeleteAsync(string email, string password)
@@ -112,7 +151,21 @@ namespace Apartments.Web.Identities
                 return await Task.FromResult(Result.Fail("User/password combination is wrong"));
             }
 
-            await _userManager.DeleteAsync(user);
+            var isProfileDeleted = await _service.DeleteUserProfileByIdentityIdAsync(user.Id);
+
+            if (isProfileDeleted.IsError)
+            {
+                return await Task.FromResult(Result.Fail(isProfileDeleted.Message));
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return await Task.FromResult(Result.Fail(result.Errors
+                                                            .Select(x => x.Description)
+                                                            .Join("\n")));
+            }
 
             return await Task.FromResult(Result.Ok());
         }

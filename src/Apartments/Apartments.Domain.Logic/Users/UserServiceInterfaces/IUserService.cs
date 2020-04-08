@@ -18,27 +18,20 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        Task<Result<UserDTO>> CreateUserAsync(AddUser user);
+        Task<Result<UserDTO>> CreateUserProfileAsync(string identityId);
 
         /// <summary>
         /// Get User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result<UserDTO>> GetUserByIdAsync(string id);
-
-        /// <summary>
-        /// Update User in DataBase
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        Task<Result<UserDTO>> UpdateUserAsync(UserDTO user);
+        Task<Result<UserDTO>> GetUserProfileByIdentityIdAsync(string identityId);
 
         /// <summary>
         /// Delete User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteUserByIdAsync(string id);
+        Task<Result> DeleteUserProfileByIdentityIdAsync(string identityId);
     }
 }

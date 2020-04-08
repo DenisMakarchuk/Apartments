@@ -21,6 +21,11 @@ namespace Apartments.Common
             return new Result(true, null);
         }
 
+        public static Result Ok(string message)
+        {
+            return new Result(true, message);
+        }
+
         public static Result Fail(string message)
         {
             return new Result(false, message);
