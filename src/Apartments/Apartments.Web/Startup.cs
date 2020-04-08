@@ -72,7 +72,15 @@ namespace Apartments.Web
                 options.UseSqlServer(
                     Configuration.GetSection("ConnectionString:IdentityConnection").Value));
 
-            services.AddIdentityCore<IdentityUser>()
+            services.AddIdentity<IdentityUser, IdentityRole>(opt=>
+            {
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireNonAlphanumeric = false;
+
+                opt.User.RequireUniqueEmail = true;
+            })
                 .AddEntityFrameworkStores<IdentityContext>();
 
             services.AddOpenApiDocument(config =>

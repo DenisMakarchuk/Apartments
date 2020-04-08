@@ -14,7 +14,7 @@ namespace Apartments.Web.Controllers.Admin
     /// <summary>
     /// Administrator work with Users
     /// </summary>
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class UserAdministrationController : ControllerBase

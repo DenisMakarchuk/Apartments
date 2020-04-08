@@ -19,6 +19,7 @@ namespace Apartments.Web.Identities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new RoleConfig());
         }
     }
 }

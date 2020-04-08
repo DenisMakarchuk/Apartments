@@ -72,6 +72,8 @@ namespace Apartments.Web.Identities
                                                 .Join("\n"));
             }
 
+            await _userManager.AddToRoleAsync(newUser, "User");
+
             return GenerateAuthanticationResult(newUser);
         }
 
@@ -92,6 +94,27 @@ namespace Apartments.Web.Identities
             }
 
             return GenerateAuthanticationResult(user);
+        }
+
+        public async Task<Result> DeleteAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return await Task.FromResult(Result.Fail("User with this Emai does not exist"));
+            }
+
+            var hasUserValidPassvord = await _userManager.CheckPasswordAsync(user, password);
+
+            if (!hasUserValidPassvord)
+            {
+                return await Task.FromResult(Result.Fail("User/password combination is wrong"));
+            }
+
+            await _userManager.DeleteAsync(user);
+
+            return await Task.FromResult(Result.Ok());
         }
     }
 }
