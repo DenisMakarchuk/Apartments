@@ -13,7 +13,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Apartments.Domain.Logic;
 using FluentValidation.AspNetCore;
-using Apartments.Web.Validation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -27,6 +26,7 @@ using NSwag.Generation.Processors.Security;
 using Apartments.Domain.Logic.Options;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Logic.Users.UserService;
+using Apartments.Domain.Logic.Validation;
 
 namespace Apartments.Web
 {
@@ -67,21 +67,6 @@ namespace Apartments.Web
                 });
 
             services.AddDomainServices(Configuration);
-
-            services.AddDbContext<IdentityContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetSection("ConnectionString:IdentityConnection").Value));
-
-            services.AddIdentity<IdentityUser, IdentityRole>(opt=>
-            {
-                opt.Password.RequiredLength = 8;
-                opt.Password.RequireDigit = false;
-                opt.Password.RequireUppercase = false;
-                opt.Password.RequireNonAlphanumeric = false;
-
-                opt.User.RequireUniqueEmail = true;
-            })
-                .AddEntityFrameworkStores<IdentityContext>();
 
             services.AddOpenApiDocument(config =>
             {

@@ -38,6 +38,7 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> GetAllCommentsByUserIdAsync(string userId)
@@ -51,7 +52,7 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllCommentsByUserIdAsync(userId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -69,6 +70,7 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> GetAllCommentsByApartmentIdAsync(string apartmentId)
@@ -82,7 +84,7 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -100,6 +102,7 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> GetCommentByIdAsync(string commentId)
@@ -113,7 +116,7 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetCommentByIdAsync(commentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -130,6 +133,7 @@ namespace Apartments.Web.Controllers.Admin
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> UpdateCommentAsync([FromBody, CustomizeValidator]  CommentDTOAdministration comment)
@@ -161,6 +165,7 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> DeleteCommentByIdAsync(string commentId)

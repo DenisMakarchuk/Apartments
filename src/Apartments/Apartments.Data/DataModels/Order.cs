@@ -16,6 +16,6 @@ namespace Apartments.Data.DataModels
 
         public HashSet<BusyDate> Dates { get; set; }
 
-        public DateTime? Update { get; set; } = DateTime.Now;
+        public DateTime? Update { get; set; } = DateTime.UtcNow;
     }
 }

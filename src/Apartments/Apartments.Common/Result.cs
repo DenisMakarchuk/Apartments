@@ -46,6 +46,11 @@ namespace Apartments.Common
             return new Result<T>(true, null, data);
         }
 
+        public static Result<T> Ok<T>(T data, string message) where T : class
+        {
+            return new Result<T>(true, message, data);
+        }
+
         public static Result<T> Fail<T>(string message) where T : class
         {
             return new Result<T>(false, message, null);

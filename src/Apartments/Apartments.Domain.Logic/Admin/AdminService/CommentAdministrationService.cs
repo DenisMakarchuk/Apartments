@@ -45,7 +45,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .Fail<IEnumerable<CommentDTOAdministration>>("This User haven't Comments");
+                        .Ok<IEnumerable<CommentDTOAdministration>>(new List<CommentDTOAdministration>(), "This User haven't Comments");
                 }
 
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
@@ -76,7 +76,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .Fail<IEnumerable<CommentDTOAdministration>>("This Apartment haven't Comments");
+                        .Ok<IEnumerable<CommentDTOAdministration>>(new List<CommentDTOAdministration>(), "This Apartment haven't Comments");
                 }
 
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
@@ -127,7 +127,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         [LogAttribute]
         public async Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment)
         {
-            comment.Update = DateTime.Now;
+            comment.Update = DateTime.UtcNow;
             Comment commentForUpdate = _mapper.Map<Comment>(comment);
 
             _db.Entry(commentForUpdate).Property(c => c.Title).IsModified = true;

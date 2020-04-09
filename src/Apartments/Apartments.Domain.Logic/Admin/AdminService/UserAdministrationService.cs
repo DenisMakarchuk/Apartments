@@ -8,14 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
 using System.Collections.Generic;
 using Apartments.Data.DataModels;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
 {
     /// <summary>
-    /// Methods of Administrator work with Users
+    /// Methods of Administrator work with User Profiles
     /// </summary>
     public class UserAdministrationService : IUserAdministrationService
     {
@@ -29,7 +28,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         }
 
         /// <summary>
-        /// Get User by User Id. Id must be verified to convert to Guid at the web level 
+        /// Get User by Identity Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

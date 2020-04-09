@@ -29,7 +29,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Put User to the DataBase
+        /// Create User profile with identityId
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>        
@@ -74,7 +74,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get User by User Id. Id must be verified to convert to Guid at the web level
+        /// Get User profile by identityId
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -103,7 +103,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Delete User by User Id. Id must be verified to convert to Guid at the web level
+        /// Delete User by identityId
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>

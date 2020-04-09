@@ -36,7 +36,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 var ordered = await _db.Apartments.Where(_ => _.Id == apartmentId)
                     .Where(_ => _.Dates
-                        .Where(_ => _.Date.Date != item.Date).Any()).Select(_=>_.Dates).FirstOrDefaultAsync();
+                        .Where(_ => _.Date != item.Date).Any()).Select(_=>_.Dates).FirstOrDefaultAsync();
 
                 if (ordered !is null || ordered.Any())
                 {

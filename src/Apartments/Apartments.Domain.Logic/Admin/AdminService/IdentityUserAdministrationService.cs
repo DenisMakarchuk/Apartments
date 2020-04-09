@@ -13,24 +13,43 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
 {
+    /// <summary>
+    /// Methods of Administrator work with Identity Users & User Profoles
+    /// </summary>
     public class IdentityUserAdministrationService : IIdentityUserAdministrationService
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly JwtSettings _jwtSettings;
 
-        IUserAdministrationService _service;
+        private readonly IUserAdministrationService _service;
 
-        public IdentityUserAdministrationService(UserManager<IdentityUser> userManager, JwtSettings jwtSettings, IUserAdministrationService service)
+        public IdentityUserAdministrationService(UserManager<IdentityUser> userManager, IUserAdministrationService service)
         {
             _userManager = userManager;
-            _jwtSettings = jwtSettings;
 
             _service = service;
         }
 
+        /// <summary>
+        /// Get all Identity Users in role
+        /// </summary>
+        /// <param name="role"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<IEnumerable<IdentityUserAdministrationDTO>>> GetAllUsersInRoleAsync(string role)
         {
             var users = await _userManager.GetUsersInRoleAsync(role);
+
+            if (users == null)
+            {
+                return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
+                    .Fail<IEnumerable<IdentityUserAdministrationDTO>>("Not found");
+            }
+
+            if (!users.Any())
+            {
+                return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
+                    .Ok<IEnumerable<IdentityUserAdministrationDTO>>(new List<IdentityUserAdministrationDTO>(), $"No Identity users in role {role}");
+            }
 
             List<IdentityUserAdministrationDTO> result = new List<IdentityUserAdministrationDTO>();
 
@@ -44,16 +63,16 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                     });
             }
 
-            if (users == null)
-            {
-                return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
-                    .Fail<IEnumerable<IdentityUserAdministrationDTO>>("Not found");
-            }
-
             return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
                 .Ok(result as IEnumerable<IdentityUserAdministrationDTO>);
         }
 
+        /// <summary>
+        /// Get IdentityUser with User Profile by IdentityId
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<UserAdministrationView>> GetUserByIdAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -64,13 +83,25 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                     .Fail<UserAdministrationView>("Not found");
             }
 
-            var profile = await _service.GetUserProfileByIdentityIdAsync(id);
-
             IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
             {
                 IdentityId = user.Id,
                 Email = user.Email
             };
+
+            var profile = await _service.GetUserProfileByIdentityIdAsync(id);
+
+            if (profile.IsError)
+            {
+                UserAdministrationView failView = new UserAdministrationView()
+                {
+                    Profile = null,
+                    IdentityUser = identityUser
+                };
+
+                return (Result<UserAdministrationView>)Result<UserAdministrationView>
+                    .Ok<UserAdministrationView>(failView, profile.Message);
+            }
 
             UserAdministrationView view = new UserAdministrationView()
             {
@@ -82,7 +113,13 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 .Ok(view);
         }
 
-        public async Task<Result<UserAdministrationView>> MakeAdminAsync(string id)
+        /// <summary>
+        /// Add User to Admin role
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [LogAttribute]
+        public async Task<Result<UserAdministrationView>> AddToAdminAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -94,13 +131,25 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             await _userManager.AddToRoleAsync(user,"Admin");
 
-            var profile = await _service.GetUserProfileByIdentityIdAsync(id);
-
             IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
             {
                 IdentityId = user.Id,
                 Email = user.Email
             };
+
+            var profile = await _service.GetUserProfileByIdentityIdAsync(id);
+
+            if (profile.IsError)
+            {
+                UserAdministrationView failView = new UserAdministrationView()
+                {
+                    Profile = null,
+                    IdentityUser = identityUser
+                };
+
+                return (Result<UserAdministrationView>)Result<UserAdministrationView>
+                    .Ok<UserAdministrationView>(failView, profile.Message);
+            }
 
             UserAdministrationView view = new UserAdministrationView()
             {
@@ -112,7 +161,13 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 .Ok(view);
         }
 
-        public async Task<Result<UserAdministrationView>> MakeUserAsync(string id)
+        /// <summary>
+        /// Remove User from Admin role
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [LogAttribute]
+        public async Task<Result<UserAdministrationView>> AddToUserAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -142,6 +197,12 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 .Ok(view);
         }
 
+        /// <summary>
+        /// Delete IdentityUser & User Profile
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteByIdAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
@@ -160,6 +221,11 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 return await Task.FromResult(Result.Fail(result.Errors
                                                             .Select(x => x.Description)
                                                             .Join("\n")));
+            }
+
+            if (isProfileDeleted.IsSuccess)
+            {
+                return await Task.FromResult(Result.Ok());
             }
 
             return await Task.FromResult(Result.Ok(isProfileDeleted.Message));

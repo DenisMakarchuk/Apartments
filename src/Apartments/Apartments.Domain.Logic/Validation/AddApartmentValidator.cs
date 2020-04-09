@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Apartments.Web.Validation
+namespace Apartments.Domain.Logic.Validation
 {
     public class AddApartmentValidator : AbstractValidator<AddApartment>
     {

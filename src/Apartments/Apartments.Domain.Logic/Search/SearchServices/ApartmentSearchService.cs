@@ -74,7 +74,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             {
                 foreach (var item in search.NeedDates)
                 {
-                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date.Date == item.Date).FirstOrDefault() == null);
+                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date == item.Date).FirstOrDefault() == null);
                 }
             }
 

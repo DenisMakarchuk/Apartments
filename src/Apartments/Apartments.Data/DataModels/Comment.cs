@@ -17,6 +17,6 @@ namespace Apartments.Data.DataModels
         public string Title { get; set; }
         public string Text { get; set; }
 
-        public DateTime? Update { get; set; } = DateTime.Now;
+        public DateTime? Update { get; set; } = DateTime.UtcNow;
     }
 }

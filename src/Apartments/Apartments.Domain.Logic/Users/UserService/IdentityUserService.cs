@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Users.UserService
 {
+    /// <summary>
+    /// Methods of User work with own profile & Identity
+    /// </summary>
     public class IdentityUserService : IIdentityUserService
     {
         private readonly UserManager<IdentityUser> _userManager;
@@ -35,6 +38,12 @@ namespace Apartments.Domain.Logic.Users.UserService
             _roleManager = roleManager;
         }
 
+        /// <summary>
+        /// Genetate token
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        [LogAttribute]
         private async Task<Result<string>> GenerateAuthanticationResult(IdentityUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -87,10 +96,18 @@ namespace Apartments.Domain.Logic.Users.UserService
             return (Result<string>)Result<string>.Ok(tokenHandler.WriteToken(token));
         }
 
+        /// <summary>
+        /// Create User profile & Identity User
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<UserViewModel>> RegisterAsync(string email, string password)
         {
-            var existingUser = await _userManager.FindByEmailAsync(email);
             string defaultRole = "User";
+
+            var existingUser = await _userManager.FindByEmailAsync(email);
 
             if (existingUser != null)
             {
@@ -139,6 +156,13 @@ namespace Apartments.Domain.Logic.Users.UserService
             return (Result<UserViewModel>)Result<UserViewModel>.Ok(result);
         }
 
+        /// <summary>
+        /// Login User
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<UserViewModel>> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -174,6 +198,13 @@ namespace Apartments.Domain.Logic.Users.UserService
             return (Result<UserViewModel>)Result<UserViewModel>.Ok(result);
         }
 
+        /// <summary>
+        /// Delete User own profile & Identity User
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> DeleteAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);

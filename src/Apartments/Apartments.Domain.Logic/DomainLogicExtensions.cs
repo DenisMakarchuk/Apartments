@@ -10,6 +10,8 @@ using Apartments.Domain.Logic.Search.SearchServiceInterfaces;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Logic.Search.SearchServices;
 using Apartments.Domain.Logic.Users.UserService;
+using Apartments.Data.Context;
+using Microsoft.AspNetCore.Identity;
 
 namespace Apartments.Domain.Logic
 {
@@ -22,20 +24,27 @@ namespace Apartments.Domain.Logic
 
             services.AddAutoMapper(typeof(MapperLogicModule));
 
-            services.AddScoped<IIdentityUserService, IdentityUserService>();
-            services.AddScoped<IIdentityUserAdministrationService, IdentityUserAdministrationService>();
-
-            
-
-            services.AddScoped<IUserAdministrationService, UserAdministrationService>();
             services.AddScoped<ICommentAdministrationService, CommentAdministrationService>();
+            services.AddScoped<IIdentityUserAdministrationService, IdentityUserAdministrationService>();
 
             services.AddScoped<IApartmentSearchService, ApartmentSearchService>();
 
             services.AddScoped<IApartmentUserService, ApartmentUserService>();
             services.AddScoped<ICommentUserService, CommentUserService>();
             services.AddScoped<IOrderUserService, OrderUserService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IIdentityUserService, IdentityUserService>();
+
+            services.AddIdentityCore<IdentityUser>(opt =>
+            {
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireNonAlphanumeric = false;
+
+                opt.User.RequireUniqueEmail = true;
+            })
+                .AddRoleStore<IdentityRole>()
+                .AddEntityFrameworkStores<IdentityContext>();
 
             return services;
         }
