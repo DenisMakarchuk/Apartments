@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace Apartments.Data
 {
@@ -19,6 +20,17 @@ namespace Apartments.Data
             services.AddDbContext<IdentityContext>(options =>
                 options.UseSqlServer(
                     config.GetSection("ConnectionString:IdentityConnection").Value));
+
+            services.AddIdentity<IdentityUser, IdentityRole>(opt =>
+            {
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireNonAlphanumeric = false;
+
+                opt.User.RequireUniqueEmail = true;
+            })
+                .AddEntityFrameworkStores<IdentityContext>();
 
             return services;
         }

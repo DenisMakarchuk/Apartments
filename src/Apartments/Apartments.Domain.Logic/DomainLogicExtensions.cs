@@ -34,18 +34,6 @@ namespace Apartments.Domain.Logic
             services.AddScoped<IOrderUserService, OrderUserService>();
             services.AddScoped<IIdentityUserService, IdentityUserService>();
 
-            services.AddIdentityCore<IdentityUser>(opt =>
-            {
-                opt.Password.RequiredLength = 8;
-                opt.Password.RequireDigit = false;
-                opt.Password.RequireUppercase = false;
-                opt.Password.RequireNonAlphanumeric = false;
-
-                opt.User.RequireUniqueEmail = true;
-            })
-                .AddRoleStore<IdentityRole>()
-                .AddEntityFrameworkStores<IdentityContext>();
-
             return services;
         }
     }

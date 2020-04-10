@@ -42,6 +42,8 @@ namespace Apartments.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDomainServices(Configuration);
+
             var jwtSettings = new JwtSettings();
             Configuration.Bind(nameof(jwtSettings), jwtSettings);
             services.AddSingleton(jwtSettings);
@@ -65,8 +67,6 @@ namespace Apartments.Web
                         ValidateLifetime = true
                     };
                 });
-
-            services.AddDomainServices(Configuration);
 
             services.AddOpenApiDocument(config =>
             {
