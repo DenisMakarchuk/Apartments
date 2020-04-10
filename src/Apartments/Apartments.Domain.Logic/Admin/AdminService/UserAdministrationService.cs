@@ -42,7 +42,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (profile is null)
                 {
                     return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
-                        .Fail<UserDTOAdministration>($"User was not found");
+                        .NoContent<UserDTOAdministration>();
 
                 }
 
@@ -68,7 +68,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             if (profile is null)
             {
-                return await Task.FromResult(Result.Fail("Not found"));
+                return await Task.FromResult(Result.NoContent());
             }
 
             try

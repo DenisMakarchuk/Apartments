@@ -37,9 +37,10 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("getusers/{role}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> GetAllUsersInRoleAsync(string role)
@@ -53,7 +54,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllUsersInRoleAsync(role);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -69,9 +72,10 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> GetUserByIdAsync(string id)
@@ -85,7 +89,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetUserByIdAsync(id);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? NotFound(result.Message)
+                    : result.Data == null ? NoContent()
+                    : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -101,9 +107,10 @@ namespace Apartments.Web.Controllers.Admin
         [HttpPut]
         [Route("makeadmit/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> ChangeRoleToAdminAsync(string id)
@@ -117,7 +124,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.AddToAdminAsync(id);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? NotFound(result.Message)
+                    : result.Data == null ? NoContent()
+                    : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -133,9 +142,10 @@ namespace Apartments.Web.Controllers.Admin
         [HttpPut]
         [Route("makeuser/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> ChangeRoleToUserAsync(string id)
@@ -149,7 +159,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.AddToUserAsync(id);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? NotFound(result.Message)
+                    : result.Data == null ? NoContent()
+                    : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -165,9 +177,10 @@ namespace Apartments.Web.Controllers.Admin
         [HttpDelete]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> DeleteUserByIdAsync(string id)
@@ -181,7 +194,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.DeleteByIdAsync(id);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? NotFound(result.Message)
+                    : result.Message == null ? NoContent()
+                    : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {

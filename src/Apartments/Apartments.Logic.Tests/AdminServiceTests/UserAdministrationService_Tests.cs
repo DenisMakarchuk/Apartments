@@ -1,140 +1,95 @@
-﻿//using Apartments.Data.Context;
-//using Apartments.Data.DataModels;
-//using Bogus;
-//using Microsoft.EntityFrameworkCore;
-//using System;
-//using System.Collections.Generic;
-//using System.Text;
-//using Xunit;
-//using System.Linq;
-//using AutoMapper;
-//using Apartments.Domain.Admin.DTO;
-//using Apartments.Domain.Logic.Admin.AdminService;
-//using FluentAssertions;
+﻿using Apartments.Data.Context;
+using Apartments.Data.DataModels;
+using Bogus;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Xunit;
+using System.Linq;
+using AutoMapper;
+using Apartments.Domain.Admin.DTO;
+using Apartments.Domain.Logic.Admin.AdminService;
+using FluentAssertions;
 
-//namespace Apartments.Logic.Tests.AdminServiceTests
-//{
-//    public class UserAdministrationService_Tests
-//    {
-//        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.IdentityId, Guid.NewGuid().ToString());
-//        List<User> _users;
-//        IMapper _mapper;
+namespace Apartments.Logic.Tests.AdminServiceTests
+{
+    public class UserAdministrationService_Tests
+    {
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.IdentityId, Guid.NewGuid().ToString());
+        List<User> _users;
+        IMapper _mapper;
 
-//        public UserAdministrationService_Tests()
-//        {
-//            var mapperConfig = new MapperConfiguration(cfg =>
-//            {
-//                cfg.CreateMap<UserDTOAdministration, User>().ReverseMap();
-//            });
+        public UserAdministrationService_Tests()
+        {
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<UserDTOAdministration, User>().ReverseMap();
+            });
 
-//            _mapper = new Mapper(mapperConfig);
+            _mapper = new Mapper(mapperConfig);
 
-//            _users = _fakeUser.Generate(3);
-//        }
+            _users = _fakeUser.Generate(3);
+        }
 
-//        [Fact]
-//        public async void GetAllUsersAsync_Positive_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "GetAllUsersAsync_Positive_TestAsync")
-//                .Options;
+        [Fact]
+        public async void GetUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
-//            }
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
+            }
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var service = new UserAdministrationService(context, _mapper);
+            using (var context = new ApartmentContext(options))
+            {
+                var user = await context.Users.AsNoTracking().FirstOrDefaultAsync();
 
-//                var result = await service.GetAllUsersAsync();
+                var service = new UserAdministrationService(context, _mapper);
 
-//                foreach (var item in _users)
-//                {
-//                    var itemFromResult = result.Data.Where(_ => _.Name.Equals(item.Name)).Select(_ => _).FirstOrDefault();
+                var resultPositive = await service.GetUserProfileByIdentityIdAsync(user.IdentityId.ToString());
+                var resultNegative = await service.GetUserProfileByIdentityIdAsync(new Guid().ToString());
 
-//                    itemFromResult.Should().NotBeNull();
-//                }
-//            }
-//        }
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.IdentityId.Should().BeEquivalentTo(user.IdentityId);
 
-//        [Fact]
-//        public async void GetAllUsersAsync_Negative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "GetAllUsersAsync_Negative_TestAsync")
-//                .Options;
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeNull();
+            }
+        }
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var service = new UserAdministrationService(context, _mapper);
+        [Fact]
+        public async void DeleteUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "DeleteUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
 
-//                var result = await service.GetAllUsersAsync();
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
+            }
 
-//                result.IsSuccess.Should().BeFalse();
-//            }
-//        }
+            using (var context = new ApartmentContext(options))
+            {
+                var user = await context.Users.AsNoTracking().FirstOrDefaultAsync();
 
-//        [Fact]
-//        public async void GetUserByIdAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "GetUserByIdAsync_PositiveAndNegative_TestAsync")
-//                .Options;
+                var service = new UserAdministrationService(context, _mapper);
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
-//            }
+                var resultPositive = await service.DeleteUserProfileByIdentityIdAsync(user.IdentityId.ToString());
+                var resultNegative = await service.DeleteUserProfileByIdentityIdAsync(new Guid().ToString());
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var user = await context.Users.AsNoTracking().FirstOrDefaultAsync();
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Message.Should().BeNull();
 
-//                var service = new UserAdministrationService(context, _mapper);
-
-//                var resultPositive = await service.GetUserByIdAsync(user.Id.ToString());
-//                var resultNegative = await service.GetUserByIdAsync(new Guid().ToString());
-
-//                resultPositive.IsSuccess.Should().BeTrue();
-//                resultPositive.Data.Name.Should().BeEquivalentTo(user.Name);
-
-//                resultNegative.IsSuccess.Should().BeFalse();
-//                resultNegative.Data.Should().BeNull();
-//            }
-//        }
-
-//        [Fact]
-//        public async void DeleteUserByIdAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "DeleteUserByIdAsync_PositiveAndNegative_TestAsync")
-//                .Options;
-
-//            using (var context = new ApartmentContext(options))
-//            {
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
-//            }
-
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var user = await context.Users.AsNoTracking().FirstOrDefaultAsync();
-
-//                var service = new UserAdministrationService(context, _mapper);
-
-//                var resultPositive = await service.DeleteUserByIdAsync(user.Id.ToString());
-//                var resultNegative = await service.DeleteUserByIdAsync(new Guid().ToString());
-
-//                resultPositive.IsSuccess.Should().BeTrue();
-//                resultPositive.Message.Should().BeNull();
-
-//                resultNegative.IsSuccess.Should().BeFalse();
-//                resultNegative.Message.Should().Contain("User was not found");
-//            }
-//        }
-//    }
-//}
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Message.Should().BeNull();
+            }
+        }
+    }
+}
