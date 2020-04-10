@@ -34,6 +34,9 @@ namespace Apartments.Domain.Logic
             services.AddScoped<IOrderUserService, OrderUserService>();
             services.AddScoped<IIdentityUserService, IdentityUserService>();
 
+            services.AddScoped<IUserAdministrationService, UserAdministrationService>();
+            services.AddScoped<IUserService, UserService>();
+
             return services;
         }
     }
