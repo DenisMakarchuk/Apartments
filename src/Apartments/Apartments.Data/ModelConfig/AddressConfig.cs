@@ -25,11 +25,10 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasOne(_ => _.Apartment).WithOne(_ => _.Address)
                 .HasForeignKey<Apartment>(_ => _.AddressId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(_ => _.City).IsRequired().HasMaxLength(50);
             builder.Property(_ => _.Street).IsRequired().HasMaxLength(50);
-            builder.Property(_ => _.Home).IsRequired().HasMaxLength(50);
         }
     }
 }

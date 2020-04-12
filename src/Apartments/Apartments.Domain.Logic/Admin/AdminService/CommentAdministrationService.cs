@@ -45,7 +45,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .Fail<IEnumerable<CommentDTOAdministration>>("This User haven't Comments");
+                        .NoContent<IEnumerable<CommentDTOAdministration>>();
                 }
 
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
@@ -76,7 +76,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .Fail<IEnumerable<CommentDTOAdministration>>("This Apartment haven't Comments");
+                        .NoContent<IEnumerable<CommentDTOAdministration>>();
                 }
 
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
@@ -106,7 +106,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (user is null)
                 {
                     return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
-                        .Fail<CommentDTOAdministration>($"Comment was not found");
+                        .NoContent<CommentDTOAdministration>();
                 }
 
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
@@ -127,7 +127,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         [LogAttribute]
         public async Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment)
         {
-            comment.Update = DateTime.Now;
+            comment.Update = DateTime.UtcNow;
             Comment commentForUpdate = _mapper.Map<Comment>(comment);
 
             _db.Entry(commentForUpdate).Property(c => c.Title).IsModified = true;
@@ -168,7 +168,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             if (comment is null)
             {
-                return await Task.FromResult(Result.Fail("Comment was not found"));
+                return await Task.FromResult(Result.NoContent());
             }
 
             try

@@ -18,7 +18,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
 {
     public class UserService_Tests
     {
-        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Id, new Guid());
         List<User> _users;
         IMapper _mapper;
 
@@ -46,17 +46,20 @@ namespace Apartments.Logic.Tests.UserServiceTests
             {
                 var service = new UserService(context, _mapper);
 
-                var user = _mapper.Map<AddUser>(_users.FirstOrDefault());
+                AddUser user = new AddUser()
+                {
+                    Id = Guid.NewGuid().ToString()
+                };
 
                 AddUser failAddUser = new AddUser()
                 {
-                    Name = user.Name
+                    Id = user.Id
                 };
 
-                var resultPositive = await service.CreateUserAsync(user);
-                //var resultNegative = await service.CreateUserAsync(failAddUser);
+                var resultPositive = await service.CreateUserProfileAsync(user.Id);
+                //var resultNegative = await service.CreateUserProfileAsync(failAddUser.Id);
 
-                resultPositive.Data.Name.Should().BeEquivalentTo(user.Name);
+                resultPositive.Data.Id.Should().BeEquivalentTo(user.Id);
 
                 //resultNegative.IsSuccess.Should().BeFalse();
             }
@@ -81,49 +84,11 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 var service = new UserService(context, _mapper);
 
-                var resultPositive = await service.GetUserByIdAsync(user.Id.ToString());
-                var resultNegative = await service.GetUserByIdAsync(new Guid().ToString());
+                var resultPositive = await service.GetUserProfileByIdentityIdAsync(user.Id.ToString());
+                var resultNegative = await service.GetUserProfileByIdentityIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Name.Should().BeEquivalentTo(user.Name);
-
-                resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Data.Should().BeNull();
-            }
-        }
-
-        [Fact]
-        public async void UpdateUserAsync_PositiveAndNegative_TestAsync()
-        {
-            var options = new DbContextOptionsBuilder<ApartmentContext>()
-                .UseInMemoryDatabase(databaseName: "UpdateUserAsync_PositiveAndNegative_TestAsync")
-                .Options;
-
-            using (var context = new ApartmentContext(options))
-            {
-                context.AddRange(_users);
-                await context.SaveChangesAsync();
-            }
-
-            using (var context = new ApartmentContext(options))
-            {
-                var user = await context.Users.AsNoTracking().FirstOrDefaultAsync();
-                var userForUpdate = _mapper.Map<UserDTO>(user);
-
-                userForUpdate.Name = "Updated";
-                UserDTO failUserForUpdate = new UserDTO()
-                {
-                    Id = new Guid().ToString(),
-                    Name = "Fail"
-                };
-
-                var service = new UserService(context, _mapper);
-
-                var resultPositive = await service.UpdateUserAsync(userForUpdate);
-                var resultNegative = await service.UpdateUserAsync(failUserForUpdate);
-
-                resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Name.Should().BeEquivalentTo(userForUpdate.Name);
+                resultPositive.Data.Id.Should().BeEquivalentTo(user.Id.ToString());
 
                 resultNegative.IsSuccess.Should().BeFalse();
                 resultNegative.Data.Should().BeNull();
@@ -149,14 +114,14 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 var service = new UserService(context, _mapper);
 
-                var resultPositive = await service.DeleteUserByIdAsync(user.Id.ToString());
-                var resultNegative = await service.DeleteUserByIdAsync(new Guid().ToString());
+                var resultPositive = await service.DeleteUserProfileByIdentityIdAsync(user.Id.ToString());
+                var resultNegative = await service.DeleteUserProfileByIdentityIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().Contain("User was not found");
+                resultNegative.Message.Should().BeNull();
             }
         }
     }

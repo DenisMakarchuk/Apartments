@@ -18,7 +18,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
 {
     public class CommentUserService_Test
     {
-        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Id, new Guid());
         private Faker<Apartment> _fakeApartment = new Faker<Apartment>().RuleFor(x => x.IsOpen, true)
             .RuleFor(x => x.Price, y => y.Random.Decimal(5M, 15M))
             .RuleFor(x => x.Title, y => y.Name.JobTitle())
@@ -71,14 +71,13 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 AddComment comment = new AddComment()
                 {
                     ApartmentId = apartment.Id.ToString(),
-                    AuthorId = user.Id.ToString(),
                     Title = "Title",
                     Text = "Text"
                 };
 
                 var service = new CommentUserService(context, _mapper);
 
-                var resultPositive = await service.CreateCommentAsync(comment);
+                var resultPositive = await service.CreateCommentAsync(comment, user.Id.ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.Title.Should().BeEquivalentTo(comment.Title);
@@ -117,8 +116,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
                 var userWithoutComments = await context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllCommentsByUserIdAsync(userWithComments.Id.ToString());
-                var resultNegative = await service.GetAllCommentsByUserIdAsync(userWithoutComments.Id.ToString());
+                var resultPositive = await service.GetAllCommentsByAuthorIdAsync(userWithComments.Id.ToString());
+                var resultNegative = await service.GetAllCommentsByAuthorIdAsync(userWithoutComments.Id.ToString());
 
                 foreach (var item in commentsInBase)
                 {
@@ -262,6 +261,11 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
+                foreach (var item in _comments)
+                {
+                    item.AuthorId = new Guid();
+                }
+
                 context.AddRange(_comments);
                 await context.SaveChangesAsync();
             }
@@ -272,8 +276,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 var service = new CommentUserService(context, _mapper);
 
-                var resultPositive = await service.DeleteCommentByIdAsync(comment.Id.ToString());
-                var resultNegative = await service.DeleteCommentByIdAsync(new Guid().ToString());
+                var resultPositive = await service.DeleteCommentByIdAsync(comment.Id.ToString(), comment.AuthorId.ToString());
+                var resultNegative = await service.DeleteCommentByIdAsync(new Guid().ToString(), new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Message.Should().BeNull();

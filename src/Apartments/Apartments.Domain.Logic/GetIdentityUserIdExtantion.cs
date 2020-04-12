@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Apartments.Web.Identities
+namespace Apartments.Domain.Logic
 {
     public static class GetIdentityUserIdExtantion
     {

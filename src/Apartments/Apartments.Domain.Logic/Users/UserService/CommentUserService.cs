@@ -34,9 +34,11 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="comment"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<CommentDTO>> CreateCommentAsync(AddComment comment)
+        public async Task<Result<CommentDTO>> CreateCommentAsync(AddComment comment, string authorId)
         {
             var addedComment = _mapper.Map<Comment>(comment);
+
+            addedComment.AuthorId = Guid.Parse(authorId);
 
             _db.Comments.Add(addedComment);
 
@@ -74,19 +76,19 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="userId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByUserIdAsync(string userId)
+        public async Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByAuthorIdAsync(string authorId)
         {
-            Guid athorId = Guid.Parse(userId);
+            Guid id = Guid.Parse(authorId);
 
             try
             {
-                var comments = await _db.Comments.Where(_ => _.AuthorId == athorId).Select(_ => _)
+                var comments = await _db.Comments.Where(_ => _.AuthorId == id).Select(_ => _)
                     .AsNoTracking().ToListAsync();
 
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                        .Fail<IEnumerable<CommentDTO>>("This User haven't Comments");
+                        .NoContent<IEnumerable<CommentDTO>>();
                 }
 
                 return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
@@ -117,7 +119,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (!comments.Any())
                 {
                     return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                        .Fail<IEnumerable<CommentDTO>>("This Apartment haven't Comments");
+                        .NoContent<IEnumerable<CommentDTO>>();
                 }
 
                 return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
@@ -147,7 +149,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (user is null)
                 {
                     return (Result<CommentDTO>)Result<CommentDTO>
-                        .Fail<CommentDTO>($"Comment was not found");
+                        .NoContent<CommentDTO>();
                 }
 
                 return (Result<CommentDTO>)Result<CommentDTO>
@@ -201,15 +203,19 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteCommentByIdAsync(string commentId)
+        public async Task<Result> DeleteCommentByIdAsync(string commentId, string authorId)
         {
             Guid id = Guid.Parse(commentId);
+            Guid authId = Guid.Parse(authorId);
 
-            var comment = await _db.Comments.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+            var comment = await _db.Comments
+                .Where(_ => _.Id == id)
+                .Where(_ => _.AuthorId == authId)
+                .IgnoreQueryFilters().FirstOrDefaultAsync();
 
             if (comment is null)
             {
-                return await Task.FromResult(Result.Fail("Comment was not found"));
+                return await Task.FromResult(Result.NotOk("Comment was not found or you are not author"));
             }
 
             try

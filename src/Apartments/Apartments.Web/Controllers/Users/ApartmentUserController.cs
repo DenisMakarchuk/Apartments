@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Apartments.Common;
+using Apartments.Domain.Logic;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.ViewModels;
@@ -39,6 +40,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> CreateApartmentAsync([FromBody, CustomizeValidator]AddApartment apartment)
@@ -48,9 +50,11 @@ namespace Apartments.Web.Controllers.Users
                 return BadRequest(ModelState);
             }
 
+            string ownerId = HttpContext.GetUserId();
+
             try
             {
-                var result = await _service.CreateApartmentAsync(apartment);
+                var result = await _service.CreateApartmentAsync(apartment, ownerId);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -66,24 +70,25 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("user/{userId}")]
+        [Route("owner")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllApartmentByUserIdAsync(string userId)
+        public async Task<IActionResult> GetAllApartmentByOwnerIdAsync()
         {
-            if (!Guid.TryParse(userId, out var _))
-            {
-                return BadRequest();
-            }
+            string ownerId = HttpContext.GetUserId();
 
             try
             {
-                var result = await _service.GetAllApartmentByUserIdAsync(userId);
+                var result = await _service.GetAllApartmentByOwnerIdAsync(ownerId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -99,7 +104,9 @@ namespace Apartments.Web.Controllers.Users
         [HttpGet]
         [Route("apartment/{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -114,7 +121,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetApartmentByIdAsync(apartmentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -131,6 +140,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> UpdateApartmentAsync([FromBody, CustomizeValidator] ApartmentView apartment)
@@ -140,9 +150,23 @@ namespace Apartments.Web.Controllers.Users
                 return BadRequest(ModelState);
             }
 
-            var result = await _service.UpdateApartmentAsync(apartment);
+            string ownerId = HttpContext.GetUserId();
 
-            return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            if (!apartment.Apartment.OwnerId.Equals(ownerId))
+            {
+                return BadRequest("You are not owner");
+            }
+
+            try
+            {
+                var result = await _service.UpdateApartmentAsync(apartment);
+
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
 
         /// <summary>
@@ -154,6 +178,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -161,12 +186,23 @@ namespace Apartments.Web.Controllers.Users
         {
             if (!Guid.TryParse(apartmentId, out var _))
             {
-                return BadRequest();
+                return BadRequest("Invalig Id");
             }
 
-            var result = await _service.DeleteApartmentByIdAsync(apartmentId);
+            string ownerId = HttpContext.GetUserId();
 
-            return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
+            try
+            {
+                var result = await _service.DeleteApartmentByIdAsync(apartmentId, ownerId);
+
+                return result.IsError ? NotFound(result.Message)
+                    : !result.IsSuccess ? BadRequest(result.Message)
+                    : (IActionResult)Ok(result.IsSuccess);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
         }
     }
 }

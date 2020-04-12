@@ -35,9 +35,11 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="apartment"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<ApartmentView>> CreateApartmentAsync(AddApartment apartment)
+        public async Task<Result<ApartmentView>> CreateApartmentAsync(AddApartment apartment, string ownerId)
         {
             var addedApartment = _mapper.Map<Apartment>(apartment);
+
+            addedApartment.OwnerId = Guid.Parse(ownerId);
 
             _db.Apartments.Add(addedApartment);
 
@@ -85,20 +87,20 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="userId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByUserIdAsync(string userId)
+        public async Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByOwnerIdAsync(string ownerId)
         {
-            Guid ownerId = Guid.Parse(userId);
+            Guid id = Guid.Parse(ownerId);
 
             try
             {
-                var apartments = await _db.Apartments.Where(_ => _.OwnerId == ownerId)
+                var apartments = await _db.Apartments.Where(_ => _.OwnerId == id)
                     .Select(_ => _)
                     .AsNoTracking().ToListAsync();
 
                 if (!apartments.Any())
                 {
                     return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
-                        .Fail<IEnumerable<ApartmentDTO>>("This User haven't Apartments");
+                        .NoContent<IEnumerable<ApartmentDTO>>();
                 }
 
                 return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
@@ -130,7 +132,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (apartment is null)
                 {
                     return (Result<ApartmentView>)Result<ApartmentView>
-                        .Fail<ApartmentView>($"Apartment was not found");
+                        .NoContent<ApartmentView>();
                 }
 
                 ApartmentView view = new ApartmentView()
@@ -207,15 +209,19 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteApartmentByIdAsync(string apartmentId)
+        public async Task<Result> DeleteApartmentByIdAsync(string apartmentId, string ownerId)
         {
             Guid id = Guid.Parse(apartmentId);
+            Guid ownId = Guid.Parse(ownerId);
 
-            var apartment = await _db.Apartments.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+            var apartment = await _db.Apartments
+                .Where(_ => _.Id == id)
+                .Where(_=>_.OwnerId == ownId)
+                .IgnoreQueryFilters().FirstOrDefaultAsync();
 
             if (apartment is null)
             {
-                return await Task.FromResult(Result.Fail("Apartment was not found"));
+                return await Task.FromResult(Result.NotOk("Apartment was not found or you are not owner"));
             }
 
             try
@@ -227,11 +233,11 @@ namespace Apartments.Domain.Logic.Users.UserService
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.InnerException.Message}"));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.InnerException.Message}"));
             }
         }
     }

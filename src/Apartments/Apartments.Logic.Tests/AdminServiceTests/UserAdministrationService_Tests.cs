@@ -16,7 +16,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 {
     public class UserAdministrationService_Tests
     {
-        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Id, new Guid());
         List<User> _users;
         IMapper _mapper;
 
@@ -33,55 +33,10 @@ namespace Apartments.Logic.Tests.AdminServiceTests
         }
 
         [Fact]
-        public async void GetAllUsersAsync_Positive_TestAsync()
+        public async void GetUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync()
         {
             var options = new DbContextOptionsBuilder<ApartmentContext>()
-                .UseInMemoryDatabase(databaseName: "GetAllUsersAsync_Positive_TestAsync")
-                .Options;
-
-            using (var context = new ApartmentContext(options))
-            {
-                context.AddRange(_users);
-                await context.SaveChangesAsync();
-            }
-
-            using (var context = new ApartmentContext(options))
-            {
-                var service = new UserAdministrationService(context, _mapper);
-
-                var result = await service.GetAllUsersAsync();
-
-                foreach (var item in _users)
-                {
-                    var itemFromResult = result.Data.Where(_ => _.Name.Equals(item.Name)).Select(_ => _).FirstOrDefault();
-
-                    itemFromResult.Should().NotBeNull();
-                }
-            }
-        }
-
-        [Fact]
-        public async void GetAllUsersAsync_Negative_TestAsync()
-        {
-            var options = new DbContextOptionsBuilder<ApartmentContext>()
-                .UseInMemoryDatabase(databaseName: "GetAllUsersAsync_Negative_TestAsync")
-                .Options;
-
-            using (var context = new ApartmentContext(options))
-            {
-                var service = new UserAdministrationService(context, _mapper);
-
-                var result = await service.GetAllUsersAsync();
-
-                result.IsSuccess.Should().BeFalse();
-            }
-        }
-
-        [Fact]
-        public async void GetUserByIdAsync_PositiveAndNegative_TestAsync()
-        {
-            var options = new DbContextOptionsBuilder<ApartmentContext>()
-                .UseInMemoryDatabase(databaseName: "GetUserByIdAsync_PositiveAndNegative_TestAsync")
+                .UseInMemoryDatabase(databaseName: "GetUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync")
                 .Options;
 
             using (var context = new ApartmentContext(options))
@@ -96,11 +51,11 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
                 var service = new UserAdministrationService(context, _mapper);
 
-                var resultPositive = await service.GetUserByIdAsync(user.Id.ToString());
-                var resultNegative = await service.GetUserByIdAsync(new Guid().ToString());
+                var resultPositive = await service.GetUserProfileByIdentityIdAsync(user.Id.ToString());
+                var resultNegative = await service.GetUserProfileByIdentityIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Name.Should().BeEquivalentTo(user.Name);
+                resultPositive.Data.Id.Should().BeEquivalentTo(user.Id.ToString());
 
                 resultNegative.IsSuccess.Should().BeFalse();
                 resultNegative.Data.Should().BeNull();
@@ -108,10 +63,10 @@ namespace Apartments.Logic.Tests.AdminServiceTests
         }
 
         [Fact]
-        public async void DeleteUserByIdAsync_PositiveAndNegative_TestAsync()
+        public async void DeleteUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync()
         {
             var options = new DbContextOptionsBuilder<ApartmentContext>()
-                .UseInMemoryDatabase(databaseName: "DeleteUserByIdAsync_PositiveAndNegative_TestAsync")
+                .UseInMemoryDatabase(databaseName: "DeleteUserProfileByIdentityIdAsync_PositiveAndNegative_TestAsync")
                 .Options;
 
             using (var context = new ApartmentContext(options))
@@ -126,14 +81,14 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
                 var service = new UserAdministrationService(context, _mapper);
 
-                var resultPositive = await service.DeleteUserByIdAsync(user.Id.ToString());
-                var resultNegative = await service.DeleteUserByIdAsync(new Guid().ToString());
+                var resultPositive = await service.DeleteUserProfileByIdentityIdAsync(user.Id.ToString());
+                var resultNegative = await service.DeleteUserProfileByIdentityIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().Contain("User was not found");
+                resultNegative.Message.Should().BeNull();
             }
         }
     }

@@ -4,13 +4,10 @@ using System.Text;
 
 namespace Apartments.Domain.Admin.DTO
 {
-    /// <summary>
-    /// Model for user administration
-    /// </summary>
-    public class UserDTOAdministration
+    public class IdentityUserAdministrationDTO
     {
         public string Id { get; set; }
 
-        public DateTime Update { get; set; }
+        public string Email { get; set; }
     }
 }

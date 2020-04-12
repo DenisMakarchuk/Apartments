@@ -29,14 +29,19 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Put User to the DataBase
+        /// Create User profile with identityId
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>        
         [LogAttribute]
-        public async Task<Result<UserDTO>> CreateUserAsync(AddUser user)
+        public async Task<Result<UserDTO>> CreateUserProfileAsync(string identityId)
         {
-            var addedUser = _mapper.Map<User>(user);
+            AddUser newProfile = new AddUser()
+            {
+                Id = identityId
+            };
+
+            var addedUser = _mapper.Map<User>(newProfile);
 
             _db.Users.Add(addedUser);
 
@@ -44,7 +49,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 await _db.SaveChangesAsync();
 
-                User userAfterAdding = await _db.Users.Where(_ => _.Name == addedUser.Name)
+                User userAfterAdding = await _db.Users.Where(_ => _.Id == addedUser.Id)
                     .Select(_ => _)
                     .AsNoTracking().FirstOrDefaultAsync();
 
@@ -69,23 +74,23 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get User by User Id. Id must be verified to convert to Guid at the web level
+        /// Get User profile by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserDTO>> GetUserByIdAsync(string id)
+        public async Task<Result<UserDTO>> GetUserProfileByIdentityIdAsync(string identityId)
         {
-            Guid userId = Guid.Parse(id);
+            Guid id = Guid.Parse(identityId);
 
             try
             {
-                var user = await _db.Users.Where(_ => _.Id == userId).AsNoTracking().FirstOrDefaultAsync();
+                var user = await _db.Users.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
 
                 if (user is null)
                 {
                     return (Result<UserDTO>)Result<UserDTO>
-                        .Fail<UserDTO>($"User was not found");
+                        .NoContent<UserDTO>();
 
                 }
 
@@ -100,54 +105,20 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Update User in DataBase
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        [LogAttribute]
-        public async Task<Result<UserDTO>> UpdateUserAsync(UserDTO user)
-        {
-            user.Update = DateTime.Now;
-            User userForUpdate = _mapper.Map<User>(user);
-
-            _db.Entry(userForUpdate).Property(c => c.Name).IsModified = true;
-
-            _db.Entry(userForUpdate).Property(c => c.Update).IsModified = true;
-
-            try
-            {
-                await _db.SaveChangesAsync();
-
-                return (Result<UserDTO>)Result<UserDTO>
-                    .Ok(user);
-            }
-            catch (DbUpdateConcurrencyException ex)
-            {
-                return (Result<UserDTO>)Result<UserDTO>
-                    .Fail<UserDTO>($"Cannot update model. {ex.Message}");
-            }
-            catch (DbUpdateException ex)
-            {
-                return (Result<UserDTO>)Result<UserDTO>
-                    .Fail<UserDTO>($"Cannot update model. {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Delete User by User Id. Id must be verified to convert to Guid at the web level
+        /// Delete User by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteUserByIdAsync(string id)
+        public async Task<Result> DeleteUserProfileByIdentityIdAsync(string identityId)
         {
-            Guid userId = Guid.Parse(id);
+            Guid id = Guid.Parse(identityId);
 
-            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == userId);
+            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
 
             if (user is null)
             {
-                return await Task.FromResult(Result.Fail("User was not found"));
+                return await Task.FromResult(Result.NoContent());
             }
 
             try

@@ -13,18 +13,19 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Apartments.Domain.Logic;
 using FluentValidation.AspNetCore;
-using Apartments.Web.Validation;
-using Apartments.Web.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Apartments.Web.Identities;
 using Microsoft.AspNetCore.Identity;
 using LinqToDB;
 using Microsoft.EntityFrameworkCore;
 using NSwag;
 using NSwag.AspNetCore;
 using NSwag.Generation.Processors.Security;
+using Apartments.Domain.Logic.Options;
+using Apartments.Domain.Logic.Users.UserServiceInterfaces;
+using Apartments.Domain.Logic.Users.UserService;
+using Apartments.Domain.Logic.Validation;
 
 namespace Apartments.Web
 {
@@ -40,6 +41,8 @@ namespace Apartments.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDomainServices(Configuration);
+
             var jwtSettings = new JwtSettings();
             Configuration.Bind(nameof(jwtSettings), jwtSettings);
             services.AddSingleton(jwtSettings);
@@ -63,25 +66,6 @@ namespace Apartments.Web
                         ValidateLifetime = true
                     };
                 });
-
-            services.AddScoped<IIdentityService, IdentityService>();
-
-            services.AddDomainServices(Configuration);
-
-            services.AddDbContext<IdentityContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetSection("ConnectionString:IdentityConnection").Value));
-
-            services.AddIdentity<IdentityUser, IdentityRole>(opt=>
-            {
-                opt.Password.RequiredLength = 8;
-                opt.Password.RequireDigit = false;
-                opt.Password.RequireUppercase = false;
-                opt.Password.RequireNonAlphanumeric = false;
-
-                opt.User.RequireUniqueEmail = true;
-            })
-                .AddEntityFrameworkStores<IdentityContext>();
 
             services.AddOpenApiDocument(config =>
             {

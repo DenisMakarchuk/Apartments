@@ -17,10 +17,6 @@ namespace Apartments.Data.ModelConfig
             builder.ToTable("Users");
 
             builder.HasKey(_ => _.Id);
-            builder.Property(_ => _.Id).ValueGeneratedOnAdd();
-
-            builder.Property(_ => _.Name).IsRequired().HasMaxLength(50);
-            builder.HasIndex(_ => _.Name).IsUnique();
 
             builder.HasMany(_ => _.Apartments).WithOne(_ => _.Owner)
                 .HasForeignKey(_ => _.OwnerId)
@@ -28,7 +24,7 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasMany(_ => _.Orders).WithOne(_ => _.Customer)
                 .HasForeignKey(_ => _.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(_ => _.Comments).WithOne(_ => _.Author)
                 .HasForeignKey(_ => _.AuthorId)

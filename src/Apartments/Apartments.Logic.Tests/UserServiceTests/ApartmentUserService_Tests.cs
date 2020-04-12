@@ -19,7 +19,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
     public class ApartmentUserService_Tests
     {
         private Faker<User> _fakeUser = new Faker<User>()
-            .RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+            .RuleFor(x => x.Id, new Guid());
 
         private Faker<Apartment> _fakeApartment = new Faker<Apartment>()
             .RuleFor(x => x.IsOpen, true)
@@ -34,7 +34,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
             .RuleFor(x => x.NumberOfApartment, y => y.Random.Int(1, 10));
 
         List<User> _users;
-        List<Apartment> _apartments;       
+        List<Apartment> _apartments;
         List<Address> _addresses;
 
         IMapper _mapper;
@@ -60,7 +60,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
         }
 
         [Fact]
-        public async void CreateApartmentAsync_PositiveAndNegative_TestAsync()
+        public async void CreateApartmentAsync_Positive_TestAsync()
         {
             var options = new DbContextOptionsBuilder<ApartmentContext>()
                 .UseInMemoryDatabase(databaseName: "CreateApartmentAsync_PositiveAndNegative_TestAsync")
@@ -92,28 +92,18 @@ namespace Apartments.Logic.Tests.UserServiceTests
                     Address = address,
                     Area = 54,
                     IsOpen = true,
-                    OwnerId = context.Users.FirstOrDefault().Id.ToString(),
                     Price = 15M,
                     Title = "Apartment",
                     Text = "AddedApartment",
                     NumberOfRooms = 2
                 };
 
-                AddApartment apartmentFail = new AddApartment()
-                {
-                    Address = address,
-                    OwnerId = context.Users.FirstOrDefault().Id.ToString(),
-                };
-
-                var resultPositive = await service.CreateApartmentAsync(apartmentOk);
-                //var resultNegative = await service.CreateApartmentAsync(apartmentFail);
+                var resultPositive = await service.CreateApartmentAsync(apartmentOk, user.Id.ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Data.Country.Id.Should().BeEquivalentTo(address.CountryId);
                 resultPositive.Data.Address.Street.Should().BeEquivalentTo(address.Street);
                 resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartmentOk.Title);
-
-                //resultNegative.IsSuccess.Should().BeFalse();
             }
         }
 
@@ -136,8 +126,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 foreach (var item in _addresses)
                 {
                     item.CountryId = context.Countries.FirstOrDefault().Id;
-                }                
-                
+                }
+
                 for (int i = 0; i < 2; i++)
                 {
                     _apartments[i].OwnerId = userWithApartments.Id;
@@ -155,8 +145,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var apartmentsInBase = await context.Apartments.AsNoTracking().ToListAsync();
                 var userWithoutApartments = await context.Users.Where(_ => _.Id != userWithApartments.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllApartmentByUserIdAsync(userWithApartments.Id.ToString());
-                var resultNegative = await service.GetAllApartmentByUserIdAsync(userWithoutApartments.Id.ToString());
+                var resultPositive = await service.GetAllApartmentByOwnerIdAsync(userWithApartments.Id.ToString());
+                var resultNegative = await service.GetAllApartmentByOwnerIdAsync(userWithoutApartments.Id.ToString());
 
                 foreach (var item in apartmentsInBase)
                 {
@@ -202,7 +192,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
             using (var context = new ApartmentContext(options))
             {
                 var apartment = await context.Apartments.AsNoTracking()
-                    .Include(_=>_.Address.Country).FirstOrDefaultAsync();
+                    .Include(_ => _.Address.Country).FirstOrDefaultAsync();
 
                 var service = new ApartmentUserService(context, _mapper);
 
@@ -315,20 +305,11 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 var service = new ApartmentUserService(context, _mapper);
 
-                var resultPositive = await service.DeleteApartmentByIdAsync(apartmenr.Id.ToString());
-                var resultNegative = await service.DeleteApartmentByIdAsync(new Guid().ToString());
-
-                var apartmentAfterDelete = await context.Apartments.Where(_=>_.Id == apartmenr.Id)
-                    .AsNoTracking().FirstOrDefaultAsync();
-
-                //var addressAfterDelete = await context.Adresses.Where(_ => _.ApartmentId == apartmenr.Id)
-                 //   .AsNoTracking().FirstOrDefaultAsync();
+                var resultPositive = await service.DeleteApartmentByIdAsync(apartmenr.Id.ToString(), apartmenr.OwnerId.ToString());
+                var resultNegative = await service.DeleteApartmentByIdAsync(new Guid().ToString(), new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Message.Should().BeNull();
-
-                apartmentAfterDelete.Should().BeNull();
-                //addressAfterDelete.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
                 resultNegative.Message.Should().Contain("Apartment was not found");

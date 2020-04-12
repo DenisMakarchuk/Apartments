@@ -11,8 +11,6 @@ namespace Apartments.Domain.Users.AddDTO
     {
         public string ApartmentId { get; set; }
 
-        public string CustomerId { get; set; }
-
         public IEnumerable<DateTime> Dates { get; set; }
     }
 }

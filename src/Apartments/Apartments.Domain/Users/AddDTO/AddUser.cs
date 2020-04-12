@@ -9,6 +9,6 @@ namespace Apartments.Domain.Users.AddDTO
     /// </summary>
     public class AddUser
     {
-        public string Name { get; set; }
+        public string Id { get; set; }
     }
 }

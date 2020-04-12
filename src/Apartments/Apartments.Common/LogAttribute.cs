@@ -26,7 +26,7 @@ namespace Apartments.Common
                 $"METHOD: {args.Method.Name} has exception: " +
                 $"\n{args.Exception.Data}\n" +
                 $"{args.Exception.Message}\n" +
-                $"{args.Exception.InnerException.Message}");
+                $"{args.Exception.InnerException?.Message}");
         }
     }
 }

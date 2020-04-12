@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Apartments.Domain.Logic;
 
 namespace Apartments.Web.Controllers.Users
 {
@@ -38,6 +39,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> CreateOrderAsync([FromBody, CustomizeValidator]AddOrder order)
@@ -47,11 +49,15 @@ namespace Apartments.Web.Controllers.Users
                 return BadRequest(ModelState);
             }
 
+            string customerId = HttpContext.GetUserId();
+
             try
             {
-                var result = await _service.CreateOrderAsync(order);
+                var result = await _service.CreateOrderAsync(order, customerId);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? BadRequest(result.Message) 
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                    : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -65,24 +71,25 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("user/{userId}")]
+        [Route("customer")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllOrdersByUserIdAsync(string userId)
+        public async Task<IActionResult> GetAllOrdersByCustomerIdAsync()
         {
-            if (!Guid.TryParse(userId, out var _))
-            {
-                return BadRequest();
-            }
+            string customerId = HttpContext.GetUserId();
 
             try
             {
-                var result = await _service.GetAllOrdersByUserIdAsync(userId);
+                var result = await _service.GetAllOrdersByCustomerIdAsync(customerId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -98,7 +105,9 @@ namespace Apartments.Web.Controllers.Users
         [HttpGet]
         [Route("apartment/{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -113,7 +122,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetAllOrdersByApartmentIdAsync(apartmentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -129,7 +140,9 @@ namespace Apartments.Web.Controllers.Users
         [HttpGet]
         [Route("order/{orderId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -144,7 +157,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetOrderByIdAsync(orderId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -161,6 +176,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> UpdateOrderAsync([FromBody, CustomizeValidator] OrderDTO order)
@@ -168,6 +184,13 @@ namespace Apartments.Web.Controllers.Users
             if (order is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            string customerId = HttpContext.GetUserId();
+
+            if (!order.CustomerId.Equals(customerId))
+            {
+                return BadRequest("You are not customer");
             }
 
             try
@@ -201,11 +224,15 @@ namespace Apartments.Web.Controllers.Users
                 return BadRequest();
             }
 
+            string customerId = HttpContext.GetUserId();
+
             try
             {
-                var result = await _service.DeleteOrderByIdAsync(orderId);
+                var result = await _service.DeleteOrderByIdAsync(orderId, customerId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? NotFound(result.Message)
+                    : !result.IsSuccess ? BadRequest(result.Message)
+                    : (IActionResult)Ok(result.IsSuccess);
             }
             catch (InvalidOperationException ex)
             {
