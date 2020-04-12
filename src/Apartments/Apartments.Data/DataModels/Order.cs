@@ -14,6 +14,8 @@ namespace Apartments.Data.DataModels
         public Guid? CustomerId { get; set; }
         public User Customer { get; set; }
 
+        public decimal? TotalCoast { get; set; }
+
         public HashSet<BusyDate> Dates { get; set; }
 
         public DateTime? Update { get; set; } = DateTime.UtcNow;

@@ -60,20 +60,15 @@ namespace Apartments.Domain.Logic.Users.UserService
         {
             OrderView view = new OrderView()
             {
-
                 Order = _mapper.Map<OrderDTO>(order),
-
                 Apartment = _mapper.Map<ApartmentDTO>(order.Apartment),
-
                 Address = _mapper.Map<AddressDTO>(order.Apartment.Address),
-
                 Country = _mapper.Map<CountryDTO>(order.Apartment.Address.Country)
             };
 
             List<DateTime> notFreeDates = new List<DateTime>();
 
             foreach (var date in (order.Dates as IEnumerable<BusyDate>))
-
             {
                 notFreeDates.Add(date.Date);
             }
@@ -81,6 +76,36 @@ namespace Apartments.Domain.Logic.Users.UserService
             view.Order.Dates = notFreeDates;
 
             return view;
+        }
+
+        private decimal MakeTotalCoast(decimal coastByDay, IEnumerable<DateTime> dates)
+        {
+            decimal totalCoast = 0m;
+
+            foreach (var item in dates)
+            {
+                totalCoast += coastByDay;
+            }
+
+            return totalCoast;
+        }
+
+        private List<BusyDate> MakeListBusyDates(IEnumerable<DateTime> dates, Guid apartmentId)
+        {
+            List<BusyDate> busyDates = new List<BusyDate>();
+
+            foreach (var item in dates)
+            {
+                BusyDate date = new BusyDate()
+                {
+                    ApartmentId = apartmentId,
+                    Date = item.Date
+                };
+
+                busyDates.Add(date);
+            }
+
+            return busyDates;
         }
 
         /// <summary>
@@ -92,7 +117,6 @@ namespace Apartments.Domain.Logic.Users.UserService
         public async Task<Result<OrderView>> CreateOrderAsync(AddOrder order, string customerId)
         {
             var addedOrder = _mapper.Map<Order>(order);
-
             addedOrder.CustomerId = Guid.Parse(customerId);
 
             if (!await IsApartmentFree(order.Dates, addedOrder.ApartmentId.Value))
@@ -101,20 +125,16 @@ namespace Apartments.Domain.Logic.Users.UserService
                     .NotOk<OrderView>(null, $"Cannot add order. Dates are not free!");
             };
 
-            List<BusyDate> busyDates = new List<BusyDate>();
+            List<BusyDate> busyDates = MakeListBusyDates(order.Dates, addedOrder.ApartmentId.Value);
 
-            foreach (var item in order.Dates)
-            {
-                BusyDate date = new BusyDate()
-                {
-                    ApartmentId = Guid.Parse(order.ApartmentId),
-                    Date = item.Date
-                };
+            decimal coastByDay = _db.Apartments.Where(_ => _.Id == addedOrder.ApartmentId.Value)
+                                               .FirstOrDefault()
+                                               .Price.Value;
 
-                busyDates.Add(date);
-            }
+            decimal totalCoast = MakeTotalCoast(coastByDay, order.Dates);
 
             addedOrder.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+            addedOrder.TotalCoast = totalCoast;
 
             _db.Orders.Add(addedOrder);
 
@@ -302,20 +322,16 @@ namespace Apartments.Domain.Logic.Users.UserService
                     .NotOk<OrderView>(null, "Cannot update order. Dates are not free!");
             };
 
-            List<BusyDate> busyDates = new List<BusyDate>();
+            List<BusyDate> busyDates = MakeListBusyDates(order.Dates, updatedOrder.ApartmentId.Value);
 
-            foreach (var item in order.Dates)
-            {
-                BusyDate date = new BusyDate()
-                {
-                    ApartmentId = Guid.Parse(order.ApartmentId),
-                    Date = item.Date
-                };
+            decimal coastByDay = _db.Apartments.Where(_ => _.Id == updatedOrder.ApartmentId.Value)
+                                   .FirstOrDefault()
+                                   .Price.Value;
 
-                busyDates.Add(date);
-            }
+            decimal totalCoast = MakeTotalCoast(coastByDay, order.Dates);
 
             updatedOrder.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+            updatedOrder.TotalCoast = totalCoast;
             updatedOrder.Update = DateTime.Now;
 
             try
@@ -328,7 +344,6 @@ namespace Apartments.Domain.Logic.Users.UserService
 
                 Order orderAfterUpdating = await _db.Orders
                     .Where(_ => _.Id == updatedOrder.Id)
-                    .Select(_ => _)
                     .Include(_ => _.Dates)
                     .Include(_ => _.Apartment)
                     .Include(_ => _.Apartment.Address)
