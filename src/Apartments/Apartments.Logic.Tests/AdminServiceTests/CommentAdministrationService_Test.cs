@@ -16,7 +16,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 {
     public class CommentAdministrationService_Test
     {
-        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.IdentityId, new Guid().ToString());
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Id, new Guid());
         private Faker<Apartment> _fakeApartment = new Faker<Apartment>().RuleFor(x => x.IsOpen, true)
             .RuleFor(x => x.Price, y => y.Random.Decimal(5M, 15M))
             .RuleFor(x => x.Title, y => y.Name.JobTitle())

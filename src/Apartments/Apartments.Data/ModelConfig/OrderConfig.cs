@@ -21,15 +21,15 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasOne(_ => _.Apartment).WithMany(_ => _.Orders)
                 .HasForeignKey(_ => _.ApartmentId)
-                .OnDelete(DeleteBehavior.Restrict).IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(_ => _.Customer).WithMany(_ => _.Orders)
                 .HasForeignKey(_ => _.CustomerId)
-                .OnDelete(DeleteBehavior.Restrict).IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(_ => _.Dates).WithOne(_ => _.Order)
                 .HasForeignKey(_ => _.OrderId)
-                .OnDelete(DeleteBehavior.Cascade).IsRequired();
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

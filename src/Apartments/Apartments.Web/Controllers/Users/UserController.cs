@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Apartments.Web.Identities;
 using Microsoft.EntityFrameworkCore.Internal;
 using Apartments.Domain.Users.ViewModels;
 
@@ -39,7 +38,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
-        [Route("")]
+        [Route("registration")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -59,7 +58,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.RegisterAsync(request.Email, request.Password);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? BadRequest(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                    : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -71,6 +72,7 @@ namespace Apartments.Web.Controllers.Users
         [HttpPost]
         [Route("logIn")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -80,7 +82,10 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.LoginAsync(request.Email, request.Password);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError ? BadRequest(result.Message)
+                    : result.Data == null ? NoContent()
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                    : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -113,7 +118,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.DeleteAsync(request.Email, request.Password);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? BadRequest(result.Message) 
+                    : !result.IsSuccess ? BadRequest(result.Message)
+                    : (IActionResult)Ok(result.IsSuccess);
             }
             catch (InvalidOperationException ex)
             {

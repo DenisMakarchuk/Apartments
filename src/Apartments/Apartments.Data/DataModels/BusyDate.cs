@@ -8,10 +8,10 @@ namespace Apartments.Data.DataModels
     {
         public Guid Id { get; set; }
 
-        public Guid OrderId { get; set; }
+        public Guid? OrderId { get; set; }
         public Order Order { get; set; }
 
-        public Guid ApartmentId { get; set; }
+        public Guid? ApartmentId { get; set; }
         public Apartment Apartment { get; set; }
 
         public DateTime Date { get; set; }

@@ -80,7 +80,7 @@ namespace Apartments.Web.Controllers.Admin
         [LogAttribute]
         public async Task<IActionResult> GetUserByIdAsync(string id)
         {
-            if (id == null)
+            if (!Guid.TryParse(id, out var _))
             {
                 return BadRequest("Invalid id");
             }
@@ -115,7 +115,7 @@ namespace Apartments.Web.Controllers.Admin
         [LogAttribute]
         public async Task<IActionResult> ChangeRoleToAdminAsync(string id)
         {
-            if (id == null)
+            if (!Guid.TryParse(id, out var _))
             {
                 return BadRequest("Invalid id");
             }
@@ -150,7 +150,7 @@ namespace Apartments.Web.Controllers.Admin
         [LogAttribute]
         public async Task<IActionResult> ChangeRoleToUserAsync(string id)
         {
-            if (id == null)
+            if (!Guid.TryParse(id, out var _))
             {
                 return BadRequest("Invalid id");
             }
@@ -185,7 +185,7 @@ namespace Apartments.Web.Controllers.Admin
         [LogAttribute]
         public async Task<IActionResult> DeleteUserByIdAsync(string id)
         {
-            if (id == null)
+            if (!Guid.TryParse(id, out var _))
             {
                 return BadRequest("Invalid id");
             }

@@ -11,8 +11,6 @@ namespace Apartments.Domain.Users.AddDTO
     {
         public string ApartmentId { get; set; }
 
-        public string AuthorId { get; set; }
-
         public string Title { get; set; }
         public string Text { get; set; }
     }

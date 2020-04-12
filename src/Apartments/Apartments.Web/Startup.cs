@@ -16,7 +16,6 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Apartments.Web.Identities;
 using Microsoft.AspNetCore.Identity;
 using LinqToDB;
 using Microsoft.EntityFrameworkCore;

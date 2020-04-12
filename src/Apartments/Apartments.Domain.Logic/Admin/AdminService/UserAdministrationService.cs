@@ -28,16 +28,18 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         }
 
         /// <summary>
-        /// Get User by Identity Id
+        /// Get User profile by Id. Id must be verified to convert to Guid at the web level 
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTOAdministration>> GetUserProfileByIdentityIdAsync(string id)
         {
+            Guid identityId = Guid.Parse(id);
+
             try
             {
-                var profile = await _db.Users.Where(_ => _.IdentityId == id).AsNoTracking().FirstOrDefaultAsync();
+                var profile = await _db.Users.Where(_ => _.Id == identityId).AsNoTracking().FirstOrDefaultAsync();
 
                 if (profile is null)
                 {
@@ -64,7 +66,9 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         [LogAttribute]
         public async Task<Result> DeleteUserProfileByIdentityIdAsync(string id)
         {
-            var profile = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_=>_.IdentityId == id);
+            Guid identityId = Guid.Parse(id);
+
+            var profile = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_=>_.Id == identityId);
 
             if (profile is null)
             {

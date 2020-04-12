@@ -50,7 +50,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 result.Add(
                     new IdentityUserAdministrationDTO()
                     {
-                        IdentityId = item.Id,
+                        Id = item.Id,
                         Email = item.Email
                     });
             }
@@ -77,13 +77,13 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
             {
-                IdentityId = user.Id,
+                Id = user.Id,
                 Email = user.Email
             };
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id);
 
-            if (profile.IsError)
+            if (profile.IsError || !profile.IsSuccess)
             {
                 UserAdministrationView failView = new UserAdministrationView()
                 {
@@ -125,13 +125,13 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
             {
-                IdentityId = user.Id,
+                Id = user.Id,
                 Email = user.Email
             };
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id);
 
-            if (profile.IsError)
+            if (profile.IsError || !profile.IsSuccess)
             {
                 UserAdministrationView failView = new UserAdministrationView()
                 {
@@ -173,13 +173,13 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
             {
-                IdentityId = user.Id,
+                Id = user.Id,
                 Email = user.Email
             };
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id);
 
-            if (profile.IsError)
+            if (profile.IsError || !profile.IsSuccess)
             {
                 UserAdministrationView failView = new UserAdministrationView()
                 {

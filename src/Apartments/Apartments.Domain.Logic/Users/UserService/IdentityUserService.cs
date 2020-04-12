@@ -111,7 +111,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             if (existingUser != null)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>("User with this Emai already exist");
+                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null,"User with this Emai already exist");
             }
 
             var newUser = new IdentityUser
@@ -169,14 +169,14 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             if (user == null)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>("User with this Emai does not exist");
+                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "User with this Emai does not exist");
             }
 
             var hasUserValidPassvord = await _userManager.CheckPasswordAsync(user, password);
 
             if (!hasUserValidPassvord)
             {
-                return (Result<UserViewModel>)Result<string>.Fail<UserViewModel>("User/password combination is wrong");
+                return (Result<UserViewModel>)Result<string>.NotOk<UserViewModel>(null, "User/password combination is wrong");
             }
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id);
@@ -187,6 +187,11 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>($"{profile.Message}\n" +
                     $"or token is null");
+            }
+
+            if (!profile.IsSuccess)
+            {
+                return (Result<UserViewModel>)Result<UserViewModel>.NoContent<UserViewModel>();
             }
 
             UserViewModel result = new UserViewModel()
@@ -211,14 +216,14 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             if (user == null)
             {
-                return await Task.FromResult(Result.Fail("User with this Emai does not exist"));
+                return await Task.FromResult(Result.NoContent());
             }
 
             var hasUserValidPassvord = await _userManager.CheckPasswordAsync(user, password);
 
             if (!hasUserValidPassvord)
             {
-                return await Task.FromResult(Result.Fail("User/password combination is wrong"));
+                return await Task.FromResult(Result.NotOk("User/password combination is wrong"));
             }
 
             var isProfileDeleted = await _service.DeleteUserProfileByIdentityIdAsync(user.Id);

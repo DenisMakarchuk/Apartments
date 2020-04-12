@@ -16,7 +16,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 {
     public class UserAdministrationService_Tests
     {
-        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.IdentityId, Guid.NewGuid().ToString());
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Id, new Guid());
         List<User> _users;
         IMapper _mapper;
 
@@ -51,11 +51,11 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
                 var service = new UserAdministrationService(context, _mapper);
 
-                var resultPositive = await service.GetUserProfileByIdentityIdAsync(user.IdentityId.ToString());
+                var resultPositive = await service.GetUserProfileByIdentityIdAsync(user.Id.ToString());
                 var resultNegative = await service.GetUserProfileByIdentityIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.IdentityId.Should().BeEquivalentTo(user.IdentityId);
+                resultPositive.Data.Id.Should().BeEquivalentTo(user.Id.ToString());
 
                 resultNegative.IsSuccess.Should().BeFalse();
                 resultNegative.Data.Should().BeNull();
@@ -81,7 +81,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 
                 var service = new UserAdministrationService(context, _mapper);
 
-                var resultPositive = await service.DeleteUserProfileByIdentityIdAsync(user.IdentityId.ToString());
+                var resultPositive = await service.DeleteUserProfileByIdentityIdAsync(user.Id.ToString());
                 var resultNegative = await service.DeleteUserProfileByIdentityIdAsync(new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();

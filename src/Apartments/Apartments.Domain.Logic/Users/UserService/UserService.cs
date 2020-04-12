@@ -38,7 +38,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         {
             AddUser newProfile = new AddUser()
             {
-                IdentityId = identityId
+                Id = identityId
             };
 
             var addedUser = _mapper.Map<User>(newProfile);
@@ -49,7 +49,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 await _db.SaveChangesAsync();
 
-                User userAfterAdding = await _db.Users.Where(_ => _.IdentityId == addedUser.IdentityId)
+                User userAfterAdding = await _db.Users.Where(_ => _.Id == addedUser.Id)
                     .Select(_ => _)
                     .AsNoTracking().FirstOrDefaultAsync();
 
@@ -74,21 +74,23 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get User profile by identityId
+        /// Get User profile by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTO>> GetUserProfileByIdentityIdAsync(string identityId)
         {
+            Guid id = Guid.Parse(identityId);
+
             try
             {
-                var user = await _db.Users.Where(_ => _.IdentityId == identityId).AsNoTracking().FirstOrDefaultAsync();
+                var user = await _db.Users.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
 
                 if (user is null)
                 {
                     return (Result<UserDTO>)Result<UserDTO>
-                        .Fail<UserDTO>($"Not found");
+                        .NoContent<UserDTO>();
 
                 }
 
@@ -103,18 +105,20 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Delete User by identityId
+        /// Delete User by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> DeleteUserProfileByIdentityIdAsync(string identityId)
         {
-            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.IdentityId == identityId);
+            Guid id = Guid.Parse(identityId);
+
+            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
 
             if (user is null)
             {
-                return await Task.FromResult(Result.Fail("User was not found"));
+                return await Task.FromResult(Result.NoContent());
             }
 
             try

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Apartments.Common;
+using Apartments.Domain.Logic;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.DTO;
@@ -38,6 +39,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> CreateCommentAsync([FromBody, CustomizeValidator]AddComment comment)
@@ -47,9 +49,11 @@ namespace Apartments.Web.Controllers.Users
                 return BadRequest(ModelState);
             }
 
+            string authorId = HttpContext.GetUserId();
+
             try
             {
-                var result = await _service.CreateCommentAsync(comment);
+                var result = await _service.CreateCommentAsync(comment, authorId);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -65,24 +69,25 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("user/{userId}")]
+        [Route("owner")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllCommentsByUserIdAsync(string userId)
+        public async Task<IActionResult> GetAllCommentsByAuthorIdAsync()
         {
-            if (!Guid.TryParse(userId, out var _))
-            {
-                return BadRequest();
-            }
+            string authorId = HttpContext.GetUserId();
 
             try
             {
-                var result = await _service.GetAllCommentsByUserIdAsync(userId);
+                var result = await _service.GetAllCommentsByAuthorIdAsync(authorId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -98,7 +103,9 @@ namespace Apartments.Web.Controllers.Users
         [HttpGet]
         [Route("apartment/{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -113,7 +120,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -129,7 +138,9 @@ namespace Apartments.Web.Controllers.Users
         [HttpGet]
         [Route("comment/{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -144,7 +155,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetCommentByIdAsync(commentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -161,6 +174,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> UpdateCommentAsync([FromBody, CustomizeValidator] CommentDTO comment)
@@ -168,6 +182,13 @@ namespace Apartments.Web.Controllers.Users
             if (comment is null || !ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            string authorId = HttpContext.GetUserId();
+
+            if (!comment.AuthorId.Equals(authorId))
+            {
+                return BadRequest("You are not owner");
             }
 
             try
@@ -191,6 +212,7 @@ namespace Apartments.Web.Controllers.Users
         [Route("{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -201,11 +223,15 @@ namespace Apartments.Web.Controllers.Users
                 return BadRequest();
             }
 
+            string authorId = HttpContext.GetUserId();
+
             try
             {
-                var result = await _service.DeleteCommentByIdAsync(commentId);
+                var result = await _service.DeleteCommentByIdAsync(commentId, authorId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? NotFound(result.Message)
+                    : !result.IsSuccess ? BadRequest(result.Message)
+                    : (IActionResult)Ok(result.IsSuccess);
             }
             catch (InvalidOperationException ex)
             {

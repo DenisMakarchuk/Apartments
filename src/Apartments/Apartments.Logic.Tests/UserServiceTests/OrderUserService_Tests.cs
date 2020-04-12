@@ -1,543 +1,520 @@
-﻿//using Apartments.Data.Context;
-//using Apartments.Data.DataModels;
-//using Apartments.Domain.Logic.Users.UserService;
-//using Apartments.Domain.Users.AddDTO;
-//using Apartments.Domain.Users.DTO;
-//using Apartments.Domain.Users.ViewModels;
-//using AutoMapper;
-//using Bogus;
-//using FluentAssertions;
-//using Microsoft.EntityFrameworkCore;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using Xunit;
-
-//namespace Apartments.Logic.Tests.UserServiceTests
-//{
-//    public class OrderUserService_Tests
-//    {
-//        private Faker<User> _fakeUser = new Faker<User>()
-//        .RuleFor(x => x.Name, y => y.Person.FullName.ToString());
-
-//        private Faker<Apartment> _fakeApartment = new Faker<Apartment>()
-//            .RuleFor(x => x.IsOpen, true)
-//            .RuleFor(x => x.Price, y => y.Random.Decimal(5M, 15M))
-//            .RuleFor(x => x.Title, y => y.Name.JobTitle())
-//            .RuleFor(x => x.Text, y => y.Name.JobDescriptor());
-
-//        private Faker<Address> _fakeAddress = new Faker<Address>()
-//            .RuleFor(x => x.City, y => y.Address.City())
-//            .RuleFor(x => x.Street, y => y.Address.StreetName())
-//            .RuleFor(x => x.Home, y => y.Random.Int(1, 10).ToString())
-//            .RuleFor(x => x.NumberOfApartment, y => y.Random.Int(1, 10));
-
-//        List<User> _users;
-//        List<Apartment> _apartments;
-//        List<Address> _addresses;
-
-//        IMapper _mapper;
-
-//        public OrderUserService_Tests()
-//        {
-//            var mapperConfig = new MapperConfiguration(cfg =>
-//            {
-//                cfg.CreateMap<AddApartment, Apartment>();
-//                cfg.CreateMap<ApartmentDTO, Apartment>().ReverseMap();
-
-//                cfg.CreateMap<AddAddress, Address>();
-//                cfg.CreateMap<AddressDTO, Address>().ReverseMap();
-
-//                cfg.CreateMap<CountryDTO, Country>().ReverseMap();
-
-//                cfg.CreateMap<AddOrder, Order>()
-//                .ForMember(_=>_.Dates, _=>_.Ignore());
-//                cfg.CreateMap<OrderDTO, Order>()
-//                .ForMember(_ => _.Dates, _ => _.Ignore())
-//                .ReverseMap()
-//                .ForMember(_ => _.Dates, _ => _.Ignore());
-//            });
-
-//            _mapper = new Mapper(mapperConfig);
-
-//            _users = _fakeUser.Generate(2);
-//            _apartments = _fakeApartment.Generate(2);
-//            _addresses = _fakeAddress.Generate(2);
-//        }
-
-//        [Fact]
-//        public async void CreateOrderAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "CreateOrderAsync_PositiveAndNegative_TestAsync")
-//                .Options;
-
-//            using (var context = new ApartmentContext(options))
-//            {
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
-
-//                User userWithApartments = context.Users.AsNoTracking().FirstOrDefault();
-
-//                foreach (var item in _addresses)
-//                {
-//                    item.CountryId = context.Countries.FirstOrDefault().Id;
-//                }
-
-//                for (int i = 0; i < 2; i++)
-//                {
-//                    _apartments[i].OwnerId = userWithApartments.Id;
-//                    _apartments[i].Address = _addresses[i];
-//                }
-
-//                context.AddRange(_apartments);
-//                await context.SaveChangesAsync();
-//            }
-
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var service = new OrderUserService(context, _mapper);
-
-//                User user = await context.Users.FirstOrDefaultAsync();
+﻿using Apartments.Data.Context;
+using Apartments.Data.DataModels;
+using Apartments.Domain.Logic.Users.UserService;
+using Apartments.Domain.Users.AddDTO;
+using Apartments.Domain.Users.DTO;
+using Apartments.Domain.Users.ViewModels;
+using AutoMapper;
+using Bogus;
+using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Xunit;
+
+namespace Apartments.Logic.Tests.UserServiceTests
+{
+    public class OrderUserService_Tests
+    {
+        private Faker<User> _fakeUser = new Faker<User>()
+        .RuleFor(x => x.Id, new Guid());
+
+        private Faker<Apartment> _fakeApartment = new Faker<Apartment>()
+            .RuleFor(x => x.IsOpen, true)
+            .RuleFor(x => x.Price, y => y.Random.Decimal(5M, 15M))
+            .RuleFor(x => x.Title, y => y.Name.JobTitle())
+            .RuleFor(x => x.Text, y => y.Name.JobDescriptor());
+
+        private Faker<Address> _fakeAddress = new Faker<Address>()
+            .RuleFor(x => x.City, y => y.Address.City())
+            .RuleFor(x => x.Street, y => y.Address.StreetName())
+            .RuleFor(x => x.Home, y => y.Random.Int(1, 10).ToString())
+            .RuleFor(x => x.NumberOfApartment, y => y.Random.Int(1, 10));
+
+        List<User> _users;
+        List<Apartment> _apartments;
+        List<Address> _addresses;
+
+        IMapper _mapper;
+
+        public OrderUserService_Tests()
+        {
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<AddApartment, Apartment>();
+                cfg.CreateMap<ApartmentDTO, Apartment>().ReverseMap();
+
+                cfg.CreateMap<AddAddress, Address>();
+                cfg.CreateMap<AddressDTO, Address>().ReverseMap();
+
+                cfg.CreateMap<CountryDTO, Country>().ReverseMap();
+
+                cfg.CreateMap<AddOrder, Order>()
+                .ForMember(_ => _.Dates, _ => _.Ignore());
+                cfg.CreateMap<OrderDTO, Order>()
+                .ForMember(_ => _.Dates, _ => _.Ignore())
+                .ReverseMap()
+                .ForMember(_ => _.Dates, _ => _.Ignore());
+            });
+
+            _mapper = new Mapper(mapperConfig);
+
+            _users = _fakeUser.Generate(2);
+            _apartments = _fakeApartment.Generate(2);
+            _addresses = _fakeAddress.Generate(2);
+        }
+
+        [Fact]
+        public async void CreateOrderAsync_Positive_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "CreateOrderAsync_PositiveAndNegative_TestAsync")
+                .Options;
+
+            using (var context = new ApartmentContext(options))
+            {
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
+
+                User userWithApartments = context.Users.AsNoTracking().FirstOrDefault();
+
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithApartments.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
+
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new OrderUserService(context, _mapper);
+
+                var user = context.Users.AsNoTracking().FirstOrDefault(); ;
+                var apartment = context.Apartments.AsNoTracking().FirstOrDefault(); ;
 
-//                Apartment apartment = await context.Apartments
-//                    .Include(_ => _.Address.Country).FirstOrDefaultAsync();
+                IEnumerable<DateTime> dateTimes = new List<DateTime>()
+                {
+                    DateTime.Now.Date
+                };
 
-//                IEnumerable<DateTime> dateTimes = new List<DateTime>()
-//                {
-//                    DateTime.Now.Date
-//                };
+                AddOrder order = new AddOrder()
+                {
+                    ApartmentId = apartment.Id.ToString(),
+                    Dates = dateTimes
+                };
 
-//                AddOrder order = new AddOrder()
-//                {
-//                    ApartmentId = apartment.Id.ToString(),
-//                    CustomerId = user.Id.ToString(),
-//                    Dates = dateTimes
-//                };
-
-//                AddOrder failOrder = new AddOrder()
-//                {
-//                    ApartmentId = apartment.Id.ToString(),
-//                    CustomerId = user.Id.ToString(),
-//                    Dates = dateTimes
-//                };
-
-//                var resultPositive = await service.CreateOrderAsync(order);
-//                //var resultNegative = await service.CreateOrderAsync(failOrder);
-
-//                resultPositive.IsSuccess.Should().BeTrue();
-//                resultPositive.Data.Country.Name.Should().BeEquivalentTo(apartment.Address.Country.Name);
-//                resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
-//                resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(dateTimes.First());
-
-//                context.BusyDates.FirstOrDefault().Date.Should().BeSameDateAs(dateTimes.First());
-
-//                //resultNegative.IsSuccess.Should().BeFalse();
-//            }
-//        }
-
-//        [Fact]
-//        public async void GetAllOrdersByUserIdAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "GetAllOrdersByUserIdAsync_PositiveAndNegative_TestAsync")
-//                .Options;
-
-//            User userWithOrders;
+                var resultPositive = await service.CreateOrderAsync(order, user.Id.ToString());
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                Country country = new Country()
-//                {
-//                    Name = "Litva"
-//                };
-
-//                context.Add(country);
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
+                resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(dateTimes.First());
+
+                context.BusyDates.FirstOrDefault().Date.Should().BeSameDateAs(dateTimes.First());
+            }
+        }
 
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
+        [Fact]
+        public async void GetAllOrdersByUserIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetAllOrdersByUserIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
 
-//                userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
-
-//                foreach (var item in _addresses)
-//                {
-//                    item.CountryId = context.Countries.FirstOrDefault().Id;
-//                }
+            User userWithOrders;
 
-//                for (int i = 0; i < 2; i++)
-//                {
-//                    _apartments[i].OwnerId = userWithOrders.Id;
-//                    _apartments[i].Address = _addresses[i];
-//                }
+            using (var context = new ApartmentContext(options))
+            {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
 
-//                context.AddRange(_apartments);
-//                await context.SaveChangesAsync();
+                context.Add(country);
 
-//                Order order = new Order()
-//                {
-//                    ApartmentId = context.Apartments.FirstOrDefault().Id,
-//                    CustomerId = userWithOrders.Id,
-//                };
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
 
-//                List<BusyDate> busyDates = new List<BusyDate>();
+                userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
 
-//                    BusyDate date = new BusyDate()
-//                    {
-//                        ApartmentId = context.Apartments.FirstOrDefault().Id,
-//                        Date = DateTime.Now.Date
-//                    };
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
 
-//                    busyDates.Add(date);
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithOrders.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
 
-//                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
 
-//                context.AddRange(order);
-//                await context.SaveChangesAsync();
-//            }
+                Order order = new Order()
+                {
+                    ApartmentId = context.Apartments.FirstOrDefault().Id,
+                    CustomerId = userWithOrders.Id,
+                };
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var service = new OrderUserService(context, _mapper);
+                List<BusyDate> busyDates = new List<BusyDate>();
 
-//                var ordersInBase = await context.Orders.AsNoTracking().ToListAsync();
-//                var userWithoutOrders = await context.Users.Where(_ => _.Id != userWithOrders.Id).FirstOrDefaultAsync();
+                BusyDate date = new BusyDate()
+                {
+                    ApartmentId = context.Apartments.FirstOrDefault().Id,
+                    Date = DateTime.Now.Date
+                };
 
-//                var resultPositive = await service.GetAllOrdersByUserIdAsync(userWithOrders.Id.ToString());
-//                var resultNegative = await service.GetAllOrdersByUserIdAsync(userWithoutOrders.Id.ToString());
-
-//                foreach (var item in ordersInBase)
-//                {
-//                    resultPositive.Data.FirstOrDefault()
-//                        .Order.CustomerId
-//                        .Should().BeEquivalentTo(item.CustomerId.ToString());
-//                }
-
-//                resultNegative.IsSuccess.Should().BeFalse();
-//            }
-//        }
-
-//        [Fact]
-//        public async void GetAllOrdersByApartmentIdAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "GetAllOrdersByApartmentIdAsync_PositiveAndNegative_TestAsync")
-//                .Options;
-
-//            Apartment apartmentWithOrders;
+                busyDates.Add(date);
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                Country country = new Country()
-//                {
-//                    Name = "Litva"
-//                };
-
-//                context.Add(country);
+                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
 
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
+                context.AddRange(order);
+                await context.SaveChangesAsync();
+            }
 
-//                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
-
-//                foreach (var item in _addresses)
-//                {
-//                    item.CountryId = context.Countries.FirstOrDefault().Id;
-//                }
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new OrderUserService(context, _mapper);
 
-//                for (int i = 0; i < 2; i++)
-//                {
-//                    _apartments[i].OwnerId = userWithOrders.Id;
-//                    _apartments[i].Address = _addresses[i];
-//                }
+                var ordersInBase = await context.Orders.AsNoTracking().ToListAsync();
+                var userWithoutOrders = await context.Users.Where(_ => _.Id != userWithOrders.Id).FirstOrDefaultAsync();
 
-//                context.AddRange(_apartments);
-//                await context.SaveChangesAsync();
+                var resultPositive = await service.GetAllOrdersByCustomerIdAsync(userWithOrders.Id.ToString());
+                var resultNegative = await service.GetAllOrdersByCustomerIdAsync(userWithoutOrders.Id.ToString());
+
+                foreach (var item in ordersInBase)
+                {
+                    resultPositive.Data.FirstOrDefault()
+                        .Order.CustomerId
+                        .Should().BeEquivalentTo(item.CustomerId.ToString());
+                }
+
+                resultNegative.IsSuccess.Should().BeFalse();
+            }
+        }
 
-//                apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
+        [Fact]
+        public async void GetAllOrdersByApartmentIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetAllOrdersByApartmentIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
 
-//                Order order = new Order()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    CustomerId = userWithOrders.Id,
-//                };
+            Apartment apartmentWithOrders;
 
-//                List<BusyDate> busyDates = new List<BusyDate>();
+            using (var context = new ApartmentContext(options))
+            {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
 
-//                BusyDate date = new BusyDate()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    Date = DateTime.Now.Date
-//                };
+                context.Add(country);
 
-//                busyDates.Add(date);
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
 
-//                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
 
-//                context.AddRange(order);
-//                await context.SaveChangesAsync();
-//            }
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var service = new OrderUserService(context, _mapper);
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithOrders.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
 
-//                var ordersInBase = await context.Orders.AsNoTracking().ToListAsync();
-//                var apartmentWithoutOrders = await context.Users.Where(_ => _.Id != apartmentWithOrders.Id).FirstOrDefaultAsync();
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
 
-//                var resultPositive = await service.GetAllOrdersByApartmentIdAsync(apartmentWithOrders.Id.ToString());
-//                var resultNegative = await service.GetAllOrdersByApartmentIdAsync(apartmentWithoutOrders.Id.ToString());
+                apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
 
-//                foreach (var item in ordersInBase)
-//                {
-//                    resultPositive.Data.FirstOrDefault()
-//                        .ApartmentId
-//                        .Should().BeEquivalentTo(item.ApartmentId.ToString());
-//                }
+                Order order = new Order()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    CustomerId = userWithOrders.Id,
+                };
 
-//                resultNegative.IsSuccess.Should().BeFalse();
-//            }
-//        }
+                List<BusyDate> busyDates = new List<BusyDate>();
 
-//        [Fact]
-//        public async void GetOrderByIdAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "GetOrderByIdAsync_PositiveAndNegative_TestAsync")
-//                .Options;
+                BusyDate date = new BusyDate()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    Date = DateTime.Now.Date
+                };
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                Country country = new Country()
-//                {
-//                    Name = "Litva"
-//                };
+                busyDates.Add(date);
 
-//                context.Add(country);
+                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
 
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
+                context.AddRange(order);
+                await context.SaveChangesAsync();
+            }
 
-//                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new OrderUserService(context, _mapper);
 
-//                foreach (var item in _addresses)
-//                {
-//                    item.CountryId = context.Countries.FirstOrDefault().Id;
-//                }
+                var ordersInBase = await context.Orders.AsNoTracking().ToListAsync();
+                var apartmentWithoutOrders = await context.Users.Where(_ => _.Id != apartmentWithOrders.Id).FirstOrDefaultAsync();
 
-//                for (int i = 0; i < 2; i++)
-//                {
-//                    _apartments[i].OwnerId = userWithOrders.Id;
-//                    _apartments[i].Address = _addresses[i];
-//                }
+                var resultPositive = await service.GetAllOrdersByApartmentIdAsync(apartmentWithOrders.Id.ToString());
+                var resultNegative = await service.GetAllOrdersByApartmentIdAsync(apartmentWithoutOrders.Id.ToString());
 
-//                context.AddRange(_apartments);
-//                await context.SaveChangesAsync();
+                foreach (var item in ordersInBase)
+                {
+                    resultPositive.Data.FirstOrDefault()
+                        .ApartmentId
+                        .Should().BeEquivalentTo(item.ApartmentId.ToString());
+                }
 
-//                Apartment apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
+                resultNegative.IsSuccess.Should().BeFalse();
+            }
+        }
 
-//                Order order = new Order()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    CustomerId = userWithOrders.Id,
-//                };
+        [Fact]
+        public async void GetOrderByIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "GetOrderByIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
 
-//                List<BusyDate> busyDates = new List<BusyDate>();
+            using (var context = new ApartmentContext(options))
+            {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
 
-//                BusyDate date = new BusyDate()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    Date = DateTime.Now.Date
-//                };
+                context.Add(country);
 
-//                busyDates.Add(date);
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
 
-//                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
 
-//                context.AddRange(order);
-//                await context.SaveChangesAsync();
-//            }
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var service = new OrderUserService(context, _mapper);
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithOrders.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
 
-//                var orderInBase = await context.Orders.AsNoTracking().FirstOrDefaultAsync();
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
 
-//                var resultPositive = await service.GetOrderByIdAsync(orderInBase.Id.ToString());
-//                var resultNegative = await service.GetOrderByIdAsync(new Guid().ToString());
+                Apartment apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
 
-//                resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(DateTime.Now.Date);
+                Order order = new Order()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    CustomerId = userWithOrders.Id,
+                };
 
-//                resultNegative.IsSuccess.Should().BeFalse();
-//            }
-//        }
+                List<BusyDate> busyDates = new List<BusyDate>();
 
-//        [Fact]
-//        public async void UpdateOrderAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "UpdateOrderAsync_PositiveAndNegative_TestAsync")
-//                .Options;
+                BusyDate date = new BusyDate()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    Date = DateTime.Now.Date
+                };
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                Country country = new Country()
-//                {
-//                    Name = "Litva"
-//                };
+                busyDates.Add(date);
 
-//                context.Add(country);
+                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
 
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
+                context.AddRange(order);
+                await context.SaveChangesAsync();
+            }
 
-//                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new OrderUserService(context, _mapper);
 
-//                foreach (var item in _addresses)
-//                {
-//                    item.CountryId = context.Countries.FirstOrDefault().Id;
-//                }
+                var orderInBase = await context.Orders.AsNoTracking().FirstOrDefaultAsync();
 
-//                for (int i = 0; i < 2; i++)
-//                {
-//                    _apartments[i].OwnerId = userWithOrders.Id;
-//                    _apartments[i].Address = _addresses[i];
-//                }
+                var resultPositive = await service.GetOrderByIdAsync(orderInBase.Id.ToString());
+                var resultNegative = await service.GetOrderByIdAsync(new Guid().ToString());
 
-//                context.AddRange(_apartments);
-//                await context.SaveChangesAsync();
+                resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(DateTime.Now.Date);
 
-//                Apartment apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
+                resultNegative.IsSuccess.Should().BeFalse();
+            }
+        }
 
-//                Order order = new Order()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    CustomerId = userWithOrders.Id,
-//                };
+        [Fact]
+        public async void UpdateOrderAsync_Positive_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "UpdateOrderAsync_PositiveAndNegative_TestAsync")
+                .Options;
 
-//                List<BusyDate> busyDates = new List<BusyDate>();
+            using (var context = new ApartmentContext(options))
+            {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
 
-//                BusyDate date = new BusyDate()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    Date = DateTime.Now.Date
-//                };
+                context.Add(country);
 
-//                busyDates.Add(date);
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
 
-//                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
 
-//                context.AddRange(order);
-//                await context.SaveChangesAsync();
-//            }
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var service = new OrderUserService(context, _mapper);
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithOrders.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
 
-//                var orderInBase = await context.Orders.AsNoTracking().FirstOrDefaultAsync();
-//                var orderForUpdate = _mapper.Map<OrderDTO>(orderInBase);
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
 
-//                DateTime newDate = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, DateTime.Now.Day);
+                Apartment apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
 
-//                IEnumerable<DateTime> dates = new List<DateTime>() 
-//                {
-//                    newDate
-//                };
+                Order order = new Order()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    CustomerId = userWithOrders.Id,
+                };
 
-//                orderForUpdate.Dates = dates;
+                List<BusyDate> busyDates = new List<BusyDate>();
 
-//                //OrderDTO failOrder = new OrderDTO()
-//                //{
-//                //    Id = new Guid().ToString(),
-//                //    ApartmentId = orderForUpdate.ApartmentId
-//                //};
+                BusyDate date = new BusyDate()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    Date = DateTime.Now.Date
+                };
 
-//                var resultPositive = await service.UpdateOrderAsync(orderForUpdate);
-//                //var resultNegative = await service.UpdateOrderAsync(failOrder);
+                busyDates.Add(date);
 
-//                resultPositive.IsSuccess.Should().BeTrue();
-//                resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(newDate);
+                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
 
-//                //resultNegative.IsSuccess.Should().BeFalse();
-//            }
-//        }
+                context.AddRange(order);
+                await context.SaveChangesAsync();
+            }
 
-//        [Fact]
-//        public async void DeleteOrderByIdAsync_PositiveAndNegative_TestAsync()
-//        {
-//            var options = new DbContextOptionsBuilder<ApartmentContext>()
-//                .UseInMemoryDatabase(databaseName: "DeleteOrderByIdAsync_PositiveAndNegative_TestAsync")
-//                .Options;
+            using (var context = new ApartmentContext(options))
+            {
+                var service = new OrderUserService(context, _mapper);
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                Country country = new Country()
-//                {
-//                    Name = "Litva"
-//                };
+                var orderInBase = await context.Orders.AsNoTracking().FirstOrDefaultAsync();
+                var orderForUpdate = _mapper.Map<OrderDTO>(orderInBase);
 
-//                context.Add(country);
+                DateTime newDate = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, DateTime.Now.Day);
 
-//                context.AddRange(_users);
-//                await context.SaveChangesAsync();
+                IEnumerable<DateTime> dates = new List<DateTime>()
+                {
+                    newDate
+                };
 
-//                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
+                orderForUpdate.Dates = dates;
 
-//                foreach (var item in _addresses)
-//                {
-//                    item.CountryId = context.Countries.FirstOrDefault().Id;
-//                }
+                var resultPositive = await service.UpdateOrderAsync(orderForUpdate);
 
-//                for (int i = 0; i < 2; i++)
-//                {
-//                    _apartments[i].OwnerId = userWithOrders.Id;
-//                    _apartments[i].Address = _addresses[i];
-//                }
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(newDate);
+            }
+        }
 
-//                context.AddRange(_apartments);
-//                await context.SaveChangesAsync();
+        [Fact]
+        public async void DeleteOrderByIdAsync_PositiveAndNegative_TestAsync()
+        {
+            var options = new DbContextOptionsBuilder<ApartmentContext>()
+                .UseInMemoryDatabase(databaseName: "DeleteOrderByIdAsync_PositiveAndNegative_TestAsync")
+                .Options;
 
-//                Apartment apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
+            using (var context = new ApartmentContext(options))
+            {
+                Country country = new Country()
+                {
+                    Name = "Litva"
+                };
 
-//                Order order = new Order()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    CustomerId = userWithOrders.Id,
-//                };
+                context.Add(country);
 
-//                List<BusyDate> busyDates = new List<BusyDate>();
+                context.AddRange(_users);
+                await context.SaveChangesAsync();
 
-//                BusyDate date = new BusyDate()
-//                {
-//                    ApartmentId = apartmentWithOrders.Id,
-//                    Date = DateTime.Now.Date
-//                };
+                User userWithOrders = context.Users.AsNoTracking().FirstOrDefault();
 
-//                busyDates.Add(date);
+                foreach (var item in _addresses)
+                {
+                    item.CountryId = context.Countries.FirstOrDefault().Id;
+                }
 
-//                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+                for (int i = 0; i < 2; i++)
+                {
+                    _apartments[i].OwnerId = userWithOrders.Id;
+                    _apartments[i].Address = _addresses[i];
+                }
 
-//                context.AddRange(order);
-//                await context.SaveChangesAsync();
-//            }
+                context.AddRange(_apartments);
+                await context.SaveChangesAsync();
 
-//            using (var context = new ApartmentContext(options))
-//            {
-//                var orderInBase = await context.Orders.AsNoTracking().FirstOrDefaultAsync();
+                Apartment apartmentWithOrders = context.Apartments.AsNoTracking().FirstOrDefault();
 
-//                var service = new OrderUserService(context, _mapper);
+                Order order = new Order()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    CustomerId = userWithOrders.Id,
+                };
 
-//                var resultPositive = await service.DeleteOrderByIdAsync(orderInBase.Id.ToString());
-//                var resultNegative = await service.DeleteOrderByIdAsync(new Guid().ToString());
+                List<BusyDate> busyDates = new List<BusyDate>();
 
-//                resultPositive.IsSuccess.Should().BeTrue();
-//                resultPositive.Message.Should().BeNull();
+                BusyDate date = new BusyDate()
+                {
+                    ApartmentId = apartmentWithOrders.Id,
+                    Date = DateTime.Now.Date
+                };
 
-//                resultNegative.IsSuccess.Should().BeFalse();
-//                resultNegative.Message.Should().Contain("Order was not found");
-//            }
-//        }
-//    }
-//}
+                busyDates.Add(date);
+
+                order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+
+                context.AddRange(order);
+                await context.SaveChangesAsync();
+            }
+
+            using (var context = new ApartmentContext(options))
+            {
+                var orderInBase = await context.Orders.AsNoTracking().FirstOrDefaultAsync();
+
+                var service = new OrderUserService(context, _mapper);
+
+                var resultPositive = await service.DeleteOrderByIdAsync(orderInBase.Id.ToString(), orderInBase.CustomerId.ToString());
+                var resultNegative = await service.DeleteOrderByIdAsync(new Guid().ToString(), new Guid().ToString());
+
+                resultPositive.IsSuccess.Should().BeTrue();
+                resultPositive.Message.Should().BeNull();
+
+                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Message.Should().Contain("not found");
+            }
+        }
+    }
+}

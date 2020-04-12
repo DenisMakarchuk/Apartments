@@ -6,7 +6,7 @@ namespace Apartments.Domain.Admin.DTO
 {
     public class IdentityUserAdministrationDTO
     {
-        public string IdentityId { get; set; }
+        public string Id { get; set; }
 
         public string Email { get; set; }
     }
