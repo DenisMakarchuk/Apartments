@@ -11,8 +11,6 @@ namespace Apartments.Domain.Users.DTO
     {
         public string Id { get; set; }
 
-        public string Name { get; set; }
-
         public DateTime Update { get; set; }
     }
 }

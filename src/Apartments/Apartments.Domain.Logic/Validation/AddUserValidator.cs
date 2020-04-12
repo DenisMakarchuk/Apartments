@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Apartments.Web.Validation
+namespace Apartments.Domain.Logic.Validation
 {
     public class AddUserValidator : AbstractValidator<AddUser>
     {
         public AddUserValidator()
         {
-            RuleFor(_ => _.Name).NotEmpty().WithMessage("You must write the name");
+            RuleFor(_ => _.Id).NotEmpty().WithMessage("You must write the Id");
         }
     }
 }

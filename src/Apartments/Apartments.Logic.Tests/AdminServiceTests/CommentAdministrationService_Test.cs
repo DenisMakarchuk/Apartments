@@ -16,9 +16,9 @@ namespace Apartments.Logic.Tests.AdminServiceTests
 {
     public class CommentAdministrationService_Test
     {
-        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+        private Faker<User> _fakeUser = new Faker<User>().RuleFor(x => x.Id, new Guid());
         private Faker<Apartment> _fakeApartment = new Faker<Apartment>().RuleFor(x => x.IsOpen, true)
-            .RuleFor(x=>x.Price, y=>y.Random.Decimal(5M,15M))
+            .RuleFor(x => x.Price, y => y.Random.Decimal(5M, 15M))
             .RuleFor(x => x.Title, y => y.Name.JobTitle())
             .RuleFor(x => x.Text, y => y.Name.JobDescriptor());
         private Faker<Comment> _fakeComment = new Faker<Comment>()
@@ -84,7 +84,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 foreach (var item in commentsInBase)
                 {
                     resultPositive.Data
-                        .Where(_=>_.Id == item.Id.ToString())
+                        .Where(_ => _.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
@@ -240,7 +240,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().Contain("Comment was not found");
+                resultNegative.Message.Should().BeNull();
             }
         }
     }

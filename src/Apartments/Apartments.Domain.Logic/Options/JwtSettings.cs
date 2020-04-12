@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Apartments.Web.Options
+namespace Apartments.Domain.Logic.Options
 {
     public class JwtSettings
     {

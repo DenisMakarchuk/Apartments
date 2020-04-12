@@ -31,7 +31,7 @@ namespace Apartments.Web.Controllers.Search
         /// </summary>
         /// <param name="search"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Route("apartments")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -49,7 +49,9 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetAllApartmentsAsync(search);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : !result.IsSuccess ? BadRequest(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -80,7 +82,7 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetApartmentByIdAsync(apartmentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -104,7 +106,7 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetAllCountriesAsync();
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -135,7 +137,7 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetCountryByIdAsync(countryId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {

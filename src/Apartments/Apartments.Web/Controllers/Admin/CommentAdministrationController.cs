@@ -36,7 +36,9 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("user/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -51,7 +53,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllCommentsByUserIdAsync(userId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message) 
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data) 
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -67,7 +71,9 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("apartment/{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -82,7 +88,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data) 
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -98,7 +106,9 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("comment/{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -113,7 +123,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetCommentByIdAsync(commentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {
@@ -130,6 +142,7 @@ namespace Apartments.Web.Controllers.Admin
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> UpdateCommentAsync([FromBody, CustomizeValidator]  CommentDTOAdministration comment)
@@ -159,7 +172,9 @@ namespace Apartments.Web.Controllers.Admin
         [HttpDelete]
         [Route("{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -174,7 +189,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.DeleteCommentByIdAsync(commentId);
 
-                return result.IsError ? NotFound(result.Message) : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError ? NotFound(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
+                    : NoContent();
             }
             catch (InvalidOperationException ex)
             {

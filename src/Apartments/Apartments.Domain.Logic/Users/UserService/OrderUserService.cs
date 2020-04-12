@@ -32,13 +32,16 @@ namespace Apartments.Domain.Logic.Users.UserService
         [LogAttribute]
         private async Task<bool> IsApartmentFree(IEnumerable<DateTime> dates, Guid apartmentId)
         {
+            var notFreeDates = await _db.Apartments.AsNoTracking()
+                                                   .Where(_ => _.Id == apartmentId)
+                                                   .Select(_ => _.Dates
+                                                        .Select(_=>_.Date)
+                                                        .ToList())
+                                                   .FirstOrDefaultAsync();
+
             foreach (var item in dates)
             {
-                var ordered = await _db.Apartments.Where(_ => _.Id == apartmentId)
-                    .Where(_ => _.Dates
-                        .Where(_ => _.Date.Date != item.Date).Any()).Select(_=>_.Dates).FirstOrDefaultAsync();
-
-                if (ordered !is null || ordered.Any())
+                if (notFreeDates.Contains(item))
                 {
                     return false;
                 }
@@ -48,35 +51,90 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Put Order to the DataBase
+        /// Make OrderView
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<OrderView>> CreateOrderAsync(AddOrder order)
+        private OrderView MakeViewModel(Order order)
         {
-            var addedOrder = _mapper.Map<Order>(order);
-
-            if (await IsApartmentFree(order.Dates, addedOrder.ApartmentId))
+            OrderView view = new OrderView()
             {
-                return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Cannot save model. Dates are not free!");
+                Order = _mapper.Map<OrderDTO>(order),
+                Apartment = _mapper.Map<ApartmentDTO>(order.Apartment),
+                Address = _mapper.Map<AddressDTO>(order.Apartment.Address),
+                Country = _mapper.Map<CountryDTO>(order.Apartment.Address.Country)
             };
 
+            List<DateTime> notFreeDates = new List<DateTime>();
+
+            foreach (var date in (order.Dates as IEnumerable<BusyDate>))
+            {
+                notFreeDates.Add(date.Date.Value);
+            }
+
+            view.Order.Dates = notFreeDates;
+
+            return view;
+        }
+
+        private decimal MakeTotalCoast(decimal coastByDay, IEnumerable<DateTime> dates)
+        {
+            decimal totalCoast = 0m;
+
+            foreach (var item in dates)
+            {
+                totalCoast += coastByDay;
+            }
+
+            return totalCoast;
+        }
+
+        private List<BusyDate> MakeListBusyDates(IEnumerable<DateTime> dates, Guid apartmentId)
+        {
             List<BusyDate> busyDates = new List<BusyDate>();
 
-            foreach (var item in order.Dates)
+            foreach (var item in dates)
             {
                 BusyDate date = new BusyDate()
                 {
-                    ApartmentId = Guid.Parse(order.ApartmentId),
+                    ApartmentId = apartmentId,
                     Date = item.Date
                 };
 
                 busyDates.Add(date);
             }
 
+            return busyDates;
+        }
+
+        /// <summary>
+        /// Put Order to the DataBase
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns></returns>
+        [LogAttribute]
+        public async Task<Result<OrderView>> CreateOrderAsync(AddOrder order, string customerId)
+        {
+            var addedOrder = _mapper.Map<Order>(order);
+            addedOrder.CustomerId = Guid.Parse(customerId);
+
+            if (!await IsApartmentFree(order.Dates, addedOrder.ApartmentId.Value))
+            {
+                return (Result<OrderView>)Result<OrderView>
+                    .NotOk<OrderView>(null, $"Cannot add order. Dates are not free!");
+            };
+
+            List<BusyDate> busyDates = MakeListBusyDates(order.Dates, addedOrder.ApartmentId.Value);
+
+            decimal coastByDay = _db.Apartments.Where(_ => _.Id == addedOrder.ApartmentId.Value)
+                                               .FirstOrDefault()
+                                               .Price.Value;
+
+            decimal totalCoast = MakeTotalCoast(coastByDay, order.Dates);
+
             addedOrder.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+            addedOrder.TotalCoast = totalCoast;
 
             _db.Orders.Add(addedOrder);
 
@@ -84,26 +142,18 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 await _db.SaveChangesAsync();
 
-                Order orderAfterAdding = await _db.Orders.Where(_ => _.CustomerId == addedOrder.CustomerId)
-                    .Select(_ => _)
+                Order orderAfterAdding = await _db.Orders
+                    .Where(_ => _.CustomerId == addedOrder.CustomerId)
+                    .Where(_=>_.Dates
+                        .Where(_=>_.Date == order.Dates.First())
+                        .FirstOrDefault() != null)
+                    .Include(_ => _.Dates)
                     .Include(_ => _.Apartment)
                     .Include(_ => _.Apartment.Address)
                     .Include(_ => _.Apartment.Address.Country)
                     .AsNoTracking().FirstOrDefaultAsync();
 
-                OrderView view = new OrderView()
-                {
-
-                    Order = _mapper.Map<OrderDTO>(orderAfterAdding),
-
-                    Apartment = _mapper.Map<ApartmentDTO>(orderAfterAdding.Apartment),
-
-                    Address = _mapper.Map<AddressDTO>(orderAfterAdding.Apartment.Address),
-
-                    Country = _mapper.Map<CountryDTO>(orderAfterAdding.Apartment.Address.Country)
-                };
-
-                view.Order.Dates = order.Dates;
+                var view = MakeViewModel(orderAfterAdding);
 
                 return (Result<OrderView>)Result<OrderView>
                     .Ok(view);
@@ -131,13 +181,13 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="userId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<OrderView>>> GetAllOrdersByUserIdAsync(string userId)
+        public async Task<Result<IEnumerable<OrderView>>> GetAllOrdersByCustomerIdAsync(string customerId)
         {
-            Guid customerId = Guid.Parse(userId);
+            Guid id = Guid.Parse(customerId);
 
             try
             {
-                var orders = await _db.Orders.Where(_ => _.CustomerId == customerId)
+                var orders = await _db.Orders.Where(_ => _.CustomerId == id)
                     .Include(_=>_.Dates)
                     .Include(_=>_.Apartment)
                     .Include(_ => _.Apartment.Address)
@@ -147,32 +197,14 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (!orders.Any())
                 {
                     return (Result<IEnumerable<OrderView>>)Result<IEnumerable<OrderView>>
-                        .Fail<IEnumerable<OrderView>>("This User haven't Orders");
+                        .NoContent<IEnumerable<OrderView>>();
                 }
 
                 List<OrderView> result = new List<OrderView>();
 
                 foreach (var item in orders)
                 {
-                    OrderView view = new OrderView()
-                    {
-                        Order = _mapper.Map<OrderDTO>(item),
-
-                        Apartment = _mapper.Map<ApartmentDTO>(item.Apartment),
-
-                        Address = _mapper.Map<AddressDTO>(item.Apartment.Address),
-
-                        Country = _mapper.Map<CountryDTO>(item.Apartment.Address.Country)
-                    };
-
-                    List<DateTime> notFreeDates = new List<DateTime>();
-
-                    foreach (var date in item.Dates)
-                    {
-                        notFreeDates.Add(date.Date);
-                    }
-
-                    view.Order.Dates = notFreeDates;
+                    var view = MakeViewModel(item);
 
                     result.Add(view);
                 }
@@ -206,7 +238,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (!orders.Any())
                 {
                     return (Result<IEnumerable<OrderDTO>>)Result<IEnumerable<OrderDTO>>
-                        .Fail<IEnumerable<OrderDTO>>("This Apartment haven't Orders");
+                        .NoContent<IEnumerable<OrderDTO>>();
                 }
 
                 var result = _mapper.Map<IEnumerable<OrderDTO>>(orders) as List<OrderDTO>;
@@ -221,7 +253,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
                     foreach (var date in dates)
                     {
-                        notFreeDates.Add(date.Date);
+                        notFreeDates.Add(date.Date.Value);
                     }
 
                     item.Dates = notFreeDates;
@@ -259,28 +291,10 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (order is null)
                 {
                     return (Result<OrderView>)Result<OrderView>
-                        .Fail<OrderView>($"Order was not found");
+                        .NoContent<OrderView>();
                 }
 
-                OrderView view = new OrderView()
-                {
-                    Order = _mapper.Map<OrderDTO>(order),
-
-                    Apartment = _mapper.Map<ApartmentDTO>(order.Apartment),
-
-                    Address = _mapper.Map<AddressDTO>(order.Apartment.Address),
-
-                    Country = _mapper.Map<CountryDTO>(order.Apartment.Address.Country)
-                };
-
-                List<DateTime> notFreeDates = new List<DateTime>();
-
-                foreach (var date in order.Dates)
-                {
-                    notFreeDates.Add(date.Date);
-                }
-
-                view.Order.Dates = notFreeDates;
+                var view = MakeViewModel(order);
 
                 return (Result<OrderView>)Result<OrderView>
                     .Ok(_mapper.Map<OrderView>(view));
@@ -301,53 +315,52 @@ namespace Apartments.Domain.Logic.Users.UserService
         public async Task<Result<OrderView>> UpdateOrderAsync(OrderDTO order)
         {
             var updatedOrder = _mapper.Map<Order>(order);
+            var oldOrder = _db.Orders.Where(_ => _.Id == updatedOrder.Id).ToList().FirstOrDefault();
 
-            if (await IsApartmentFree(order.Dates, updatedOrder.ApartmentId))
+            if (oldOrder == null)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Cannot save model. Dates are not free!");
+                    .NotOk<OrderView>(null, "No order for update!");
             };
-
-            List<BusyDate> busyDates = new List<BusyDate>();
-
-            foreach (var item in order.Dates)
-            {
-                BusyDate date = new BusyDate()
-                {
-                    ApartmentId = Guid.Parse(order.ApartmentId),
-                    Date = item.Date
-                };
-            }
-
-            updatedOrder.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
-            updatedOrder.Update = DateTime.Now;
-
-            _db.Orders.Update(updatedOrder);
 
             try
             {
+                _db.Orders.Remove(oldOrder);
                 await _db.SaveChangesAsync();
 
-                Order orderAfterUpdating = await _db.Orders.Where(_ => _.CustomerId == updatedOrder.CustomerId)
-                    .Select(_ => _)
+                if (!await IsApartmentFree(order.Dates, updatedOrder.ApartmentId.Value))
+                {
+                    _db.Orders.Add(oldOrder);
+                    await _db.SaveChangesAsync();
+
+                    return (Result<OrderView>)Result<OrderView>
+                        .NotOk<OrderView>(null, "Cannot update order. Dates are not free!");
+                };
+
+                List<BusyDate> busyDates = MakeListBusyDates(order.Dates, updatedOrder.ApartmentId.Value);
+
+                decimal coastByDay = _db.Apartments.Where(_ => _.Id == updatedOrder.ApartmentId.Value)
+                                   .FirstOrDefault()
+                                   .Price.Value;
+
+                decimal totalCoast = MakeTotalCoast(coastByDay, order.Dates);
+
+                updatedOrder.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+                updatedOrder.TotalCoast = totalCoast;
+                updatedOrder.Update = DateTime.Now;
+
+                _db.Orders.Add(updatedOrder);
+                await _db.SaveChangesAsync();
+
+                Order orderAfterUpdating = await _db.Orders
+                    .Where(_ => _.Id == updatedOrder.Id)
+                    .Include(_ => _.Dates)
                     .Include(_ => _.Apartment)
                     .Include(_ => _.Apartment.Address)
                     .Include(_ => _.Apartment.Address.Country)
                     .AsNoTracking().FirstOrDefaultAsync();
 
-                OrderView view = new OrderView()
-                {
-
-                    Order = _mapper.Map<OrderDTO>(orderAfterUpdating),
-
-                    Apartment = _mapper.Map<ApartmentDTO>(orderAfterUpdating.Apartment),
-
-                    Address = _mapper.Map<AddressDTO>(orderAfterUpdating.Apartment.Address),
-
-                    Country = _mapper.Map<CountryDTO>(orderAfterUpdating.Apartment.Address.Country)
-                };
-
-                view.Order.Dates = order.Dates;
+                var view = MakeViewModel(orderAfterUpdating);
 
                 return (Result<OrderView>)Result<OrderView>
                     .Ok(view);
@@ -355,17 +368,17 @@ namespace Apartments.Domain.Logic.Users.UserService
             catch (DbUpdateConcurrencyException ex)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Cannot save model. {ex.Message}");
+                    .Fail<OrderView>($"Cannot save model. {ex.InnerException.Message}");
             }
             catch (DbUpdateException ex)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Cannot save model. {ex.Message}");
+                    .Fail<OrderView>($"Cannot save model. {ex.InnerException.Message}");
             }
             catch (ArgumentNullException ex)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Source is null. {ex.Message}");
+                    .Fail<OrderView>($"Source is null. {ex.InnerException.Message}");
             }
 
         }
@@ -376,20 +389,25 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="orderId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteOrderByIdAsync(string orderId)
+        public async Task<Result> DeleteOrderByIdAsync(string orderId, string customerId)
         {
             Guid id = Guid.Parse(orderId);
+            Guid cusId = Guid.Parse(customerId);
 
-            var order = await _db.Orders.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+            var isOrder = await _db.Orders
+                .Where(_ => _.Id == id)
+                .Where(_ => _.CustomerId == cusId)
+                .IgnoreQueryFilters().AnyAsync();
 
-            if (order is null)
+            if (!isOrder)
             {
-                return await Task.FromResult(Result.Fail("Order was not found"));
+                return await Task.FromResult(Result.NotOk("Order was not found or you are not customer"));
             }
+
+            _db.Entry(new Order() { Id = id }).State = EntityState.Deleted;
 
             try
             {
-                _db.Orders.Remove(order);
                 await _db.SaveChangesAsync();
 
                 return await Task.FromResult(Result.Ok());
@@ -400,7 +418,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete Order. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete Order. {ex.InnerException.Message}"));
             }
         }
     }

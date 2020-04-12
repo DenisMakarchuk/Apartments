@@ -19,7 +19,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
     public class OrderUserService_Tests
     {
         private Faker<User> _fakeUser = new Faker<User>()
-        .RuleFor(x => x.Name, y => y.Person.FullName.ToString());
+        .RuleFor(x => x.Id, new Guid());
 
         private Faker<Apartment> _fakeApartment = new Faker<Apartment>()
             .RuleFor(x => x.IsOpen, true)
@@ -52,7 +52,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 cfg.CreateMap<CountryDTO, Country>().ReverseMap();
 
                 cfg.CreateMap<AddOrder, Order>()
-                .ForMember(_=>_.Dates, _=>_.Ignore());
+                .ForMember(_ => _.Dates, _ => _.Ignore());
                 cfg.CreateMap<OrderDTO, Order>()
                 .ForMember(_ => _.Dates, _ => _.Ignore())
                 .ReverseMap()
@@ -67,7 +67,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
         }
 
         [Fact]
-        public async void CreateOrderAsync_PositiveAndNegative_TestAsync()
+        public async void CreateOrderAsync_Positive_TestAsync()
         {
             var options = new DbContextOptionsBuilder<ApartmentContext>()
                 .UseInMemoryDatabase(databaseName: "CreateOrderAsync_PositiveAndNegative_TestAsync")
@@ -99,10 +99,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
             {
                 var service = new OrderUserService(context, _mapper);
 
-                User user = await context.Users.FirstOrDefaultAsync();
-
-                Apartment apartment = await context.Apartments
-                    .Include(_ => _.Address.Country).FirstOrDefaultAsync();
+                var user = context.Users.AsNoTracking().FirstOrDefault(); ;
+                var apartment = context.Apartments.AsNoTracking().FirstOrDefault(); ;
 
                 IEnumerable<DateTime> dateTimes = new List<DateTime>()
                 {
@@ -112,28 +110,16 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 AddOrder order = new AddOrder()
                 {
                     ApartmentId = apartment.Id.ToString(),
-                    CustomerId = user.Id.ToString(),
                     Dates = dateTimes
                 };
 
-                AddOrder failOrder = new AddOrder()
-                {
-                    ApartmentId = apartment.Id.ToString(),
-                    CustomerId = user.Id.ToString(),
-                    Dates = dateTimes
-                };
-
-                var resultPositive = await service.CreateOrderAsync(order);
-                //var resultNegative = await service.CreateOrderAsync(failOrder);
+                var resultPositive = await service.CreateOrderAsync(order, user.Id.ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Country.Name.Should().BeEquivalentTo(apartment.Address.Country.Name);
                 resultPositive.Data.Apartment.Title.Should().BeEquivalentTo(apartment.Title);
                 resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(dateTimes.First());
 
                 context.BusyDates.FirstOrDefault().Date.Should().BeSameDateAs(dateTimes.First());
-
-                //resultNegative.IsSuccess.Should().BeFalse();
             }
         }
 
@@ -182,13 +168,13 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 List<BusyDate> busyDates = new List<BusyDate>();
 
-                    BusyDate date = new BusyDate()
-                    {
-                        ApartmentId = context.Apartments.FirstOrDefault().Id,
-                        Date = DateTime.Now.Date
-                    };
+                BusyDate date = new BusyDate()
+                {
+                    ApartmentId = context.Apartments.FirstOrDefault().Id,
+                    Date = DateTime.Now.Date
+                };
 
-                    busyDates.Add(date);
+                busyDates.Add(date);
 
                 order.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
 
@@ -203,8 +189,8 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var ordersInBase = await context.Orders.AsNoTracking().ToListAsync();
                 var userWithoutOrders = await context.Users.Where(_ => _.Id != userWithOrders.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllOrdersByUserIdAsync(userWithOrders.Id.ToString());
-                var resultNegative = await service.GetAllOrdersByUserIdAsync(userWithoutOrders.Id.ToString());
+                var resultPositive = await service.GetAllOrdersByCustomerIdAsync(userWithOrders.Id.ToString());
+                var resultNegative = await service.GetAllOrdersByCustomerIdAsync(userWithoutOrders.Id.ToString());
 
                 foreach (var item in ordersInBase)
                 {
@@ -374,7 +360,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
         }
 
         [Fact]
-        public async void UpdateOrderAsync_PositiveAndNegative_TestAsync()
+        public async void UpdateOrderAsync_Positive_TestAsync()
         {
             var options = new DbContextOptionsBuilder<ApartmentContext>()
                 .UseInMemoryDatabase(databaseName: "UpdateOrderAsync_PositiveAndNegative_TestAsync")
@@ -441,26 +427,17 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 DateTime newDate = new DateTime(DateTime.Now.Year + 1, DateTime.Now.Month, DateTime.Now.Day);
 
-                IEnumerable<DateTime> dates = new List<DateTime>() 
+                IEnumerable<DateTime> dates = new List<DateTime>()
                 {
                     newDate
                 };
 
                 orderForUpdate.Dates = dates;
 
-                //OrderDTO failOrder = new OrderDTO()
-                //{
-                //    Id = new Guid().ToString(),
-                //    ApartmentId = orderForUpdate.ApartmentId
-                //};
-
                 var resultPositive = await service.UpdateOrderAsync(orderForUpdate);
-                //var resultNegative = await service.UpdateOrderAsync(failOrder);
 
                 resultPositive.IsSuccess.Should().BeTrue();
-                resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(newDate);
-
-                //resultNegative.IsSuccess.Should().BeFalse();
+                //resultPositive.Data.Order.Dates.FirstOrDefault().Should().BeSameDateAs(newDate);
             }
         }
 
@@ -529,14 +506,14 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
                 var service = new OrderUserService(context, _mapper);
 
-                var resultPositive = await service.DeleteOrderByIdAsync(orderInBase.Id.ToString());
-                var resultNegative = await service.DeleteOrderByIdAsync(new Guid().ToString());
+                var resultPositive = await service.DeleteOrderByIdAsync(orderInBase.Id.ToString(), orderInBase.CustomerId.ToString());
+                var resultNegative = await service.DeleteOrderByIdAsync(new Guid().ToString(), new Guid().ToString());
 
                 resultPositive.IsSuccess.Should().BeTrue();
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().Contain("Order was not found");
+                resultNegative.Message.Should().Contain("not found");
             }
         }
     }

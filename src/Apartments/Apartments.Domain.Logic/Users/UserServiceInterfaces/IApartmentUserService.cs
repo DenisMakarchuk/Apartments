@@ -19,14 +19,14 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="apartment"></param>
         /// <returns></returns>
-        Task<Result<ApartmentView>> CreateApartmentAsync(AddApartment apartment);
+        Task<Result<ApartmentView>> CreateApartmentAsync(AddApartment apartment, string ownerId);
 
         /// <summary>
         /// Get all Apartments by User Id
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByUserIdAsync(string userId);
+        Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByOwnerIdAsync(string userId);
 
         /// <summary>
         /// Get Apartment by Apartment Id
@@ -47,6 +47,6 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteApartmentByIdAsync(string apartmentId);
+        Task<Result> DeleteApartmentByIdAsync(string apartmentId, string ownerId);
     }
 }

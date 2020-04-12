@@ -18,14 +18,14 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>
-        Task<Result<CommentDTO>> CreateCommentAsync(AddComment comment);
+        Task<Result<CommentDTO>> CreateCommentAsync(AddComment comment, string authorId);
 
         /// <summary>
         /// Get all User Comments by User Id
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByUserIdAsync(string userId);
+        Task<Result<IEnumerable<CommentDTO>>> GetAllCommentsByAuthorIdAsync(string userId);
 
         /// <summary>
         /// Get all Comments by Apartment Id
@@ -53,6 +53,6 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteCommentByIdAsync(string commentId);
+        Task<Result> DeleteCommentByIdAsync(string commentId, string authorId);
     }
 }

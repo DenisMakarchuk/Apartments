@@ -1,21 +1,18 @@
-﻿using Apartments.Domain.Users.DTO;
+﻿using Apartments.Domain.Admin.DTO;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Apartments.Web.Validation
+namespace Apartments.Domain.Logic.Validation
 {
-    public class CommentDTOValidator : AbstractValidator<CommentDTO>
+    public class CommentDTOAdministrationValidator : AbstractValidator<CommentDTOAdministration>
     {
-        public CommentDTOValidator()
+        public CommentDTOAdministrationValidator()
         {
             RuleFor(_=>_.Id).Must(id => Guid.TryParse(id, out var _))
-                .WithMessage("Comment Id must can parse to Guid type");
-
-            RuleFor(_ => _.AuthorId).Must(id => Guid.TryParse(id, out var _))
-                .WithMessage("Author Id can't parse to Guid type");
+                .WithMessage("Id can't parse to Guid type");
 
             RuleFor(_ => _.Title).MinimumLength(4).MaximumLength(50)
                 .WithMessage("Title must be from 4 till 50 characters");

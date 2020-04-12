@@ -8,10 +8,10 @@ namespace Apartments.Data.DataModels
     {
         public Guid Id { get; set; }
 
-        public Guid AddressId { get; set; }
+        public Guid? AddressId { get; set; }
         public Address Address { get; set; }
 
-        public Guid OwnerId { get; set; }
+        public Guid? OwnerId { get; set; }
         public User Owner { get; set; }
 
         public bool? IsOpen { get; set; } = false;
@@ -29,6 +29,6 @@ namespace Apartments.Data.DataModels
 
         public HashSet<BusyDate> Dates { get; set; }
 
-        public DateTime? Update { get; set; } = DateTime.Now;
+        public DateTime? Update { get; set; } = DateTime.UtcNow;
     }
 }

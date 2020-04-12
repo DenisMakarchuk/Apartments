@@ -38,43 +38,43 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
 
-            if (search.CountryId != null)
+            if (!string.IsNullOrEmpty(search?.CountryId))
             {
                 Guid id = Guid.Parse(search.CountryId);
 
                 apartments = apartments.Where(_ => _.Address.CountryId == id);
             }
 
-            if (search.CityName != null)
+            if (!string.IsNullOrEmpty(search?.CityName))
             {
                 apartments = apartments.Where(_ => _.Address.City.Contains(search.CityName));
             }
 
-            if (search.RoomsFrom > 0)
+            if (search?.RoomsFrom > 0)
             {
                 apartments = apartments.Where(_ => _.NumberOfRooms >= search.RoomsFrom);
             }
 
-            if (search.RoomsTill > 0 && search.RoomsTill >= search.RoomsFrom)
+            if (search?.RoomsTill > 0 && search.RoomsTill >= search.RoomsFrom)
             {
                 apartments = apartments.Where(_ => _.NumberOfRooms <= search.RoomsTill);
             }
 
-            if (search.PriceFrom > 0)
+            if (search?.PriceFrom > 0)
             {
                 apartments = apartments.Where(_ => _.Price >= search.PriceFrom);
             }
 
-            if (search.PriceTill > 0 && search.PriceTill >= search.PriceFrom)
+            if (search?.PriceTill > 0 && search?.PriceTill >= search.PriceFrom)
             {
                 apartments = apartments.Where(_ => _.Price <= search.PriceTill);
             }
 
-            if (search.NeedDates != null && search.NeedDates.Any())
+            if (search?.NeedDates != null && search.NeedDates.Any())
             {
                 foreach (var item in search.NeedDates)
                 {
-                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date.Date == item.Date).FirstOrDefault() == null);
+                    apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date == item.Date).FirstOrDefault() == null);
                 }
             }
 
@@ -85,7 +85,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
                 if (!result.Any())
                 {
                     return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
-                        .Fail<IEnumerable<ApartmentSearchDTO>>("No Apartments with this parameters");
+                        .NotOk<IEnumerable<ApartmentSearchDTO>>(null, "No Apartments with this parameters");
                 }
 
                 return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>

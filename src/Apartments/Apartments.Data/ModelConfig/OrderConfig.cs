@@ -30,6 +30,8 @@ namespace Apartments.Data.ModelConfig
             builder.HasMany(_ => _.Dates).WithOne(_ => _.Order)
                 .HasForeignKey(_ => _.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(_ => _.TotalCoast).IsRequired();
         }
     }
 }

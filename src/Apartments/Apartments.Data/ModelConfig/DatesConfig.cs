@@ -26,6 +26,8 @@ namespace Apartments.Data.ModelConfig
             builder.HasOne(_ => _.Apartment).WithMany(_ => _.Dates)
                 .HasForeignKey(_ => _.ApartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(_ => _.Date).IsRequired();
         }
     }
 }
