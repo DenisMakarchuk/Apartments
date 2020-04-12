@@ -70,7 +70,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             foreach (var date in (order.Dates as IEnumerable<BusyDate>))
             {
-                notFreeDates.Add(date.Date);
+                notFreeDates.Add(date.Date.Value);
             }
 
             view.Order.Dates = notFreeDates;
@@ -253,7 +253,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
                     foreach (var date in dates)
                     {
-                        notFreeDates.Add(date.Date);
+                        notFreeDates.Add(date.Date.Value);
                     }
 
                     item.Dates = notFreeDates;
@@ -315,29 +315,39 @@ namespace Apartments.Domain.Logic.Users.UserService
         public async Task<Result<OrderView>> UpdateOrderAsync(OrderDTO order)
         {
             var updatedOrder = _mapper.Map<Order>(order);
+            var oldOrder = _db.Orders.Where(_ => _.Id == updatedOrder.Id).ToList().FirstOrDefault();
 
-            if (await IsApartmentFree(order.Dates, updatedOrder.ApartmentId.Value))
+            if (oldOrder == null)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .NotOk<OrderView>(null, "Cannot update order. Dates are not free!");
+                    .NotOk<OrderView>(null, "No order for update!");
             };
-
-            List<BusyDate> busyDates = MakeListBusyDates(order.Dates, updatedOrder.ApartmentId.Value);
-
-            decimal coastByDay = _db.Apartments.Where(_ => _.Id == updatedOrder.ApartmentId.Value)
-                                   .FirstOrDefault()
-                                   .Price.Value;
-
-            decimal totalCoast = MakeTotalCoast(coastByDay, order.Dates);
-
-            updatedOrder.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
-            updatedOrder.TotalCoast = totalCoast;
-            updatedOrder.Update = DateTime.Now;
 
             try
             {
-                _db.Entry(new Order() { Id = updatedOrder.Id }).State = EntityState.Deleted;
+                _db.Orders.Remove(oldOrder);
                 await _db.SaveChangesAsync();
+
+                if (!await IsApartmentFree(order.Dates, updatedOrder.ApartmentId.Value))
+                {
+                    _db.Orders.Add(oldOrder);
+                    await _db.SaveChangesAsync();
+
+                    return (Result<OrderView>)Result<OrderView>
+                        .NotOk<OrderView>(null, "Cannot update order. Dates are not free!");
+                };
+
+                List<BusyDate> busyDates = MakeListBusyDates(order.Dates, updatedOrder.ApartmentId.Value);
+
+                decimal coastByDay = _db.Apartments.Where(_ => _.Id == updatedOrder.ApartmentId.Value)
+                                   .FirstOrDefault()
+                                   .Price.Value;
+
+                decimal totalCoast = MakeTotalCoast(coastByDay, order.Dates);
+
+                updatedOrder.Dates = _mapper.Map<HashSet<BusyDate>>(busyDates);
+                updatedOrder.TotalCoast = totalCoast;
+                updatedOrder.Update = DateTime.Now;
 
                 _db.Orders.Add(updatedOrder);
                 await _db.SaveChangesAsync();
@@ -358,17 +368,17 @@ namespace Apartments.Domain.Logic.Users.UserService
             catch (DbUpdateConcurrencyException ex)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Cannot save model. {ex.Message}");
+                    .Fail<OrderView>($"Cannot save model. {ex.InnerException.Message}");
             }
             catch (DbUpdateException ex)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Cannot save model. {ex.Message}");
+                    .Fail<OrderView>($"Cannot save model. {ex.InnerException.Message}");
             }
             catch (ArgumentNullException ex)
             {
                 return (Result<OrderView>)Result<OrderView>
-                    .Fail<OrderView>($"Source is null. {ex.Message}");
+                    .Fail<OrderView>($"Source is null. {ex.InnerException.Message}");
             }
 
         }

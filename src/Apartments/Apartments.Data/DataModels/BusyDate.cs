@@ -14,6 +14,6 @@ namespace Apartments.Data.DataModels
         public Guid? ApartmentId { get; set; }
         public Apartment Apartment { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTime? Date { get; set; }
     }
 }

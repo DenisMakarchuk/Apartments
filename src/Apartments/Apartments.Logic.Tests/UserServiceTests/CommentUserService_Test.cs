@@ -261,6 +261,11 @@ namespace Apartments.Logic.Tests.UserServiceTests
 
             using (var context = new ApartmentContext(options))
             {
+                foreach (var item in _comments)
+                {
+                    item.AuthorId = new Guid();
+                }
+
                 context.AddRange(_comments);
                 await context.SaveChangesAsync();
             }

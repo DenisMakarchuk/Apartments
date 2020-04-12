@@ -8,10 +8,10 @@ namespace Apartments.Data.DataModels
     {
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        public Guid CountryId { get; set; }
+        public Guid? CountryId { get; set; }
         public Country Country { get; set; }
 
-        public Guid ApartmentId { get; set; }
+        public Guid? ApartmentId { get; set; }
         public Apartment Apartment { get; set; }
 
         public string City { get; set; }

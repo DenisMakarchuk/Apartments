@@ -24,7 +24,7 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasMany(_ => _.Orders).WithOne(_ => _.Customer)
                 .HasForeignKey(_ => _.CustomerId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(_ => _.Comments).WithOne(_ => _.Author)
                 .HasForeignKey(_ => _.AuthorId)

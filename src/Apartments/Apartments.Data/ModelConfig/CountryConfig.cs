@@ -19,11 +19,10 @@ namespace Apartments.Data.ModelConfig
             builder.HasKey(_ => _.Id);
             builder.Property(_ => _.Id).ValueGeneratedOnAdd();
 
-            builder.Property(_ => _.Name).IsRequired().HasMaxLength(50);
+            builder.Property(_ => _.Name).IsRequired();
 
             builder.HasMany(_ => _.Addresses).WithOne(_ => _.Country)
-                .HasForeignKey(_ => _.CountryId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(_ => _.CountryId);
         }
     }
 }

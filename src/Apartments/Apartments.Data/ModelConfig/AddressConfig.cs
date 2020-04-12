@@ -21,11 +21,11 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasOne(_ => _.Country).WithMany(_ => _.Addresses)
                 .HasForeignKey(_ => _.CountryId)
-                .OnDelete(DeleteBehavior.Restrict).IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(_ => _.Apartment).WithOne(_ => _.Address)
                 .HasForeignKey<Apartment>(_ => _.AddressId)
-                .OnDelete(DeleteBehavior.Cascade).IsRequired();
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(_ => _.City).IsRequired().HasMaxLength(50);
             builder.Property(_ => _.Street).IsRequired().HasMaxLength(50);

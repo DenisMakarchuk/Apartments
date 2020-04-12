@@ -8,10 +8,10 @@ namespace Apartments.Data.DataModels
     {
         public Guid Id { get; set; }
 
-        public Guid AddressId { get; set; }
+        public Guid? AddressId { get; set; }
         public Address Address { get; set; }
 
-        public Guid OwnerId { get; set; }
+        public Guid? OwnerId { get; set; }
         public User Owner { get; set; }
 
         public bool? IsOpen { get; set; } = false;

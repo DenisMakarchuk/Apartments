@@ -233,11 +233,11 @@ namespace Apartments.Domain.Logic.Users.UserService
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.InnerException.Message}"));
             }
             catch (DbUpdateException ex)
             {
-                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.Message}"));
+                return await Task.FromResult(Result.Fail($"Cannot delete Apartment. {ex.InnerException.Message}"));
             }
         }
     }

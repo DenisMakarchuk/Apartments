@@ -21,11 +21,11 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasOne(_ => _.Apartment).WithMany(_ => _.Comments)
                 .HasForeignKey(_ => _.ApartmentId)
-                .OnDelete(DeleteBehavior.Restrict).IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(_ => _.Author).WithMany(_ => _.Comments)
                 .HasForeignKey(_ => _.AuthorId)
-                .OnDelete(DeleteBehavior.Restrict).IsRequired();
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(_ => _.Title).IsRequired().HasMaxLength(25);
             builder.Property(_ => _.Text).IsRequired().HasMaxLength(255);
