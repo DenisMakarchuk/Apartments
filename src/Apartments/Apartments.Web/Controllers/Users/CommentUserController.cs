@@ -31,7 +31,7 @@ namespace Apartments.Web.Controllers.Users
         }
 
         /// <summary>
-        /// Put Comment to the DB
+        /// Add Comment to the DB
         /// </summary>
         /// <param name="comment"></param>
         /// <returns></returns>

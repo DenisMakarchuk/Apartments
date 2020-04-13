@@ -31,7 +31,7 @@ namespace Apartments.Web.Controllers.Users
         }
 
         /// <summary>
-        /// Put Order to the DataBase
+        /// Add Order to the DataBase
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>

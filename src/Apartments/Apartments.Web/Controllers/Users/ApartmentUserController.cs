@@ -32,7 +32,7 @@ namespace Apartments.Web.Controllers.Users
         }
 
         /// <summary>
-        /// Put Apartment to the DB
+        /// Add Apartment to the DB
         /// </summary>
         /// <param name="apartment"></param>
         /// <returns></returns>

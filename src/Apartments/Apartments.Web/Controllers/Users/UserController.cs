@@ -68,6 +68,11 @@ namespace Apartments.Web.Controllers.Users
             }
         }
 
+        /// <summary>
+        /// Login
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("logIn")]
@@ -93,6 +98,10 @@ namespace Apartments.Web.Controllers.Users
             }
         }
 
+        /// <summary>
+        /// Logout
+        /// </summary>
+        /// <returns></returns>
         [HttpPost]
         [Route("logOut")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -105,6 +114,11 @@ namespace Apartments.Web.Controllers.Users
             return (IActionResult)Ok(await Task.FromResult(Result.Ok()));
         }
 
+        /// <summary>
+        /// Delete account
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
         [ProducesResponseType(StatusCodes.Status200OK)]
