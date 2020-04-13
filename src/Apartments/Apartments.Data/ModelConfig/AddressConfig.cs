@@ -29,6 +29,9 @@ namespace Apartments.Data.ModelConfig
 
             builder.Property(_ => _.City).IsRequired().HasMaxLength(50);
             builder.Property(_ => _.Street).IsRequired().HasMaxLength(50);
+
+            builder.Property<bool>("IsDeleted");
+            builder.HasQueryFilter(post => EF.Property<bool>(post, "IsDeleted") == false);
         }
     }
 }

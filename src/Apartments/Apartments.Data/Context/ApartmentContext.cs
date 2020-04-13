@@ -2,9 +2,14 @@
 using Apartments.Data.ModelConfig;
 using Bogus;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Apartments.Data.Context
 {
@@ -31,6 +36,8 @@ namespace Apartments.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.ApplyConfiguration(new AddressConfig());
             modelBuilder.ApplyConfiguration(new ApartmentConfig());
             modelBuilder.ApplyConfiguration(new CommentConfig());
@@ -40,6 +47,44 @@ namespace Apartments.Data.Context
             modelBuilder.ApplyConfiguration(new DatesConfig());
 
             modelBuilder.Entity<Country>().HasData(GetCountries());
+        }
+
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            OnBeforeSaving();
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            OnBeforeSaving();
+            return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        }
+
+        private void OnBeforeSaving()
+        {
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is Order ||
+                    entry.Entity is BusyDate ||
+                    entry.Entity is Country ||
+                    entry.Entity is User)
+                {
+                    continue;
+                };
+
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.CurrentValues["IsDeleted"] = false;
+                        break;
+
+                    case EntityState.Deleted:
+                        entry.State = EntityState.Modified;
+                        entry.CurrentValues["IsDeleted"] = true;
+                        break;
+                }
+            }
         }
 
         private List<Country> GetCountries()
