@@ -3,27 +3,30 @@ using Apartments.Domain.Admin.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
 {
     /// <summary>
-    /// Methods of Administrator work with Users
+    /// Methods of Administrator work with User profile
     /// </summary>
     public interface IUserAdministrationService
     {
         /// <summary>
-        /// Get User by User Id
+        /// Get User profile by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result<UserDTOAdministration>> GetUserProfileByIdentityIdAsync(string id);
+        Task<Result<UserDTOAdministration>> 
+            GetUserProfileByIdentityIdAsync(string id, CancellationToken cancellationToken);
 
         /// <summary>
-        /// Delete User by User Id
+        /// Delete User profile by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteUserProfileByIdentityIdAsync(string id);
+        Task<Result> 
+            DeleteUserProfileByIdentityIdAsync(string id, CancellationToken cancellationToken);
     }
 }

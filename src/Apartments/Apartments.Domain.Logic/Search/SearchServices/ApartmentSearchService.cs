@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Search.SearchServices
@@ -34,7 +35,8 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// <param name="search"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<ApartmentSearchDTO>>> GetAllApartmentsAsync(SearchParameters search)
+        public async Task<Result<IEnumerable<ApartmentSearchDTO>>> 
+            GetAllApartmentsAsync(SearchParameters search, CancellationToken cancellationToken = default(CancellationToken))
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
 
@@ -80,12 +82,12 @@ namespace Apartments.Domain.Logic.Search.SearchServices
 
             try
             {
-                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync());
+                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync(cancellationToken));
 
                 if (!result.Any())
                 {
                     return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
-                        .NotOk<IEnumerable<ApartmentSearchDTO>>(null, "No Apartments with this parameters");
+                        .NoContent<IEnumerable<ApartmentSearchDTO>>();
                 }
 
                 return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
@@ -104,7 +106,8 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// <param name="apartmentId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<ApartmentSearchView>> GetApartmentByIdAsync(string apartmentId)
+        public async Task<Result<ApartmentSearchView>> 
+            GetApartmentByIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(apartmentId);
 
@@ -112,12 +115,12 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             {
                 var apartment = await _db.Apartments.Where(_ => _.Id == id)
                     .Include(_ => _.Address.Country).Include(_ => _.Address)
-                    .AsNoTracking().FirstOrDefaultAsync();
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 if (apartment is null)
                 {
                     return (Result<ApartmentSearchView>)Result<ApartmentSearchView>
-                        .Fail<ApartmentSearchView>($"Apartment was not found");
+                        .NoContent<ApartmentSearchView>();
                 }
 
                 ApartmentSearchView view = new ApartmentSearchView()
@@ -145,18 +148,27 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// </summary>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CountrySearchDTO>>> GetAllCountriesAsync()
+        public async Task<Result<IEnumerable<CountrySearchDTO>>> 
+            GetAllCountriesAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
-            var countries = await _db.Countries.AsNoTracking().ToListAsync();
+            try
+            {
+                var countries = await _db.Countries.AsNoTracking().ToListAsync(cancellationToken);
 
-            if (!countries.Any())
+                if (!countries.Any())
+                {
+                    return (Result<IEnumerable<CountrySearchDTO>>)Result<IEnumerable<CountrySearchDTO>>
+                        .NoContent<IEnumerable<CountrySearchDTO>>();
+                }
+
+                return (Result<IEnumerable<CountrySearchDTO>>)Result<IEnumerable<CountrySearchDTO>>
+                    .Ok(_mapper.Map<IEnumerable<CountrySearchDTO>>(countries));
+            }
+            catch (ArgumentNullException ex)
             {
                 return (Result<IEnumerable<CountrySearchDTO>>)Result<IEnumerable<CountrySearchDTO>>
-                    .Fail<IEnumerable<CountrySearchDTO>>("No Countries found");
+                    .Fail<IEnumerable<CountrySearchDTO>>($"Source is null. {ex.Message}");
             }
-
-            return (Result<IEnumerable<CountrySearchDTO>>)Result<IEnumerable<CountrySearchDTO>>
-                .Ok(_mapper.Map<IEnumerable<CountrySearchDTO>>(countries));
         }
 
         /// <summary>
@@ -165,18 +177,20 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// <param name="countryId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<CountrySearchDTO>> GetCountryByIdAsync(string countryId)
+        public async Task<Result<CountrySearchDTO>> 
+            GetCountryByIdAsync(string countryId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(countryId);
 
             try
             {
-                var country = await _db.Countries.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+                var country = await _db.Countries.Where(_ => _.Id == id)
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 if (country is null)
                 {
                     return (Result<CountrySearchDTO>)Result<CountrySearchDTO>
-                        .Fail<CountrySearchDTO>($"Country was not found");
+                        .NoContent<CountrySearchDTO>();
 
                 }
 

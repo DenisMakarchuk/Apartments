@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
@@ -33,7 +34,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="role"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<IdentityUserAdministrationDTO>>> GetAllUsersInRoleAsync(string role)
+        public async Task<Result<IEnumerable<IdentityUserAdministrationDTO>>> 
+            GetAllUsersInRoleAsync(string role)
         {
             var users = await _userManager.GetUsersInRoleAsync(role);
 
@@ -65,7 +67,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserAdministrationView>> GetUserByIdAsync(string id)
+        public async Task<Result<UserAdministrationView>> 
+            GetUserByIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -81,7 +84,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 Email = user.Email
             };
 
-            var profile = await _service.GetUserProfileByIdentityIdAsync(id);
+            var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
             {
@@ -111,7 +114,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserAdministrationView>> AddToAdminAsync(string id)
+        public async Task<Result<UserAdministrationView>> 
+            AddToAdminAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -129,7 +133,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 Email = user.Email
             };
 
-            var profile = await _service.GetUserProfileByIdentityIdAsync(id);
+            var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
             {
@@ -159,7 +163,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserAdministrationView>> AddToUserAsync(string id)
+        public async Task<Result<UserAdministrationView>> 
+            AddToUserAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -177,7 +182,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 Email = user.Email
             };
 
-            var profile = await _service.GetUserProfileByIdentityIdAsync(id);
+            var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
             {
@@ -207,7 +212,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteByIdAsync(string id)
+        public async Task<Result> 
+            DeleteByIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             var user = await _userManager.FindByIdAsync(id);
 
@@ -216,7 +222,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 return await Task.FromResult(Result.NoContent());
             }
 
-            var isProfileDeleted = await _service.DeleteUserProfileByIdentityIdAsync(id);
+            var isProfileDeleted = await _service.DeleteUserProfileByIdentityIdAsync(id, cancellationToken);
 
             var result = await _userManager.DeleteAsync(user);
 

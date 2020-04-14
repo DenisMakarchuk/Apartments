@@ -12,8 +12,6 @@ namespace Apartments.Data
     {
         public static IServiceCollection AddDataServices(this IServiceCollection services, IConfiguration config)
         {
-            //configure your Data Layer services here
-
             services.AddDbContext<ApartmentContext>(options =>
                 options.UseSqlServer(config.GetSection("ConnectionString:ApartmentConnection").Value));
 

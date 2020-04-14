@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Admin.AdminService
@@ -31,16 +32,18 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get all User Comments by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByUserIdAsync(string userId)
+        public async Task<Result<IEnumerable<CommentDTOAdministration>>> 
+            GetAllCommentsByUserIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid athorId = Guid.Parse(userId);
 
             try
             {
                 var comments = await _db.Comments.Where(_ => _.AuthorId == athorId).Select(_ => _)
-                    .AsNoTracking().ToListAsync();
+                    .AsNoTracking().ToListAsync(cancellationToken);
 
                 if (!comments.Any())
                 {
@@ -62,16 +65,18 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get all Apartment Comments by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CommentDTOAdministration>>> GetAllCommentsByApartmentIdAsync(string apartmentId)
+        public async Task<Result<IEnumerable<CommentDTOAdministration>>> 
+            GetAllCommentsByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(apartmentId);
 
             try
             {
                 var comments = await _db.Comments.Where(_ => _.ApartmentId == id).Select(_ => _)
-                    .AsNoTracking().ToListAsync();
+                    .AsNoTracking().ToListAsync(cancellationToken);
 
                 if (!comments.Any())
                 {
@@ -93,24 +98,26 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get Comment by Comment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="commentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<CommentDTOAdministration>> GetCommentByIdAsync(string commentId)
+        public async Task<Result<CommentDTOAdministration>> 
+            GetCommentByIdAsync(string commentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(commentId);
 
             try
             {
-                var user = await _db.Comments.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+                var comment = await _db.Comments.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
-                if (user is null)
+                if (comment is null)
                 {
                     return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
                         .NoContent<CommentDTOAdministration>();
                 }
 
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
-                    .Ok(_mapper.Map<CommentDTOAdministration>(user));
+                    .Ok(_mapper.Map<CommentDTOAdministration>(comment));
             }
             catch (ArgumentNullException ex)
             {
@@ -123,9 +130,11 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Update Comment in DataBase
         /// </summary>
         /// <param name="comment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<CommentDTOAdministration>> UpdateCommentAsync(CommentDTOAdministration comment)
+        public async Task<Result<CommentDTOAdministration>> 
+            UpdateCommentAsync(CommentDTOAdministration comment, CancellationToken cancellationToken = default(CancellationToken))
         {
             comment.Update = DateTime.UtcNow;
             Comment commentForUpdate = _mapper.Map<Comment>(comment);
@@ -137,7 +146,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             try
             {
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
                     .Ok(comment);
@@ -158,13 +167,15 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Delete Comment by Comment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="commentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteCommentByIdAsync(string commentId)
+        public async Task<Result> 
+            DeleteCommentByIdAsync(string commentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(commentId);
 
-            var comment = await _db.Comments.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+            var comment = await _db.Comments.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id, cancellationToken);
 
             if (comment is null)
             {
@@ -174,7 +185,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             try
             {
                 _db.Comments.Remove(comment);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());
             }

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic
 {
+    /// <summary>
+    /// Extantion for get IdentityUser own ID
+    /// </summary>
     public static class GetIdentityUserIdExtantion
     {
         public static string GetUserId(this HttpContext httpContext)

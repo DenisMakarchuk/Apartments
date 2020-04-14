@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Users.UserService
@@ -29,13 +30,29 @@ namespace Apartments.Domain.Logic.Users.UserService
             _mapper = mapper;
         }
 
+        private ApartmentView MakeApartmentView (Apartment apartment)
+        {
+            ApartmentView view = new ApartmentView()
+            {
+
+                Apartment = _mapper.Map<ApartmentDTO>(apartment),
+
+                Address = _mapper.Map<AddressDTO>(apartment.Address),
+
+                Country = _mapper.Map<CountryDTO>(apartment.Address?.Country)
+            };
+
+            return view;
+        }
+
         /// <summary>
-        /// Put Apartment to the DataBase
+        /// Add Apartment to the DataBase
         /// </summary>
         /// <param name="apartment"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<ApartmentView>> CreateApartmentAsync(AddApartment apartment, string ownerId)
+        public async Task<Result<ApartmentView>> 
+            CreateApartmentAsync(AddApartment apartment, string ownerId, CancellationToken cancellationToken = default(CancellationToken))
         {
             var addedApartment = _mapper.Map<Apartment>(apartment);
 
@@ -45,21 +62,13 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             try
             {
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 Apartment apartmentAfterAdding = await _db.Apartments.Where(_ => _.Title == addedApartment.Title)
                     .Select(_ => _).Include(_ => _.Address.Country).Include(_ => _.Address)
-                    .AsNoTracking().FirstOrDefaultAsync();
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
-                ApartmentView view = new ApartmentView()
-                {
-
-                    Apartment = _mapper.Map<ApartmentDTO>(apartmentAfterAdding),
-
-                    Address = _mapper.Map<AddressDTO>(apartmentAfterAdding.Address),
-
-                    Country = _mapper.Map<CountryDTO>(apartmentAfterAdding.Address.Country)
-                };
+                ApartmentView view = MakeApartmentView(apartmentAfterAdding);
 
                 return (Result<ApartmentView>)Result<ApartmentView>
                     .Ok(view);
@@ -87,7 +96,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="userId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<ApartmentDTO>>> GetAllApartmentByOwnerIdAsync(string ownerId)
+        public async Task<Result<IEnumerable<ApartmentDTO>>> 
+            GetAllApartmentByOwnerIdAsync(string ownerId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(ownerId);
 
@@ -95,7 +105,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 var apartments = await _db.Apartments.Where(_ => _.OwnerId == id)
                     .Select(_ => _)
-                    .AsNoTracking().ToListAsync();
+                    .AsNoTracking().ToListAsync(cancellationToken);
 
                 if (!apartments.Any())
                 {
@@ -119,7 +129,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="apartmentId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<ApartmentView>> GetApartmentByIdAsync(string apartmentId)
+        public async Task<Result<ApartmentView>> 
+            GetApartmentByIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(apartmentId);
 
@@ -127,7 +138,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 var apartment = await _db.Apartments.Where(_ => _.Id == id)
                     .Include(_ => _.Address.Country).Include(_ => _.Address)
-                    .AsNoTracking().FirstOrDefaultAsync();
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 if (apartment is null)
                 {
@@ -135,15 +146,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                         .NoContent<ApartmentView>();
                 }
 
-                ApartmentView view = new ApartmentView()
-                {
-
-                    Apartment = _mapper.Map<ApartmentDTO>(apartment),
-
-                    Address = _mapper.Map<AddressDTO>(apartment.Address),
-
-                    Country = _mapper.Map<CountryDTO>(apartment.Address.Country)
-                };
+                ApartmentView view = MakeApartmentView(apartment);
 
                 return (Result<ApartmentView>)Result<ApartmentView>
                     .Ok(view);
@@ -161,14 +164,15 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="apartment"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<ApartmentView>> UpdateApartmentAsync(ApartmentView apartment)
+        public async Task<Result<ApartmentView>> 
+            UpdateApartmentAsync(ApartmentView apartment, CancellationToken cancellationToken = default(CancellationToken))
         {
             apartment.Address.CountryId = apartment.Country.Id;
 
             Apartment apartmentForUpdate = _mapper.Map<Apartment>(apartment.Apartment);
             Address addressForUpdate = _mapper.Map<Address>(apartment.Address);
 
-            apartmentForUpdate.Update = DateTime.Now;
+            apartmentForUpdate.Update = DateTime.UtcNow;
 
             _db.Entry(apartmentForUpdate).Property(c => c.Title).IsModified = true;
             _db.Entry(apartmentForUpdate).Property(c => c.Text).IsModified = true;
@@ -186,7 +190,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             try
             {
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 return (Result<ApartmentView>)Result<ApartmentView>
                     .Ok(apartment);
@@ -209,7 +213,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteApartmentByIdAsync(string apartmentId, string ownerId)
+        public async Task<Result> 
+            DeleteApartmentByIdAsync(string apartmentId, string ownerId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(apartmentId);
             Guid ownId = Guid.Parse(ownerId);
@@ -217,7 +222,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             var apartment = await _db.Apartments
                 .Where(_ => _.Id == id)
                 .Where(_=>_.OwnerId == ownId)
-                .IgnoreQueryFilters().FirstOrDefaultAsync();
+                .IgnoreQueryFilters().FirstOrDefaultAsync(cancellationToken);
 
             if (apartment is null)
             {
@@ -227,7 +232,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             try
             {
                 _db.Apartments.Remove(apartment);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());
             }

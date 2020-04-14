@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Users.UserService
@@ -103,7 +104,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="password"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserViewModel>> RegisterAsync(string email, string password)
+        public async Task<Result<UserViewModel>> 
+            RegisterAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken))
         {
             string defaultRole = "User";
 
@@ -137,7 +139,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
-            var profile = await _service.CreateUserProfileAsync(newUser.Id);
+            var profile = await _service.CreateUserProfileAsync(newUser.Id, cancellationToken);
 
             var token = await GenerateAuthanticationResult(newUser);
 
@@ -163,7 +165,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="password"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserViewModel>> LoginAsync(string email, string password)
+        public async Task<Result<UserViewModel>> 
+            LoginAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken))
         {
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -179,7 +182,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 return (Result<UserViewModel>)Result<string>.NotOk<UserViewModel>(null, "User/password combination is wrong");
             }
 
-            var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id);
+            var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id, cancellationToken);
 
             var token = await GenerateAuthanticationResult(user);
 
@@ -210,7 +213,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="password"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteAsync(string email, string password)
+        public async Task<Result> 
+            DeleteAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken))
         {
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -226,7 +230,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 return await Task.FromResult(Result.NotOk("User/password combination is wrong"));
             }
 
-            var isProfileDeleted = await _service.DeleteUserProfileByIdentityIdAsync(user.Id);
+            var isProfileDeleted = await _service.DeleteUserProfileByIdentityIdAsync(user.Id, cancellationToken);
 
             if (isProfileDeleted.IsError)
             {

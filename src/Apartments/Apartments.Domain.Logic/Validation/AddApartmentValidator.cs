@@ -11,10 +11,10 @@ namespace Apartments.Domain.Logic.Validation
     {
         public AddApartmentValidator()
         {
-            RuleFor(_ => _.Title).MinimumLength(5).MaximumLength(100)
-                .WithMessage("Title must be from 5 till 100 characters");
-            RuleFor(_ => _.Text).MinimumLength(10).MaximumLength(255)
-                .WithMessage("Text must be from 5 till 255 characters");
+            RuleFor(_ => _.Title).MinimumLength(5).MaximumLength(120)
+                .WithMessage("Title must be from 5 till 120 characters");
+            RuleFor(_ => _.Text).MinimumLength(5).MaximumLength(500)
+                .WithMessage("Text must be from 5 till 500 characters");
             RuleFor(_ => _.Price).GreaterThan(0m)
                 .WithMessage("Price must be greater than 0");
             RuleFor(_ => _.NumberOfRooms).GreaterThan(0)

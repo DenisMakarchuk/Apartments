@@ -3,6 +3,7 @@ using Apartments.Domain.Users.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
@@ -18,7 +19,8 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<Result<UserViewModel>> RegisterAsync(string email, string password);
+        Task<Result<UserViewModel>> 
+            RegisterAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Login User
@@ -26,7 +28,8 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<Result<UserViewModel>> LoginAsync(string email, string password);
+        Task<Result<UserViewModel>> 
+            LoginAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Delete User own profile & Identity User
@@ -34,6 +37,7 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        Task<Result> DeleteAsync(string email, string password);
+        Task<Result> 
+            DeleteAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

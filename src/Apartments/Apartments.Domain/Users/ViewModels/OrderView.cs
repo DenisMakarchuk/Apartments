@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Apartments.Domain.Users.ViewModels
 {
+    /// <summary>
+    /// View model for working with an existing Order
+    /// </summary>
     public class OrderView
     {
         public OrderDTO Order { get; set; }
