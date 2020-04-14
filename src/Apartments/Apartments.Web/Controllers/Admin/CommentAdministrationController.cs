@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Admin.DTO;
@@ -32,6 +33,7 @@ namespace Apartments.Web.Controllers.Admin
         /// Get all User Comments from the DB by User Id
         /// </summary>
         /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("user/{userId}")]
@@ -42,7 +44,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllCommentsByUserIdAsync(string userId)
+        public async Task<IActionResult> 
+            GetAllCommentsByUserIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(userId, out var _))
             {
@@ -51,7 +54,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.GetAllCommentsByUserIdAsync(userId);
+                var result = await _service.GetAllCommentsByUserIdAsync(userId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message) 
                     : result.IsSuccess ? (IActionResult)Ok(result.Data) 
@@ -67,6 +70,7 @@ namespace Apartments.Web.Controllers.Admin
         /// Get all Comments by Apartment Id
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("apartment/{apartmentId}")]
@@ -77,7 +81,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllCommentsByApartmentIdAsync(string apartmentId)
+        public async Task<IActionResult> 
+            GetAllCommentsByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(apartmentId, out var _))
             {
@@ -86,7 +91,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId);
+                var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result.Data) 
@@ -102,6 +107,7 @@ namespace Apartments.Web.Controllers.Admin
         /// Get Comment by Comment Id
         /// </summary>
         /// <param name="commentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("comment/{commentId}")]
@@ -112,7 +118,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetCommentByIdAsync(string commentId)
+        public async Task<IActionResult> 
+            GetCommentByIdAsync(string commentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(commentId, out var _))
             {
@@ -121,7 +128,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.GetCommentByIdAsync(commentId);
+                var result = await _service.GetCommentByIdAsync(commentId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
@@ -137,6 +144,7 @@ namespace Apartments.Web.Controllers.Admin
         /// Update the comment
         /// </summary>
         /// <param name="comment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("")]
@@ -145,7 +153,9 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> UpdateCommentAsync([FromBody, CustomizeValidator]  CommentDTOAdministration comment)
+        public async Task<IActionResult> 
+            UpdateCommentAsync([FromBody, CustomizeValidator]  CommentDTOAdministration comment,
+                                CancellationToken cancellationToken = default(CancellationToken))
         {
             if (comment is null || !ModelState.IsValid)
             {
@@ -154,7 +164,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.UpdateCommentAsync(comment);
+                var result = await _service.UpdateCommentAsync(comment, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -168,6 +178,7 @@ namespace Apartments.Web.Controllers.Admin
         /// Delete Comment by Comment Id
         /// </summary>
         /// <param name="commentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("{commentId}")]
@@ -178,7 +189,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> DeleteCommentByIdAsync(string commentId)
+        public async Task<IActionResult> 
+            DeleteCommentByIdAsync(string commentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(commentId, out var _))
             {
@@ -187,7 +199,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.DeleteCommentByIdAsync(commentId);
+                var result = await _service.DeleteCommentByIdAsync(commentId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)

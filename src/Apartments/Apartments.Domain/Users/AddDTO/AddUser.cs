@@ -5,7 +5,7 @@ using System.Text;
 namespace Apartments.Domain.Users.AddDTO
 {
     /// <summary>
-    /// Model for user adding
+    /// Model for user profile adding
     /// </summary>
     public class AddUser
     {

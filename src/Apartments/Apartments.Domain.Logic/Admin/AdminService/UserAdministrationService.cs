@@ -33,13 +33,15 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserDTOAdministration>> GetUserProfileByIdentityIdAsync(string id)
+        public async Task<Result<UserDTOAdministration>> 
+            GetUserProfileByIdentityIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid identityId = Guid.Parse(id);
 
             try
             {
-                var profile = await _db.Users.Where(_ => _.Id == identityId).AsNoTracking().FirstOrDefaultAsync();
+                var profile = await _db.Users.Where(_ => _.Id == identityId)
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 if (profile is null)
                 {
@@ -64,11 +66,13 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteUserProfileByIdentityIdAsync(string id)
+        public async Task<Result> 
+            DeleteUserProfileByIdentityIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid identityId = Guid.Parse(id);
 
-            var profile = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_=>_.Id == identityId);
+            var profile = await _db.Users.IgnoreQueryFilters()
+                .FirstOrDefaultAsync(_=>_.Id == identityId, cancellationToken);
 
             if (profile is null)
             {
@@ -78,7 +82,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             try
             {
                 _db.Users.Remove(profile);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());
             }

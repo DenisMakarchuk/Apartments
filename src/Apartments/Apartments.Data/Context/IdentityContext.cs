@@ -11,8 +11,7 @@ namespace Apartments.Data.Context
 {
     public class IdentityContext : IdentityDbContext
     {
-        public IdentityContext(DbContextOptions options)
-        : base(options)
+        public IdentityContext(DbContextOptions options) : base(options)
         {
             Database.EnsureCreated();
         }

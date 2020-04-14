@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Internal;
 using Apartments.Domain.Users.ViewModels;
+using System.Threading;
 
 namespace Apartments.Web.Controllers.Users
 {
@@ -43,12 +44,13 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> RegisterAsync([FromBody]UserRegistrationRequest request)
+        public async Task<IActionResult> 
+            RegisterAsync([FromBody]UserRegistrationRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest((Result<string>)Result<string>
-                            .Fail<string>(ModelState.Values
+                            .NotOk<string>(null, ModelState.Values
                                 .SelectMany(x => x.Errors
                                     .Select(xx => xx.ErrorMessage))
                                 .Join("\n")));
@@ -56,7 +58,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.RegisterAsync(request.Email, request.Password);
+                var result = await _service.RegisterAsync(request.Email, request.Password, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
@@ -81,11 +83,12 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> LoginAsync([FromBody]UserLoginRequest request)
+        public async Task<IActionResult> 
+            LoginAsync([FromBody]UserLoginRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                var result = await _service.LoginAsync(request.Email, request.Password);
+                var result = await _service.LoginAsync(request.Email, request.Password, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message)
                     : result.Data == null ? NoContent()
@@ -126,11 +129,12 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> DeleteAsync([FromBody]UserLoginRequest request)
+        public async Task<IActionResult> 
+            DeleteAsync([FromBody]UserLoginRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
-                var result = await _service.DeleteAsync(request.Email, request.Password);
+                var result = await _service.DeleteAsync(request.Email, request.Password, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) 
                     : !result.IsSuccess ? BadRequest(result.Message)

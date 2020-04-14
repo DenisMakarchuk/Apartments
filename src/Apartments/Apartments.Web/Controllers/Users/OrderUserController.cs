@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Apartments.Domain.Logic;
+using System.Threading;
 
 namespace Apartments.Web.Controllers.Users
 {
@@ -42,7 +43,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> CreateOrderAsync([FromBody, CustomizeValidator]AddOrder order)
+        public async Task<IActionResult> 
+            CreateOrderAsync([FromBody, CustomizeValidator]AddOrder order, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (order is null || !ModelState.IsValid)
             {
@@ -53,7 +55,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.CreateOrderAsync(order, customerId);
+                var result = await _service.CreateOrderAsync(order, customerId, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) 
                     : result.IsSuccess ? (IActionResult)Ok(result.Data)
@@ -79,13 +81,14 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllOrdersByCustomerIdAsync()
+        public async Task<IActionResult> 
+            GetAllOrdersByCustomerIdAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             string customerId = HttpContext.GetUserId();
 
             try
             {
-                var result = await _service.GetAllOrdersByCustomerIdAsync(customerId);
+                var result = await _service.GetAllOrdersByCustomerIdAsync(customerId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result)
@@ -111,7 +114,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllOrdersByApartmentIdAsync(string apartmentId)
+        public async Task<IActionResult> 
+            GetAllOrdersByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(apartmentId, out var _))
             {
@@ -120,7 +124,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.GetAllOrdersByApartmentIdAsync(apartmentId);
+                var result = await _service.GetAllOrdersByApartmentIdAsync(apartmentId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result)
@@ -146,7 +150,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetOrderByIdAsync(string orderId)
+        public async Task<IActionResult> 
+            GetOrderByIdAsync(string orderId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(orderId, out var _))
             {
@@ -155,7 +160,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.GetOrderByIdAsync(orderId);
+                var result = await _service.GetOrderByIdAsync(orderId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result)
@@ -179,7 +184,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> UpdateOrderAsync([FromBody, CustomizeValidator] OrderDTO order)
+        public async Task<IActionResult> 
+            UpdateOrderAsync([FromBody, CustomizeValidator] OrderDTO order, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (order is null || !ModelState.IsValid)
             {
@@ -195,7 +201,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.UpdateOrderAsync(order);
+                var result = await _service.UpdateOrderAsync(order, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -217,7 +223,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> DeleteOrderByIdAsync(string orderId)
+        public async Task<IActionResult> 
+            DeleteOrderByIdAsync(string orderId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(orderId, out var _))
             {
@@ -228,7 +235,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.DeleteOrderByIdAsync(orderId, customerId);
+                var result = await _service.DeleteOrderByIdAsync(orderId, customerId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : !result.IsSuccess ? BadRequest(result.Message)

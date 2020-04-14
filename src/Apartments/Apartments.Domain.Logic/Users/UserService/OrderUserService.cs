@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Users.UserService
@@ -62,8 +63,8 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 Order = _mapper.Map<OrderDTO>(order),
                 Apartment = _mapper.Map<ApartmentDTO>(order.Apartment),
-                Address = _mapper.Map<AddressDTO>(order.Apartment.Address),
-                Country = _mapper.Map<CountryDTO>(order.Apartment.Address.Country)
+                Address = _mapper.Map<AddressDTO>(order.Apartment?.Address),
+                Country = _mapper.Map<CountryDTO>(order.Apartment?.Address?.Country)
             };
 
             List<DateTime> notFreeDates = new List<DateTime>();
@@ -109,12 +110,13 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Put Order to the DataBase
+        /// Add Order to the DataBase
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<OrderView>> CreateOrderAsync(AddOrder order, string customerId)
+        public async Task<Result<OrderView>> 
+            CreateOrderAsync(AddOrder order, string customerId, CancellationToken cancellationToken = default(CancellationToken))
         {
             var addedOrder = _mapper.Map<Order>(order);
             addedOrder.CustomerId = Guid.Parse(customerId);
@@ -140,7 +142,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             try
             {
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 Order orderAfterAdding = await _db.Orders
                     .Where(_ => _.CustomerId == addedOrder.CustomerId)
@@ -151,7 +153,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                     .Include(_ => _.Apartment)
                     .Include(_ => _.Apartment.Address)
                     .Include(_ => _.Apartment.Address.Country)
-                    .AsNoTracking().FirstOrDefaultAsync();
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 var view = MakeViewModel(orderAfterAdding);
 
@@ -181,7 +183,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="userId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<OrderView>>> GetAllOrdersByCustomerIdAsync(string customerId)
+        public async Task<Result<IEnumerable<OrderView>>> 
+            GetAllOrdersByCustomerIdAsync(string customerId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(customerId);
 
@@ -192,7 +195,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                     .Include(_=>_.Apartment)
                     .Include(_ => _.Apartment.Address)
                     .Include(_ => _.Apartment.Address.Country)
-                    .AsNoTracking().ToListAsync();
+                    .AsNoTracking().ToListAsync(cancellationToken);
 
                 if (!orders.Any())
                 {
@@ -225,7 +228,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="apartmentId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<OrderDTO>>> GetAllOrdersByApartmentIdAsync(string apartmentId)
+        public async Task<Result<IEnumerable<OrderDTO>>> 
+            GetAllOrdersByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(apartmentId);
 
@@ -233,7 +237,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 var orders = await _db.Orders.Where(_ => _.ApartmentId == id)
                     .Include(_ => _.Dates)
-                    .AsNoTracking().ToListAsync();
+                    .AsNoTracking().ToListAsync(cancellationToken);
 
                 if (!orders.Any())
                 {
@@ -275,7 +279,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="orderId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<OrderView>> GetOrderByIdAsync(string orderId)
+        public async Task<Result<OrderView>> 
+            GetOrderByIdAsync(string orderId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(orderId);
 
@@ -286,7 +291,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                     .Include(_ => _.Apartment)
                     .Include(_ => _.Apartment.Address)
                     .Include(_ => _.Apartment.Address.Country)
-                    .AsNoTracking().FirstOrDefaultAsync();
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 if (order is null)
                 {
@@ -312,7 +317,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="order"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<OrderView>> UpdateOrderAsync(OrderDTO order)
+        public async Task<Result<OrderView>> 
+            UpdateOrderAsync(OrderDTO order, CancellationToken cancellationToken = default(CancellationToken))
         {
             var updatedOrder = _mapper.Map<Order>(order);
             var oldOrder = _db.Orders.Where(_ => _.Id == updatedOrder.Id).ToList().FirstOrDefault();
@@ -326,12 +332,12 @@ namespace Apartments.Domain.Logic.Users.UserService
             try
             {
                 _db.Orders.Remove(oldOrder);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 if (!await IsApartmentFree(order.Dates, updatedOrder.ApartmentId.Value))
                 {
                     _db.Orders.Add(oldOrder);
-                    await _db.SaveChangesAsync();
+                    await _db.SaveChangesAsync(cancellationToken);
 
                     return (Result<OrderView>)Result<OrderView>
                         .NotOk<OrderView>(null, "Cannot update order. Dates are not free!");
@@ -350,7 +356,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 updatedOrder.Update = DateTime.Now;
 
                 _db.Orders.Add(updatedOrder);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 Order orderAfterUpdating = await _db.Orders
                     .Where(_ => _.Id == updatedOrder.Id)
@@ -389,7 +395,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="orderId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteOrderByIdAsync(string orderId, string customerId)
+        public async Task<Result> 
+            DeleteOrderByIdAsync(string orderId, string customerId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(orderId);
             Guid cusId = Guid.Parse(customerId);
@@ -408,7 +415,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             try
             {
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());
             }

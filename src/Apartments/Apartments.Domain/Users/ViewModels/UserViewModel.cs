@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Apartments.Domain.Users.ViewModels
 {
+    /// <summary>
+    /// View model for working with token & user profile
+    /// </summary>
     public class UserViewModel
     {
         public UserDTO Profile { get; set; }

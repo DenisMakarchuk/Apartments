@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Logic;
@@ -43,7 +44,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> CreateApartmentAsync([FromBody, CustomizeValidator]AddApartment apartment)
+        public async Task<IActionResult> 
+            CreateApartmentAsync([FromBody, CustomizeValidator]AddApartment apartment, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (apartment is null || !ModelState.IsValid)
             {
@@ -54,7 +56,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.CreateApartmentAsync(apartment, ownerId);
+                var result = await _service.CreateApartmentAsync(apartment, ownerId, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -78,7 +80,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllApartmentByOwnerIdAsync()
+        public async Task<IActionResult> 
+            GetAllApartmentByOwnerIdAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             string ownerId = HttpContext.GetUserId();
 
@@ -110,7 +113,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetApartmentByIdAsync(string apartmentId)
+        public async Task<IActionResult> 
+            GetApartmentByIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(apartmentId, out var _))
             {
@@ -119,7 +123,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.GetApartmentByIdAsync(apartmentId);
+                var result = await _service.GetApartmentByIdAsync(apartmentId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.IsSuccess ? (IActionResult)Ok(result)
@@ -143,7 +147,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> UpdateApartmentAsync([FromBody, CustomizeValidator] ApartmentView apartment)
+        public async Task<IActionResult> 
+            UpdateApartmentAsync([FromBody, CustomizeValidator] ApartmentView apartment, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (apartment is null || !ModelState.IsValid)
             {
@@ -159,7 +164,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.UpdateApartmentAsync(apartment);
+                var result = await _service.UpdateApartmentAsync(apartment, cancellationToken);
 
                 return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
             }
@@ -182,7 +187,8 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> DeleteApartmentByIdAsync(string apartmentId)
+        public async Task<IActionResult> 
+            DeleteApartmentByIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(apartmentId, out var _))
             {
@@ -193,7 +199,7 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.DeleteApartmentByIdAsync(apartmentId, ownerId);
+                var result = await _service.DeleteApartmentByIdAsync(apartmentId, ownerId, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : !result.IsSuccess ? BadRequest(result.Message)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
@@ -43,7 +44,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetAllUsersInRoleAsync(string role)
+        public async Task<IActionResult> 
+            GetAllUsersInRoleAsync(string role)
         {
             if (role == null)
             {
@@ -78,7 +80,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> GetUserByIdAsync(string id)
+        public async Task<IActionResult> 
+            GetUserByIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(id, out var _))
             {
@@ -87,7 +90,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.GetUserByIdAsync(id);
+                var result = await _service.GetUserByIdAsync(id, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.Data == null ? NoContent()
@@ -113,7 +116,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> ChangeRoleToAdminAsync(string id)
+        public async Task<IActionResult> 
+            ChangeRoleToAdminAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(id, out var _))
             {
@@ -122,7 +126,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.AddToAdminAsync(id);
+                var result = await _service.AddToAdminAsync(id, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.Data == null ? NoContent()
@@ -148,7 +152,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> ChangeRoleToUserAsync(string id)
+        public async Task<IActionResult> 
+            ChangeRoleToUserAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(id, out var _))
             {
@@ -157,7 +162,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.AddToUserAsync(id);
+                var result = await _service.AddToUserAsync(id, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.Data == null ? NoContent()
@@ -183,7 +188,8 @@ namespace Apartments.Web.Controllers.Admin
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> DeleteUserByIdAsync(string id)
+        public async Task<IActionResult> 
+            DeleteUserByIdAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(id, out var _))
             {
@@ -192,7 +198,7 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.DeleteByIdAsync(id);
+                var result = await _service.DeleteByIdAsync(id, cancellationToken);
 
                 return result.IsError ? NotFound(result.Message)
                     : result.Message == null ? NoContent()

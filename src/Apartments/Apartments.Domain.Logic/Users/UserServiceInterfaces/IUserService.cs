@@ -4,6 +4,7 @@ using Apartments.Domain.Users.DTO;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
@@ -14,24 +15,27 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
     public interface IUserService
     {
         /// <summary>
-        /// Put User to the DataBase
+        /// Add User to the DataBase
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        Task<Result<UserDTO>> CreateUserProfileAsync(string identityId);
+        Task<Result<UserDTO>> 
+            CreateUserProfileAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result<UserDTO>> GetUserProfileByIdentityIdAsync(string identityId);
+        Task<Result<UserDTO>> 
+            GetUserProfileByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Delete User by User Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        Task<Result> DeleteUserProfileByIdentityIdAsync(string identityId);
+        Task<Result>
+            DeleteUserProfileByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

@@ -11,7 +11,7 @@ namespace Apartments.Domain.Logic.Validation
     {
         public AddUserValidator()
         {
-            RuleFor(_ => _.Id).NotEmpty().WithMessage("You must write the Id");
+            RuleFor(_ => _.Id).NotEmpty().WithMessage("You must have the Id");
         }
     }
 }

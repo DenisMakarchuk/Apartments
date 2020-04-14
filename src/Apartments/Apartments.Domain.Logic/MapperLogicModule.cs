@@ -10,6 +10,9 @@ using System.Text;
 
 namespace Apartments.Domain.Logic
 {
+    /// <summary>
+    /// Mapping for all models
+    /// </summary>
     public class MapperLogicModule : Profile
     {
         public MapperLogicModule()

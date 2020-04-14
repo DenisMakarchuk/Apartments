@@ -20,7 +20,6 @@ namespace Apartments.Domain.Logic
         public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration config)
         {
             services.AddDataServices(config);
-            //configure your Domain Logic Layer services here
 
             services.AddAutoMapper(typeof(MapperLogicModule));
 

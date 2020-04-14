@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Apartments.Domain.Admin.ViewModel
 {
+    /// <summary>
+    /// View model for User administration
+    /// </summary>
     public class UserAdministrationView
     {
         public UserDTOAdministration Profile { get; set; }

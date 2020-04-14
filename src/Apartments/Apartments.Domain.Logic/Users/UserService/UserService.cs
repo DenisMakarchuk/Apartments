@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Apartments.Domain.Logic.Users.UserService
@@ -34,7 +35,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="user"></param>
         /// <returns></returns>        
         [LogAttribute]
-        public async Task<Result<UserDTO>> CreateUserProfileAsync(string identityId)
+        public async Task<Result<UserDTO>> 
+            CreateUserProfileAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken))
         {
             AddUser newProfile = new AddUser()
             {
@@ -47,11 +49,11 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             try
             {
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 User userAfterAdding = await _db.Users.Where(_ => _.Id == addedUser.Id)
                     .Select(_ => _)
-                    .AsNoTracking().FirstOrDefaultAsync();
+                    .AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 return (Result<UserDTO>)Result<UserDTO>
                     .Ok(_mapper.Map<UserDTO>(userAfterAdding));
@@ -79,13 +81,14 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserDTO>> GetUserProfileByIdentityIdAsync(string identityId)
+        public async Task<Result<UserDTO>> 
+            GetUserProfileByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(identityId);
 
             try
             {
-                var user = await _db.Users.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync();
+                var user = await _db.Users.Where(_ => _.Id == id).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
 
                 if (user is null)
                 {
@@ -110,7 +113,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="id"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result> DeleteUserProfileByIdentityIdAsync(string identityId)
+        public async Task<Result> 
+            DeleteUserProfileByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(identityId);
 
@@ -124,7 +128,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             try
             {
                 _db.Users.Remove(user);
-                await _db.SaveChangesAsync();
+                await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());
             }
