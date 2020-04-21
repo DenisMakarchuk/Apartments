@@ -45,12 +45,6 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 var comments = await _db.Comments.Where(_ => _.AuthorId == athorId).Select(_ => _)
                     .AsNoTracking().ToListAsync(cancellationToken);
 
-                if (!comments.Any())
-                {
-                    return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .NoContent<IEnumerable<CommentDTOAdministration>>();
-                }
-
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
                     .Ok(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments));
             }
@@ -77,12 +71,6 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             {
                 var comments = await _db.Comments.Where(_ => _.ApartmentId == id).Select(_ => _)
                     .AsNoTracking().ToListAsync(cancellationToken);
-
-                if (!comments.Any())
-                {
-                    return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                        .NoContent<IEnumerable<CommentDTOAdministration>>();
-                }
 
                 return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
                     .Ok(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments));
@@ -113,7 +101,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (comment is null)
                 {
                     return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
-                        .NoContent<CommentDTOAdministration>();
+                        .NotOk<CommentDTOAdministration>(null, "Comment is not exist");
                 }
 
                 return (Result<CommentDTOAdministration>)Result<CommentDTOAdministration>
@@ -179,7 +167,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             if (comment is null)
             {
-                return await Task.FromResult(Result.NoContent());
+                return await Task.FromResult(Result.NotOk("Comment is not exist"));
             }
 
             try

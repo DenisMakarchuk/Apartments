@@ -4,6 +4,7 @@ using Apartments.Domain.Search.DTO;
 using Apartments.Domain.Users.AddDTO;
 using Apartments.Domain.Users.DTO;
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -48,6 +49,8 @@ namespace Apartments.Domain.Logic
             CreateMap<Address, AddressSearchDTO>().ReverseMap();
 
             CreateMap<Country, CountrySearchDTO>().ReverseMap();
+
+            CreateMap<IdentityUser, IdentityUserAdministrationDTO>();
         }
     }
 }

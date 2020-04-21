@@ -93,7 +93,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (user is null)
                 {
                     return (Result<UserDTO>)Result<UserDTO>
-                        .NoContent<UserDTO>();
+                        .NotOk<UserDTO>(null, "Profile is not exist");
 
                 }
 
@@ -122,7 +122,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             if (user is null)
             {
-                return await Task.FromResult(Result.NoContent());
+                return await Task.FromResult(Result.NotOk("Profile is not exist"));
             }
 
             try

@@ -40,39 +40,39 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
 
-            if (!string.IsNullOrEmpty(search?.CountryId))
+            if (!string.IsNullOrEmpty(search.CountryId) && Guid.TryParse(search.CountryId, out var _))
             {
                 Guid id = Guid.Parse(search.CountryId);
 
                 apartments = apartments.Where(_ => _.Address.CountryId == id);
             }
 
-            if (!string.IsNullOrEmpty(search?.CityName))
+            if (!string.IsNullOrEmpty(search.CityName))
             {
                 apartments = apartments.Where(_ => _.Address.City.Contains(search.CityName));
             }
 
-            if (search?.RoomsFrom > 0)
+            if (search.RoomsFrom > 0)
             {
                 apartments = apartments.Where(_ => _.NumberOfRooms >= search.RoomsFrom);
             }
 
-            if (search?.RoomsTill > 0 && search.RoomsTill >= search.RoomsFrom)
+            if (search.RoomsTill > 0 && search.RoomsTill >= search.RoomsFrom)
             {
                 apartments = apartments.Where(_ => _.NumberOfRooms <= search.RoomsTill);
             }
 
-            if (search?.PriceFrom > 0)
+            if (search.PriceFrom > 0)
             {
                 apartments = apartments.Where(_ => _.Price >= search.PriceFrom);
             }
 
-            if (search?.PriceTill > 0 && search?.PriceTill >= search.PriceFrom)
+            if (search.PriceTill > 0 && search.PriceTill >= search.PriceFrom)
             {
                 apartments = apartments.Where(_ => _.Price <= search.PriceTill);
             }
 
-            if (search?.NeedDates != null && search.NeedDates.Any())
+            if (search.NeedDates != null && search.NeedDates.Any())
             {
                 foreach (var item in search.NeedDates)
                 {
@@ -83,12 +83,6 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             try
             {
                 var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync(cancellationToken));
-
-                if (!result.Any())
-                {
-                    return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
-                        .NoContent<IEnumerable<ApartmentSearchDTO>>();
-                }
 
                 return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
                     .Ok(result);
@@ -101,7 +95,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         }
 
         /// <summary>
-        /// Get Apartment by Id
+        /// Get Apartment by Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
@@ -120,7 +114,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
                 if (apartment is null)
                 {
                     return (Result<ApartmentSearchView>)Result<ApartmentSearchView>
-                        .NoContent<ApartmentSearchView>();
+                        .NotOk<ApartmentSearchView>(null, "Apartment is not exist");
                 }
 
                 ApartmentSearchView view = new ApartmentSearchView()
@@ -155,12 +149,6 @@ namespace Apartments.Domain.Logic.Search.SearchServices
             {
                 var countries = await _db.Countries.AsNoTracking().ToListAsync(cancellationToken);
 
-                if (!countries.Any())
-                {
-                    return (Result<IEnumerable<CountrySearchDTO>>)Result<IEnumerable<CountrySearchDTO>>
-                        .NoContent<IEnumerable<CountrySearchDTO>>();
-                }
-
                 return (Result<IEnumerable<CountrySearchDTO>>)Result<IEnumerable<CountrySearchDTO>>
                     .Ok(_mapper.Map<IEnumerable<CountrySearchDTO>>(countries));
             }
@@ -172,7 +160,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         }
 
         /// <summary>
-        /// Get Country by Id
+        /// Get Country by Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="countryId"></param>
         /// <returns></returns>
@@ -190,7 +178,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
                 if (country is null)
                 {
                     return (Result<CountrySearchDTO>)Result<CountrySearchDTO>
-                        .NoContent<CountrySearchDTO>();
+                        .NotOk<CountrySearchDTO>(null, "Country is not exist");
 
                 }
 

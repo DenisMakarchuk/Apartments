@@ -17,7 +17,7 @@ namespace Apartments.Web.Controllers.Admin
     /// Administrator work with Users
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    [Route("api/[controller]")]
+    [Route("api/administration/users")]
     [ApiController]
     public class UserAdministrationController : ControllerBase
     {
@@ -36,12 +36,10 @@ namespace Apartments.Web.Controllers.Admin
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("getusers/{role}")]
+        [Route("roles/{role}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -56,9 +54,7 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllUsersInRoleAsync(role);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                    : NoContent();
+                return (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -74,7 +70,6 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -92,9 +87,8 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetUserByIdAsync(id, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.Data == null ? NoContent()
-                    : (IActionResult)Ok(result);
+                return result.Data == null ? NotFound(result.Message)
+                      : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -108,9 +102,8 @@ namespace Apartments.Web.Controllers.Admin
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("makeadmit/{id}")]
+        [Route("roles/add/admin/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -128,9 +121,8 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.AddToAdminAsync(id, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.Data == null ? NoContent()
-                    : (IActionResult)Ok(result);
+                return result.Data == null ? NotFound(result.Message)
+                      : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -144,9 +136,8 @@ namespace Apartments.Web.Controllers.Admin
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("makeuser/{id}")]
+        [Route("roles/remove/admin/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -164,9 +155,8 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.AddToUserAsync(id, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.Data == null ? NoContent()
-                    : (IActionResult)Ok(result);
+                return result.Data == null ? NotFound(result.Message)
+                      : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -200,9 +190,11 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.DeleteByIdAsync(id, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.Message == null ? NoContent()
-                    : (IActionResult)Ok(result);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {

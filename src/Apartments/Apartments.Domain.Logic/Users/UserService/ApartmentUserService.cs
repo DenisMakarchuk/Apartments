@@ -34,7 +34,6 @@ namespace Apartments.Domain.Logic.Users.UserService
         {
             ApartmentView view = new ApartmentView()
             {
-
                 Apartment = _mapper.Map<ApartmentDTO>(apartment),
 
                 Address = _mapper.Map<AddressDTO>(apartment.Address),
@@ -107,12 +106,6 @@ namespace Apartments.Domain.Logic.Users.UserService
                     .Select(_ => _)
                     .AsNoTracking().ToListAsync(cancellationToken);
 
-                if (!apartments.Any())
-                {
-                    return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
-                        .NoContent<IEnumerable<ApartmentDTO>>();
-                }
-
                 return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
                     .Ok(_mapper.Map<IEnumerable<ApartmentDTO>>(apartments));
             }
@@ -143,7 +136,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (apartment is null)
                 {
                     return (Result<ApartmentView>)Result<ApartmentView>
-                        .NoContent<ApartmentView>();
+                        .NotOk<ApartmentView>(null, "Apartment is not exist");
                 }
 
                 ApartmentView view = MakeApartmentView(apartment);

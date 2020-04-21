@@ -21,7 +21,7 @@ namespace Apartments.Web.Controllers.Users
     /// Work with own Apartments
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("api/[controller]")]
+    [Route("api/apartments/")]
     [ApiController]
     public class ApartmentUserController : ControllerBase
     {
@@ -39,7 +39,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -58,7 +58,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.CreateApartmentAsync(apartment, ownerId, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -72,12 +74,10 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("owner")]
+        [Route("owner/id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -89,9 +89,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetAllApartmentByOwnerIdAsync(ownerId);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result)
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -105,9 +105,8 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="apartmentId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("apartment/{apartmentId}")]
+        [Route("{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -125,9 +124,11 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetApartmentByIdAsync(apartmentId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result)
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -166,7 +167,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.UpdateApartmentAsync(apartment, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -182,6 +185,7 @@ namespace Apartments.Web.Controllers.Users
         [HttpDelete]
         [Route("{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -201,9 +205,11 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.DeleteApartmentByIdAsync(apartmentId, ownerId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : !result.IsSuccess ? BadRequest(result.Message)
-                    : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {

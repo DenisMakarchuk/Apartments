@@ -21,7 +21,7 @@ namespace Apartments.Web.Controllers.Users
     /// User work with own profile & Identity
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("api/[controller]")]
+    [Route("api/user")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -49,19 +49,20 @@ namespace Apartments.Web.Controllers.Users
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest((Result<string>)Result<string>
-                            .NotOk<string>(null, ModelState.Values
+                return BadRequest(ModelState.Values
                                 .SelectMany(x => x.Errors
                                     .Select(xx => xx.ErrorMessage))
-                                .Join("\n")));
+                                .Join("\n"));
             }
 
             try
             {
                 var result = await _service.RegisterAsync(request.Email, request.Password, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
@@ -79,7 +80,6 @@ namespace Apartments.Web.Controllers.Users
         [HttpPost]
         [Route("logIn")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -90,9 +90,10 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.LoginAsync(request.Email, request.Password, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message)
-                    : result.Data == null ? NoContent()
-                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
@@ -125,8 +126,10 @@ namespace Apartments.Web.Controllers.Users
         [HttpDelete]
         [Route("delete")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -136,9 +139,11 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.DeleteAsync(request.Email, request.Password, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) 
-                    : !result.IsSuccess ? BadRequest(result.Message)
-                    : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {

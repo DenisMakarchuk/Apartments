@@ -46,7 +46,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 if (profile is null)
                 {
                     return (Result<UserDTOAdministration>)Result<UserDTOAdministration>
-                        .NoContent<UserDTOAdministration>();
+                        .NotOk<UserDTOAdministration>(null, "Profile is not exist");
 
                 }
 
@@ -76,7 +76,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             if (profile is null)
             {
-                return await Task.FromResult(Result.NoContent());
+                return await Task.FromResult(Result.NotOk("Profile is not exist"));
             }
 
             try

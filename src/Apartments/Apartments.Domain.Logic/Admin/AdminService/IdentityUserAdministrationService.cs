@@ -3,6 +3,7 @@ using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Admin.ViewModel;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using Apartments.Domain.Logic.Options;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
@@ -21,11 +22,15 @@ namespace Apartments.Domain.Logic.Admin.AdminService
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUserAdministrationService _service;
+        private readonly IMapper _mapper;
 
-        public IdentityUserAdministrationService(UserManager<IdentityUser> userManager, IUserAdministrationService service)
+        public IdentityUserAdministrationService(UserManager<IdentityUser> userManager, 
+                                                 IUserAdministrationService service,
+                                                 IMapper mapper)
         {
             _userManager = userManager;
             _service = service;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -39,26 +44,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         {
             var users = await _userManager.GetUsersInRoleAsync(role);
 
-            if (!users.Any())
-            {
-                return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
-                    .NoContent<IEnumerable<IdentityUserAdministrationDTO>>();
-            }
-
-            List<IdentityUserAdministrationDTO> result = new List<IdentityUserAdministrationDTO>();
-
-            foreach (var item in users)
-            {
-                result.Add(
-                    new IdentityUserAdministrationDTO()
-                    {
-                        Id = item.Id,
-                        Email = item.Email
-                    });
-            }
-
             return (Result<IEnumerable<IdentityUserAdministrationDTO>>)Result<IEnumerable<IdentityUserAdministrationDTO>>
-                .Ok(result as IEnumerable<IdentityUserAdministrationDTO>);
+                .Ok(_mapper.Map<IEnumerable<IdentityUserAdministrationDTO>>(users));
         }
 
         /// <summary>
@@ -75,14 +62,10 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             if (user == null)
             {
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
-                    .NoContent<UserAdministrationView>();
+                    .NotOk<UserAdministrationView>(null, "User is not exist");
             }
 
-            IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
-            {
-                Id = user.Id,
-                Email = user.Email
-            };
+            var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
@@ -122,16 +105,12 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             if (user == null)
             {
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
-                    .NoContent<UserAdministrationView>();
+                    .NotOk<UserAdministrationView>(null, "User is not exist");
             }
 
             await _userManager.AddToRoleAsync(user,"Admin");
 
-            IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
-            {
-                Id = user.Id,
-                Email = user.Email
-            };
+            var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
@@ -171,16 +150,12 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             if (user == null)
             {
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
-                    .NoContent<UserAdministrationView>();
+                    .NotOk<UserAdministrationView>(null, "User is not exist");
             }
 
             await _userManager.RemoveFromRoleAsync(user, "Admin");
 
-            IdentityUserAdministrationDTO identityUser = new IdentityUserAdministrationDTO()
-            {
-                Id = user.Id,
-                Email = user.Email
-            };
+            var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
@@ -219,26 +194,31 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             if (user == null)
             {
-                return await Task.FromResult(Result.NoContent());
+                return await Task.FromResult(Result.NotOk("User is not exist"));
             }
 
-            var isProfileDeleted = await _service.DeleteUserProfileByIdentityIdAsync(id, cancellationToken);
+            var deleteProfileResult = await _service.DeleteUserProfileByIdentityIdAsync(id, cancellationToken);
 
-            var result = await _userManager.DeleteAsync(user);
-
-            if (!result.Succeeded)
+            if (deleteProfileResult.IsError)
             {
-                return await Task.FromResult(Result.Fail(result.Errors
+                return await Task.FromResult(Result.Fail(deleteProfileResult.Message));
+            }
+
+            var deleteIdentityResult = await _userManager.DeleteAsync(user);
+
+            if (!deleteIdentityResult.Succeeded)
+            {
+                return await Task.FromResult(Result.Fail(deleteIdentityResult.Errors
                                                             .Select(x => x.Description)
                                                             .Join("\n")));
             }
 
-            if (isProfileDeleted.IsSuccess)
+            if (deleteProfileResult.IsSuccess)
             {
                 return await Task.FromResult(Result.Ok());
             }
 
-            return await Task.FromResult(Result.NotOk(isProfileDeleted.Message));
+            return await Task.FromResult(Result.NotOk(deleteProfileResult.Message));
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Apartments.Web.Controllers.Users
     /// Work with own Comments
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [Route("api/[controller]")]
+    [Route("api/comments")]
     [ApiController]
     public class CommentUserController : ControllerBase
     {
@@ -57,7 +57,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.CreateCommentAsync(comment, authorId, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -71,12 +73,10 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="userId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("author")]
+        [Route("author/id")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -88,9 +88,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetAllCommentsByAuthorIdAsync(authorId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result)
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -106,10 +106,8 @@ namespace Apartments.Web.Controllers.Users
         [HttpGet]
         [Route("apartment/{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -124,9 +122,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result)
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -140,9 +138,8 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="commentId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("comment/{commentId}")]
+        [Route("{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -160,9 +157,11 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.GetCommentByIdAsync(commentId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result)
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -201,7 +200,9 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.UpdateCommentAsync(comment, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -217,6 +218,7 @@ namespace Apartments.Web.Controllers.Users
         [HttpDelete]
         [Route("{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -236,9 +238,11 @@ namespace Apartments.Web.Controllers.Users
             {
                 var result = await _service.DeleteCommentByIdAsync(commentId, authorId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : !result.IsSuccess ? BadRequest(result.Message)
-                    : (IActionResult)Ok(result.IsSuccess);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {

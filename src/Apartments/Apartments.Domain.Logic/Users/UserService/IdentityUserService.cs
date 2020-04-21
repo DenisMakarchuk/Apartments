@@ -194,7 +194,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             if (!profile.IsSuccess)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.NoContent<UserViewModel>();
+                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "Profile is not exist");
             }
 
             UserViewModel result = new UserViewModel()
@@ -220,7 +220,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             if (user == null)
             {
-                return await Task.FromResult(Result.NoContent());
+                return await Task.FromResult(Result.NotOk("User is not exist"));
             }
 
             var hasUserValidPassvord = await _userManager.CheckPasswordAsync(user, password);

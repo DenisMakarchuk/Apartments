@@ -178,7 +178,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get all own Orders by User Id
+        /// Get all own Orders by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
@@ -196,12 +196,6 @@ namespace Apartments.Domain.Logic.Users.UserService
                     .Include(_ => _.Apartment.Address)
                     .Include(_ => _.Apartment.Address.Country)
                     .AsNoTracking().ToListAsync(cancellationToken);
-
-                if (!orders.Any())
-                {
-                    return (Result<IEnumerable<OrderView>>)Result<IEnumerable<OrderView>>
-                        .NoContent<IEnumerable<OrderView>>();
-                }
 
                 List<OrderView> result = new List<OrderView>();
 
@@ -223,7 +217,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get all Orders by Apartment Id
+        /// Get all Orders by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="apartmentId"></param>
         /// <returns></returns>
@@ -238,12 +232,6 @@ namespace Apartments.Domain.Logic.Users.UserService
                 var orders = await _db.Orders.Where(_ => _.ApartmentId == id)
                     .Include(_ => _.Dates)
                     .AsNoTracking().ToListAsync(cancellationToken);
-
-                if (!orders.Any())
-                {
-                    return (Result<IEnumerable<OrderDTO>>)Result<IEnumerable<OrderDTO>>
-                        .NoContent<IEnumerable<OrderDTO>>();
-                }
 
                 var result = _mapper.Map<IEnumerable<OrderDTO>>(orders) as List<OrderDTO>;
 
@@ -274,7 +262,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Get Order by Order Id
+        /// Get Order by Order Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>
@@ -296,7 +284,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (order is null)
                 {
                     return (Result<OrderView>)Result<OrderView>
-                        .NoContent<OrderView>();
+                        .NotOk<OrderView>(null, "Order is not exist");
                 }
 
                 var view = MakeViewModel(order);
@@ -390,7 +378,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
-        /// Delete own Order by Order Id
+        /// Delete own Order by Order Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="orderId"></param>
         /// <returns></returns>

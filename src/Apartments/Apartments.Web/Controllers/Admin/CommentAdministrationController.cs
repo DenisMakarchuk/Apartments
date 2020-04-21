@@ -18,7 +18,7 @@ namespace Apartments.Web.Controllers.Admin
     /// Administrator work with User Comments
     /// </summary>
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
-    [Route("api/[controller]")]
+    [Route("api/administration/comments")]
     [ApiController]
     public class CommentAdministrationController : ControllerBase
     {
@@ -38,10 +38,8 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("user/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -56,9 +54,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllCommentsByUserIdAsync(userId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message) 
-                    : result.IsSuccess ? (IActionResult)Ok(result.Data) 
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -75,10 +73,8 @@ namespace Apartments.Web.Controllers.Admin
         [HttpGet]
         [Route("apartment/{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -93,9 +89,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result.Data) 
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -110,9 +106,8 @@ namespace Apartments.Web.Controllers.Admin
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("comment/{commentId}")]
+        [Route("{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -130,9 +125,11 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetCommentByIdAsync(commentId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess 
+                    ? (IActionResult)Ok(result.Data)
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -166,7 +163,9 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.UpdateCommentAsync(comment, cancellationToken);
 
-                return result.IsError ? BadRequest(result.Message) : (IActionResult)Ok(result.Data);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -201,9 +200,11 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.DeleteCommentByIdAsync(commentId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : result.IsSuccess ? (IActionResult)Ok(result.IsSuccess)
-                    : NoContent();
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {

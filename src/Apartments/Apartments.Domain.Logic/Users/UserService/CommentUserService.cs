@@ -88,12 +88,6 @@ namespace Apartments.Domain.Logic.Users.UserService
                 var comments = await _db.Comments.Where(_ => _.AuthorId == id).Select(_ => _)
                     .AsNoTracking().ToListAsync(cancellationToken);
 
-                if (!comments.Any())
-                {
-                    return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                        .NoContent<IEnumerable<CommentDTO>>();
-                }
-
                 return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
                     .Ok(_mapper.Map<IEnumerable<CommentDTO>>(comments));
             }
@@ -119,12 +113,6 @@ namespace Apartments.Domain.Logic.Users.UserService
             {
                 var comments = await _db.Comments.Where(_ => _.ApartmentId == id).Select(_ => _)
                     .AsNoTracking().ToListAsync(cancellationToken);
-
-                if (!comments.Any())
-                {
-                    return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                        .NoContent<IEnumerable<CommentDTO>>();
-                }
 
                 return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
                     .Ok(_mapper.Map<IEnumerable<CommentDTO>>(comments));
@@ -154,7 +142,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 if (user is null)
                 {
                     return (Result<CommentDTO>)Result<CommentDTO>
-                        .NoContent<CommentDTO>();
+                        .NotOk<CommentDTO>(null, "Comment is not exist");
                 }
 
                 return (Result<CommentDTO>)Result<CommentDTO>

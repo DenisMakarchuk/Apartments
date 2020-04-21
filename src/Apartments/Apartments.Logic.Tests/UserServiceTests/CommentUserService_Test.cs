@@ -263,7 +263,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
             {
                 foreach (var item in _comments)
                 {
-                    item.AuthorId = new Guid();
+                    item.AuthorId = Guid.NewGuid();
                 }
 
                 context.AddRange(_comments);

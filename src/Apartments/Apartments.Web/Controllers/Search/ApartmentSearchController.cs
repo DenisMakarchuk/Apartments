@@ -16,7 +16,7 @@ namespace Apartments.Web.Controllers.Search
     /// Apartment Search
     /// </summary>
     [AllowAnonymous]
-    [Route("api/[controller]")]
+    [Route("api/search/apartments")]
     [ApiController]
     public class ApartmentSearchController : ControllerBase
     {
@@ -33,11 +33,9 @@ namespace Apartments.Web.Controllers.Search
         /// <param name="search"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("apartments")]
+        [Route("parameters")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -52,8 +50,8 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetAllApartmentsAsync(search, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : !result.IsSuccess ? NoContent()
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
                     : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -68,9 +66,8 @@ namespace Apartments.Web.Controllers.Search
         /// <param name="apartmentId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("apartment/{apartmentId}")]
+        [Route("{apartmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -87,9 +84,11 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetApartmentByIdAsync(apartmentId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : !result.IsSuccess ? NoContent()
-                    : (IActionResult)Ok(result.Data);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -104,7 +103,6 @@ namespace Apartments.Web.Controllers.Search
         [HttpGet]
         [Route("countries")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -115,8 +113,8 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetAllCountriesAsync(cancellationToken);
 
-                return result.IsError ? NotFound(result.Message)
-                    : !result.IsSuccess ? NoContent()
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
                     : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
@@ -131,9 +129,8 @@ namespace Apartments.Web.Controllers.Search
         /// <param name="countryId"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("country/{countryId}")]
+        [Route("countries/{countryId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -150,9 +147,11 @@ namespace Apartments.Web.Controllers.Search
             {
                 var result = await _service.GetCountryByIdAsync(countryId, cancellationToken);
 
-                return result.IsError ? NotFound(result.Message) 
-                    : !result.IsSuccess ? NoContent()
-                    : (IActionResult)Ok(result.Data);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {
