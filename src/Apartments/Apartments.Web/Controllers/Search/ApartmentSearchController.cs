@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Logic.Search.SearchServiceInterfaces;
+using Apartments.Domain.Search.DTO;
 using Apartments.Domain.Search.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,7 @@ namespace Apartments.Web.Controllers.Search
         /// <returns></returns>
         [HttpPost]
         [Route("parameters")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApartmentSearchDTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -67,7 +68,7 @@ namespace Apartments.Web.Controllers.Search
         /// <returns></returns>
         [HttpGet]
         [Route("{apartmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentSearchView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -102,7 +103,7 @@ namespace Apartments.Web.Controllers.Search
         /// <returns></returns>
         [HttpGet]
         [Route("countries")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CountrySearchDTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -130,7 +131,7 @@ namespace Apartments.Web.Controllers.Search
         /// <returns></returns>
         [HttpGet]
         [Route("countries/{countryId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CountrySearchDTO))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

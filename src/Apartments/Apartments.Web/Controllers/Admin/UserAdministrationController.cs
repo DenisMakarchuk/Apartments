@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Apartments.Common;
+using Apartments.Domain.Admin.DTO;
+using Apartments.Domain.Admin.ViewModel;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -37,7 +39,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpGet]
         [Route("roles/{role}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<IdentityUserAdministrationDTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -69,7 +71,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<UserAdministrationView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -87,11 +89,8 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetUserByIdAsync(id, cancellationToken);
 
-                return result.IsError
-                    ? throw new InvalidOperationException(result.Message)
-                    : result.IsSuccess
-                    ? (IActionResult)Ok(result.Data)
-                    : NotFound(result.Message);
+                return result.Data == null ? NotFound(result.Message)
+                      : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -106,7 +105,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpPut]
         [Route("roles/add/admin/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<UserAdministrationView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -140,7 +139,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpPut]
         [Route("roles/remove/admin/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<UserAdministrationView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

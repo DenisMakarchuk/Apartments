@@ -37,7 +37,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpGet]
         [Route("user/{userId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CommentDTOAdministration>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -72,7 +72,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpGet]
         [Route("apartment/{apartmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CommentDTOAdministration>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -107,7 +107,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpGet]
         [Route("{commentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CommentDTOAdministration))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -145,7 +145,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpPut]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CommentDTOAdministration))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

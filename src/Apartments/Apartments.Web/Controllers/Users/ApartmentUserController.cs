@@ -8,6 +8,7 @@ using Apartments.Common;
 using Apartments.Domain.Logic;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.AddDTO;
+using Apartments.Domain.Users.DTO;
 using Apartments.Domain.Users.ViewModels;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -39,7 +40,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -75,7 +76,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpGet]
         [Route("owner/id")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApartmentDTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -106,7 +107,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpGet]
         [Route("{apartmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -143,7 +144,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPut]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

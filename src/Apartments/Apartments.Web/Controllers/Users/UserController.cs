@@ -40,7 +40,7 @@ namespace Apartments.Web.Controllers.Users
         [AllowAnonymous]
         [HttpPost]
         [Route("registration")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -79,7 +79,7 @@ namespace Apartments.Web.Controllers.Users
         [AllowAnonymous]
         [HttpPost]
         [Route("logIn")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -108,14 +108,14 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPost]
         [Route("logOut")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [LogAttribute]
-        public async Task<IActionResult> LogOut()
+        public IActionResult LogOut()
         {
             HttpContext.Session.Clear();
 
-            return (IActionResult)Ok(await Task.FromResult(Result.Ok()));
+            return (IActionResult)NoContent();
         }
 
         /// <summary>
