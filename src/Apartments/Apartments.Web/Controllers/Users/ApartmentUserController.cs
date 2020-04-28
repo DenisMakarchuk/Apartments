@@ -184,7 +184,6 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpDelete]
         [Route("{apartmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

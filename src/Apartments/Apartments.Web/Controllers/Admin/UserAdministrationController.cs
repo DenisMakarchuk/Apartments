@@ -87,8 +87,11 @@ namespace Apartments.Web.Controllers.Admin
             {
                 var result = await _service.GetUserByIdAsync(id, cancellationToken);
 
-                return result.Data == null ? NotFound(result.Message)
-                      : (IActionResult)Ok(result);
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
+                    : NotFound(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -171,7 +174,6 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

@@ -179,7 +179,6 @@ namespace Apartments.Web.Controllers.Users
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
@@ -205,7 +204,7 @@ namespace Apartments.Web.Controllers.Users
                     ? throw new InvalidOperationException(result.Message)
                     : result.IsSuccess
                     ? (IActionResult)Ok(result.Data)
-                    : NotFound(result.Message);
+                    : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {
@@ -220,7 +219,6 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpDelete]
         [Route("{orderId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

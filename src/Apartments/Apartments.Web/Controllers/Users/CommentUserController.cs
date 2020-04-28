@@ -38,7 +38,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -217,7 +217,6 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpDelete]
         [Route("{commentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

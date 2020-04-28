@@ -181,7 +181,6 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpDelete]
         [Route("{commentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
