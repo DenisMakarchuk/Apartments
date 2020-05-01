@@ -35,6 +35,8 @@ export class RegisterComponent implements OnInit {
   register() {
     if (this.registerForm.valid) {
       const data = this.registerForm.value;
+      
+      this.registerRequest = new UserRegistrationRequest();
 
       this.registerRequest.email = data.name;
       this.registerRequest.password = data.password;
@@ -42,8 +44,10 @@ export class RegisterComponent implements OnInit {
       this.service.register(this.registerRequest)
         .subscribe(user => this.user = user);
 
-        this.router.navigate(['login']);
         this.registerForm.reset();
+        this.router.navigate(['login']);
     }
   }
+
+
 }
