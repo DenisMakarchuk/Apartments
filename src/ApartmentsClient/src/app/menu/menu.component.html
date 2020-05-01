@@ -17,9 +17,10 @@
        
       </ul>
 
-      <li class="form-inline mt-2 mt-md-0">
-        <a class="btn btn-success my-2 my-sm-0" [routerLink]="['/login']" routerLinkActive="active">Login</a>
-      </li>
 
+      <div class="btn-group " role="group" aria-label="Basic example">
+        <a class="btn btn-success" [routerLink]="['/login']" routerLinkActive="active">Login</a>
+        <a class="btn btn-warning" [routerLink]="['/register']" routerLinkActive="active">SingUp</a>
+      </div>
     </div>
 </nav>

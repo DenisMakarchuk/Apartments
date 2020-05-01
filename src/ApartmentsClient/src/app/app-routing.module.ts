@@ -6,12 +6,19 @@ import { ProfileComponent } from './profile/profile.component';
 import { LoginComponent } from './auth/login/login.component';
 import { ApartmentDetailComponent } from './userCapabilities/apartment-detail/apartment-detail.component';
 
+import { AuthGuardGuard } from "./auth/auth-guard.guard";
+import { RegisterComponent } from './auth/register/register.component';
+
+
+
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full' },
   { path: 'search', component: ApartmentSearchComponent },
-  { path: 'profile', component: ProfileComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'apartment/:id', component: ApartmentDetailComponent }
+  { path: 'register', component: RegisterComponent },
+  { path: 'profile', component: ProfileComponent},
+  { path: 'apartment/:id', component: ApartmentDetailComponent },
+  { path: 'profile/:id', component: ProfileComponent, canActivate: [AuthGuardGuard] }
 ];
 
 @NgModule({
