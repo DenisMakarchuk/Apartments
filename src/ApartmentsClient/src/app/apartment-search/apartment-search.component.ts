@@ -35,10 +35,10 @@ export class ApartmentSearchComponent implements OnInit {
         
     this.countryControl = new FormControl('');
     this.cityControl = new FormControl('');
-    this.roomsFromControl = new FormControl();
-    this.roomsTillControl = new FormControl();
-    this.priceFromControl = new FormControl();
-    this.priceTillControl = new FormControl();
+    this.roomsFromControl = new FormControl(0);
+    this.roomsTillControl = new FormControl(0);
+    this.priceFromControl = new FormControl(0);
+    this.priceTillControl = new FormControl(0);
     this.datesControl = new FormControl(this.dates);
 
     this.resetForm();
@@ -65,6 +65,4 @@ export class ApartmentSearchComponent implements OnInit {
     this.searchService.getAllApartments(this.params)
       .subscribe(apartments => this.apartments = apartments);
   }
-
-  
 }

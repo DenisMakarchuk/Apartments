@@ -12,13 +12,13 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link">Profile</a>
+            <a class="nav-link"  [routerLink]="['/profile']">Profile</a>
         </li>
        
       </ul>
 
       <li class="form-inline mt-2 mt-md-0">
-        <a class="btn btn-success my-2 my-sm-0" routerLinkActive="active">Login</a>
+        <a class="btn btn-success my-2 my-sm-0" [routerLink]="['/login']" routerLinkActive="active">Login</a>
       </li>
 
     </div>

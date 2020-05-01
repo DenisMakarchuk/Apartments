@@ -1,0 +1,103 @@
+<div *ngIf="apartmentView">
+    <h2>{{apartment.title | uppercase}}</h2>
+    <div><span>id: </span>{{apartment.id}}</div>
+
+    <div>
+      <label>Title:
+        <input [(ngModel)]="apartment.title" placeholder="Title"/>
+      </label>
+    </div>
+
+    <h4>{{apartment.text}}</h4>
+    <div>
+        <label>Text:
+          <input [(ngModel)]="apartment.text" placeholder="Text"/>
+        </label>
+    </div>
+
+    <h4>{{apartment.area}}</h4>
+    <div>
+        <label>Area:
+          <input [(ngModel)]="apartment.area" placeholder="Area"/>
+        </label>
+    </div>
+
+    <h4>{{apartment.isOpen}}</h4>
+    <div>
+        <label>Is Open?:
+            <div class="form-check">
+                <input [(ngModel)]="apartment.isOpen" class="form-check-input" type="radio" 
+                    name="isOpen" id="true" value="true" checked>
+                <label class="form-check-label" for="true">
+                    Open
+                </label>
+            </div>
+            <div class="form-check">
+                <input [(ngModel)]="apartment.isOpen" class="form-check-input" type="radio" 
+                    name="isOpen" id="false" value="false">
+                <label class="form-check-label" for="false">
+                    Close
+                </label>
+            </div>
+        </label>
+    </div>
+
+    <h4>{{apartment.price}}</h4>
+    <div>
+        <label>Price:
+          <input [(ngModel)]="apartment.price"  type="number" placeholder="Price"/>
+        </label>
+    </div>
+
+    <h4>{{apartment.numberOfRooms}}</h4>
+    <div>
+        <label>Number Of Rooms:
+          <input [(ngModel)]="apartment.numberOfRooms"  type="number" placeholder="Number Of Rooms"/>
+        </label>
+    </div>
+          
+    <h2>Addpess</h2>
+
+    <h4>{{country.name}}</h4>
+    <div>
+      <label>Country:
+        <input [(ngModel)]="apartment.title" placeholder="title"/>
+      </label>
+      <label>Country</label>
+      <select class="form-control" [(ngModel)]="country.id">
+          <option value="">Choose country</option>
+          <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
+      </select>
+    </div>
+
+    <h4>{{address.city}}</h4>
+    <div>
+        <label>City:
+        <input [(ngModel)]="address.city" placeholder="title"/>
+      </label>
+    </div>
+
+    <h4>{{address.street}}</h4>
+    <div>
+    <label>Street:
+        <input [(ngModel)]="address.street" placeholder="title"/>
+      </label>
+    </div>
+
+    <h4>{{address.home}}</h4>
+    <div>
+    <label>Home:
+        <input [(ngModel)]="address.home" placeholder="title"/>
+      </label>
+    </div>
+
+    <h4>{{address.numberOfApartment}}</h4>
+    <div>
+    <label>NumberOfApartment:
+        <input [(ngModel)]="address.numberOfApartment" type="number" placeholder="title"/>
+      </label>
+    </div>
+
+    <button (click)="goBack()">go back</button>
+    <button (click)="save()">save</button>
+</div>

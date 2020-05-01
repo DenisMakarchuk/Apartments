@@ -13,6 +13,11 @@ import { ApartmentSearchService } from './core/nswag.generated.service';
 import { AppComponent } from './app.component';
 import { MenuComponent } from './menu/menu.component';
 import { ApartmentSearchComponent } from './apartment-search/apartment-search.component';
+import { ProfileComponent } from './profile/profile.component';
+import { LoginComponent } from './auth/login/login.component';
+import { OrderDetailComponent } from './userCapabilities/order-detail/order-detail.component';
+import { ApartmentDetailComponent } from './userCapabilities/apartment-detail/apartment-detail.component';
+import { CommentDetailComponent } from './userCapabilities/comment-detail/comment-detail.component';
 
 
 
@@ -20,7 +25,12 @@ import { ApartmentSearchComponent } from './apartment-search/apartment-search.co
   declarations: [
     AppComponent,
     MenuComponent,
-    ApartmentSearchComponent
+    ApartmentSearchComponent,
+    ProfileComponent,
+    LoginComponent,
+    OrderDetailComponent,
+    ApartmentDetailComponent,
+    CommentDetailComponent
   ],
   imports: [
     BrowserAnimationsModule,

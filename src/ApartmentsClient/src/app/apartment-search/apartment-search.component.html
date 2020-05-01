@@ -3,6 +3,7 @@
     <div class="form-group">
       <label>Country</label>
       <select class="form-control" [formControl]="countryControl">
+          <option value="">Choose country</option>
           <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
       </select>
     </div>
