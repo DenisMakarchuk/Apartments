@@ -15,17 +15,22 @@ import { Router } from '@angular/router';
 export class RegisterComponent implements OnInit {
 
   registerForm: FormGroup;
+
   registerRequest: UserRegistrationRequest;
   user: UserViewModel;
+  currentUser = {};
+
+  email: string;
+  password: string;
 
   constructor( 
-    private service: UserService,
+    private registerService: UserService,
     public fb: FormBuilder,
     public router: Router
     ) { 
       this.registerForm = this.fb.group({
-        name: [''],
-        password: ['']
+        email: '',
+        password: ''
       });
     }
 
@@ -34,18 +39,16 @@ export class RegisterComponent implements OnInit {
 
   register() {
     if (this.registerForm.valid) {
-      const data = this.registerForm.value;
-      
-      this.registerRequest = new UserRegistrationRequest();
-
-      this.registerRequest.email = data.name;
-      this.registerRequest.password = data.password;
-
-      this.service.register(this.registerRequest)
-        .subscribe(user => this.user = user);
-
+      this.registerService.register(this.registerForm.value)
+      .subscribe(user => this.user = user);
+  
+      if (this.user != null) {
+        localStorage.setItem('access_token', this.user.token)
+        this.currentUser = this.user;
+  
         this.registerForm.reset();
-        this.router.navigate(['login']);
+        this.router.navigate(['/profile']);
+      }
     }
   }
 

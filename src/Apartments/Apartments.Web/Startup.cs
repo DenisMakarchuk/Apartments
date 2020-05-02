@@ -111,7 +111,13 @@ namespace Apartments.Web
 
             services.AddAutoMapper(typeof(Startup).Assembly);
 
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -133,7 +139,8 @@ namespace Apartments.Web
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
-            app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
+            app.UseCors("CorsPolicy");
+            //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

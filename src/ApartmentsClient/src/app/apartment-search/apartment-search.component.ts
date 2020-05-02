@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm, FormControl } from '@angular/forms';
+import { NgForm, FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { ApartmentSearchService } from 'src/app/core/nswag.generated.service';
 import { CountryDTO } from 'src/app/core/nswag.generated.service';
 
+
 import { SearchParameters } from 'src/app/core/nswag.generated.service';
+import { ISearchParameters } from 'src/app/core/nswag.generated.service';
+
 import { ApartmentSearchDTO } from 'src/app/core/nswag.generated.service';
 
 
@@ -16,43 +20,40 @@ import { ApartmentSearchDTO } from 'src/app/core/nswag.generated.service';
 export class ApartmentSearchComponent implements OnInit {
 
   countries: CountryDTO[];
-  params: SearchParameters;
+  searchParams: SearchParameters;
   apartments: ApartmentSearchDTO[];
+  data: ISearchParameters;
+
+  searchForm: FormGroup;
+
+  countryId: string;
+  cityName: string;
+  roomsFrom: number;
+  roomsTill: number;
+  priceFrom: number;
+  priceTill: number;
   dates: Date[];
 
-  countryControl: FormControl;
-  cityControl: FormControl;
-  roomsFromControl: FormControl;
-  roomsTillControl: FormControl;
-  priceFromControl: FormControl;
-  priceTillControl: FormControl;
-  datesControl: FormControl;
+  constructor(
+    private searchService: ApartmentSearchService,
+    private formBuilder: FormBuilder,
+    private avRoute: ActivatedRoute, 
+    private router: Router
+    ) { 
+      this.searchForm = this.formBuilder.group({
+        countryId: '',
+        cityName: '',
+        roomsFrom: 0,
+        roomsTill: 0,
+        priceFrom: 0,
+        priceTill: 0,
+        dates: []
+      })
 
-  constructor(private searchService: ApartmentSearchService) { }
+    }
 
   ngOnInit(): void {
     this.getCountries();
-        
-    this.countryControl = new FormControl('');
-    this.cityControl = new FormControl('');
-    this.roomsFromControl = new FormControl(0);
-    this.roomsTillControl = new FormControl(0);
-    this.priceFromControl = new FormControl(0);
-    this.priceTillControl = new FormControl(0);
-    this.datesControl = new FormControl(this.dates);
-
-    this.resetForm();
-  }
-
-  resetForm() {
-    this.params = new SearchParameters();
-    this.countryControl.valueChanges.subscribe(value => this.params.countryId = value);
-    this.cityControl.valueChanges.subscribe(value => this.params.cityName = value);
-    this.roomsFromControl.valueChanges.subscribe(value => this.params.roomsFrom = value);
-    this.roomsTillControl.valueChanges.subscribe(value => this.params.roomsTill = value);
-    this.priceFromControl.valueChanges.subscribe(value => this.params.priceFrom = value);
-    this.priceTillControl.valueChanges.subscribe(value => this.params.priceTill = value);
-    this.datesControl.valueChanges.subscribe(value => this.params.needDates = value);
   }
 
   getCountries(): void {
@@ -62,7 +63,7 @@ export class ApartmentSearchComponent implements OnInit {
 
 
   searchApartments(): void {
-    this.searchService.getAllApartments(this.params)
+    this.searchService.getAllApartments(this.searchForm.value)
       .subscribe(apartments => this.apartments = apartments);
   }
 }

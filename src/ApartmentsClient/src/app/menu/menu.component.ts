@@ -12,4 +12,13 @@ export class MenuComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  get isLoggedIn(): boolean {
+    let authToken = localStorage.getItem('access_token');
+    return (authToken !== null) ? true : false;
+  }
+
+  getToken() {
+    return localStorage.getItem('access_token');
+  }
+
 }

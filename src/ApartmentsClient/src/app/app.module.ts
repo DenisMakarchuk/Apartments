@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from './auth/authconfig.interceptor';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
@@ -21,6 +20,7 @@ import { OrderDetailComponent } from './userCapabilities/order-detail/order-deta
 import { ApartmentDetailComponent } from './userCapabilities/apartment-detail/apartment-detail.component';
 import { CommentDetailComponent } from './userCapabilities/comment-detail/comment-detail.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { LogoutComponent } from './auth/logout/logout.component';
 
 
 
@@ -34,7 +34,8 @@ import { RegisterComponent } from './auth/register/register.component';
     OrderDetailComponent,
     ApartmentDetailComponent,
     CommentDetailComponent,
-    RegisterComponent
+    RegisterComponent,
+    LogoutComponent
   ],
   imports: [
     BrowserAnimationsModule,
@@ -47,12 +48,7 @@ import { RegisterComponent } from './auth/register/register.component';
   ],
   providers: [
     ApartmentSearchService,
-    UserService,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true
-    }
+    UserService
   ],
   bootstrap: [AppComponent]
 })
