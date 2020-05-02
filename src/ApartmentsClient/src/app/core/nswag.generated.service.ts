@@ -1285,6 +1285,15 @@ export class UserService {
         this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
     }
 
+    get isLoggedIn(): boolean {
+        let authToken = localStorage.getItem('access_token');
+        return (authToken !== null) ? true : false;
+    }
+    
+    getToken() {
+        return localStorage.getItem('access_token');
+    }
+
     register(request: UserRegistrationRequest): Observable<UserViewModel> {
         let url_ = this.baseUrl + "/api/user/registration";
         url_ = url_.replace(/[?&]$/, "");

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { UserService } from 'src/app/core/nswag.generated.service';
+
 
 @Component({
   selector: 'app-menu',
@@ -7,18 +9,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MenuComponent implements OnInit {
 
-  constructor() { }
+  constructor(private authService: UserService) { }
 
   ngOnInit(): void {
   }
 
   get isLoggedIn(): boolean {
-    let authToken = localStorage.getItem('access_token');
-    return (authToken !== null) ? true : false;
-  }
-
-  getToken() {
-    return localStorage.getItem('access_token');
-  }
-
+    return this.authService.isLoggedIn;}
 }

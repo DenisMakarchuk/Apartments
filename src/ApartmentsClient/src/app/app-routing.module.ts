@@ -7,6 +7,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { ApartmentDetailComponent } from './userCapabilities/apartment-detail/apartment-detail.component';
 
 import { RegisterComponent } from './auth/register/register.component';
+import { AuthGuard } from './auth/auth.guard';
 
 
 
@@ -15,8 +16,8 @@ const routes: Routes = [
   { path: 'search', component: ApartmentSearchComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'profile', component: ProfileComponent},
-  { path: 'apartment/:id', component: ApartmentDetailComponent },
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
+  { path: 'apartment/:id', component: ApartmentDetailComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

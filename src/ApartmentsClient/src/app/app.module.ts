@@ -21,7 +21,9 @@ import { ApartmentDetailComponent } from './userCapabilities/apartment-detail/ap
 import { CommentDetailComponent } from './userCapabilities/comment-detail/comment-detail.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { LogoutComponent } from './auth/logout/logout.component';
-
+import { AuthGuard } from './auth/auth.guard';
+import { OwnApartmentsComponent } from './own/own-apartments/own-apartments.component';
+import { OwnOrdersComponent } from './own/own-orders/own-orders.component';
 
 
 @NgModule({
@@ -35,7 +37,9 @@ import { LogoutComponent } from './auth/logout/logout.component';
     ApartmentDetailComponent,
     CommentDetailComponent,
     RegisterComponent,
-    LogoutComponent
+    LogoutComponent,
+    OwnApartmentsComponent,
+    OwnOrdersComponent
   ],
   imports: [
     BrowserAnimationsModule,
@@ -48,6 +52,7 @@ import { LogoutComponent } from './auth/logout/logout.component';
   ],
   providers: [
     ApartmentSearchService,
+    AuthGuard,
     UserService
   ],
   bootstrap: [AppComponent]
