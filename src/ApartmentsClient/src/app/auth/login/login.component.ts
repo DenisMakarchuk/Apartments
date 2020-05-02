@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { UserLoginRequest } from 'src/app/core/nswag.generated.service';
 import { UserDTO } from 'src/app/core/nswag.generated.service';
 
-
-
 import { Router } from '@angular/router';
 
 import { FormGroup, FormBuilder } from '@angular/forms';

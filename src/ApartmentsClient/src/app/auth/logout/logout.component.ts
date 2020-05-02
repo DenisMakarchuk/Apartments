@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { UserService } from 'src/app/core/nswag.generated.service';
+
 @Component({
   selector: 'app-logout',
   templateUrl: './logout.component.html',
@@ -8,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class LogoutComponent implements OnInit {
 
-  constructor(public router: Router) { }
+  constructor(public router: Router, public authService: UserService) { }
 
   ngOnInit(): void {
   }
@@ -16,6 +18,7 @@ export class LogoutComponent implements OnInit {
   doLogout() {
     let removeToken = localStorage.removeItem('access_token');
     if (removeToken == null) {
+      this.authService.logOut();
       this.router.navigate(['/search']);
     }
   }
