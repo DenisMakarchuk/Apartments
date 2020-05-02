@@ -45,7 +45,7 @@ export class LoginComponent implements OnInit {
       if (this.user != null) {
         localStorage.setItem('access_token', this.user.token)
         this.currentUser = this.user;
-  
+
         this.loginForm.reset();
         this.router.navigate(['/profile']);
       }

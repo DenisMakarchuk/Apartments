@@ -18,10 +18,11 @@
       </ul>
 
 
-      <div class="btn-group " role="group" aria-label="Basic example">
-        <a class="btn btn-success" *ngIf="!isLoggedIn" [routerLink]="['/login']" routerLinkActive="active">Login</a>
-        <a class="btn btn-warning" *ngIf="!isLoggedIn" [routerLink]="['/register']" routerLinkActive="active">SingUp</a>
-        <app-logout *ngIf="isLoggedIn"></app-logout>
+      <div class="btn-group " *ngIf="!isLoggedIn" role="group" aria-label="Basic example">
+        <a class="btn btn-success" [routerLink]="['/login']" routerLinkActive="active">Login</a>
+        <a class="btn btn-warning" [routerLink]="['/register']" routerLinkActive="active">SingUp</a>
       </div>
+
+      <app-logout *ngIf="isLoggedIn"></app-logout>
     </div>
 </nav>
