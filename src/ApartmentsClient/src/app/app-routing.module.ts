@@ -9,7 +9,7 @@ import { ApartmentDetailComponent } from './userCapabilities/apartment-detail/ap
 import { RegisterComponent } from './auth/register/register.component';
 import { AuthGuard } from './auth/auth.guard';
 
-
+import { ApartmentCreateComponent } from './userCapabilities/apartment-create/apartment-create.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full' },
@@ -18,6 +18,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
   { path: 'apartment/:id', component: ApartmentDetailComponent, canActivate: [AuthGuard] },
+  { path: 'addapartment', component: ApartmentCreateComponent}
 ];
 
 @NgModule({

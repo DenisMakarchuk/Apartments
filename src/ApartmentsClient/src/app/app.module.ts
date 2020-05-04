@@ -9,8 +9,14 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { ApartmentSearchService } from './core/nswag.generated.service';
-import { UserService } from 'src/app/core/nswag.generated.service';
+import { UserService, 
+         ApartmentSearchService,
+         ApartmentUserService,
+         CommentUserService,
+         OrderUserService,
+         CommentAdministrationService,
+         UserAdministrationService
+        } from 'src/app/core/nswag.generated.service';
 
 import { AppComponent } from './app.component';
 import { MenuComponent } from './menu/menu.component';
@@ -25,6 +31,12 @@ import { LogoutComponent } from './auth/logout/logout.component';
 import { AuthGuard } from './auth/auth.guard';
 import { OwnApartmentsComponent } from './own/own-apartments/own-apartments.component';
 import { OwnOrdersComponent } from './own/own-orders/own-orders.component';
+import { ApartmentCreateComponent } from './userCapabilities/apartment-create/apartment-create.component';
+import { ApartmentUpdateComponent } from './userCapabilities/apartment-update/apartment-update.component';
+import { CommentCreateComponent } from './userCapabilities/comment-create/comment-create.component';
+import { CommentUpdateComponent } from './userCapabilities/comment-update/comment-update.component';
+import { OrderCreateComponent } from './userCapabilities/order-create/order-create.component';
+import { OrderUpdateComponent } from './userCapabilities/order-update/order-update.component';
 
 
 @NgModule({
@@ -40,7 +52,13 @@ import { OwnOrdersComponent } from './own/own-orders/own-orders.component';
     RegisterComponent,
     LogoutComponent,
     OwnApartmentsComponent,
-    OwnOrdersComponent
+    OwnOrdersComponent,
+    ApartmentCreateComponent,
+    ApartmentUpdateComponent,
+    CommentCreateComponent,
+    CommentUpdateComponent,
+    OrderCreateComponent,
+    OrderUpdateComponent
   ],
   imports: [
     BrowserAnimationsModule,
@@ -52,14 +70,19 @@ import { OwnOrdersComponent } from './own/own-orders/own-orders.component';
     ReactiveFormsModule
   ],
   providers: [
-    ApartmentSearchService,
     AuthGuard,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptorService,
       multi: true
     },
-    UserService
+    UserService,
+    ApartmentUserService,
+    CommentUserService,
+    OrderUserService,
+    ApartmentSearchService,
+    CommentAdministrationService,
+    UserAdministrationService
   ],
   bootstrap: [AppComponent]
 })

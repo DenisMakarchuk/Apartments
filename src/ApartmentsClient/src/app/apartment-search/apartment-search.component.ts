@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { ApartmentSearchService } from 'src/app/core/nswag.generated.service';
+import { ApartmentSearchService, UserService } from 'src/app/core/nswag.generated.service';
 import { CountryDTO } from 'src/app/core/nswag.generated.service';
 
 
@@ -37,6 +37,7 @@ export class ApartmentSearchComponent implements OnInit {
   constructor(
     private searchService: ApartmentSearchService,
     private formBuilder: FormBuilder,
+    private authService: UserService,
     private avRoute: ActivatedRoute, 
     private router: Router
     ) { 
@@ -66,4 +67,7 @@ export class ApartmentSearchComponent implements OnInit {
     this.searchService.getAllApartments(this.searchForm.value)
       .subscribe(apartments => this.apartments = apartments);
   }
+
+  get isLoggedIn(): boolean {
+    return this.authService.isLoggedIn;}
 }

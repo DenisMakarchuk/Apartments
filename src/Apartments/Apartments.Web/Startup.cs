@@ -114,9 +114,11 @@ namespace Apartments.Web
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
+                    builder => builder.WithOrigins("http://localhost:4200")
                         .AllowAnyMethod()
-                        .AllowAnyHeader());
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowedToAllowWildcardSubdomains());
             });
         }
 
@@ -129,8 +131,6 @@ namespace Apartments.Web
                 app.UseOpenApi().UseSwaggerUi3();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthentication();
@@ -141,6 +141,7 @@ namespace Apartments.Web
 
             app.UseCors("CorsPolicy");
             //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
+            app.UseHttpsRedirection();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

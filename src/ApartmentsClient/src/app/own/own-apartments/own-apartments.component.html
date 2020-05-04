@@ -1,1 +1,37 @@
-<p>own-apartments works!</p>
+<div>
+    <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
+        <button class="btn btn-success btn-lg" routerLink="/addapartment">Add Apartment</button>
+
+        <button class="btn btn-warning btn-lg" (click)="getOwnApartments()">Get own Apartments</button>
+    </div>
+
+    <div *ngIf="ownApartments">
+        <div class="card card-body alert alert-secondary" *ngFor="let ap of ownApartments">
+            <a routerLink="/apartment/{{ap.id}}">
+                <div class="col-md-4">
+                    <!-- <img src="..." class="card-img" alt="..."> -->
+                </div>
+                <div class="col">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ap.title}}</h4>
+                        <h6 class="card-text">Price: {{ap.price}}</h6>
+                        <h6 class="card-text">Rooms: {{ap.numberOfRooms}}</h6>
+                        <h6 class="card-text">Area: {{ap.area}}</h6>
+                        <p class="card-text">{{ap.text}}</p>
+                        <p class="card-text"><small class="text-muted">Lust time updated at {{ap.update}}</small></p>
+                    </div>
+                </div>
+            </a>
+
+
+
+            <div class="btn-group" role="group">
+                <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block">Change Apartment</button>
+                <button class="btn btn-danger">Detete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

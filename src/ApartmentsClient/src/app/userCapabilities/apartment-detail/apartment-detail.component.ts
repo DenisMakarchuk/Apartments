@@ -27,16 +27,17 @@ export class ApartmentDetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getCountries();
+    this.getApartment();
   }
 
   countries: CountryDTO[];
+
   apartmentView: ApartmentView;
   country: CountryDTO;
   address: AddressDTO;
   apartment: ApartmentDTO;
 
-  getHero(): void {
+  getApartment(): void {
     const id = this.route.snapshot.paramMap.get('id');
     this.apartmentService.getApartmentById(id)
       .subscribe(apartmentView => this.apartmentView = apartmentView);
@@ -63,5 +64,10 @@ export class ApartmentDetailComponent implements OnInit {
   
     this.apartmentService.updateApartment(this.apartmentView)
       .subscribe(apartmentView => this.apartmentView = apartmentView);
+  }
+
+  delete(){
+    const id = this.route.snapshot.paramMap.get('id');
+    this.apartmentService.deleteApartmentById(id);
   }
 }
