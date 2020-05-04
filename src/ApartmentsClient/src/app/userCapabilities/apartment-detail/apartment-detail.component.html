@@ -2,38 +2,38 @@
     <h2>{{apartment.title | uppercase}}</h2>
     <div><span>id: </span>{{apartment.id}}</div>
 
-    <div>
+    <div *ngIf="isOwner">
       <label>Title:
         <input [(ngModel)]="apartment.title" placeholder="Title"/>
       </label>
     </div>
 
     <h4>{{apartment.text}}</h4>
-    <div>
+    <div *ngIf="isOwner">
         <label>Text:
           <input [(ngModel)]="apartment.text" placeholder="Text"/>
         </label>
     </div>
 
     <h4>{{apartment.area}}</h4>
-    <div>
+    <div *ngIf="isOwner">
         <label>Area:
           <input [(ngModel)]="apartment.area" placeholder="Area"/>
         </label>
     </div>
 
-    <h4>{{apartment.isOpen}}</h4>
-    <div>
+    <h4 *ngIf="isOwner">{{apartment.isOpen}}</h4>
+    <div *ngIf="isOwner">
         <label>Is Open?:
             <div class="form-check">
-                <input [(ngModel)]="apartment.isOpen" class="form-check-input" type="radio" 
+                <input [(ngModel)]="apartment.isOpen" class="form-check-input" type="boolean" type="radio" 
                     name="isOpen" id="true" value="true" checked>
                 <label class="form-check-label" for="true">
                     Open
                 </label>
             </div>
             <div class="form-check">
-                <input [(ngModel)]="apartment.isOpen" class="form-check-input" type="radio" 
+                <input [(ngModel)]="apartment.isOpen" class="form-check-input" type="boolean" type="radio" 
                     name="isOpen" id="false" value="false">
                 <label class="form-check-label" for="false">
                     Close
@@ -43,14 +43,14 @@
     </div>
 
     <h4>{{apartment.price}}</h4>
-    <div>
+    <div *ngIf="isOwner">
         <label>Price:
           <input [(ngModel)]="apartment.price"  type="number" placeholder="Price"/>
         </label>
     </div>
 
     <h4>{{apartment.numberOfRooms}}</h4>
-    <div>
+    <div *ngIf="isOwner">
         <label>Number Of Rooms:
           <input [(ngModel)]="apartment.numberOfRooms"  type="number" placeholder="Number Of Rooms"/>
         </label>
@@ -59,10 +59,7 @@
     <h2>Addpess</h2>
 
     <h4>{{country.name}}</h4>
-    <div>
-      <label>Country:
-        <input [(ngModel)]="apartment.title" placeholder="title"/>
-      </label>
+    <div *ngIf="isOwner">
       <label>Country</label>
       <select class="form-control" [(ngModel)]="country.id">
           <option value="">Choose country</option>
@@ -71,33 +68,35 @@
     </div>
 
     <h4>{{address.city}}</h4>
-    <div>
+    <div *ngIf="isOwner">
         <label>City:
         <input [(ngModel)]="address.city" placeholder="title"/>
       </label>
     </div>
 
     <h4>{{address.street}}</h4>
-    <div>
-    <label>Street:
+    <div *ngIf="isOwner">
+      <label>Street:
         <input [(ngModel)]="address.street" placeholder="title"/>
       </label>
     </div>
 
     <h4>{{address.home}}</h4>
-    <div>
+    <div *ngIf="isOwner">
     <label>Home:
         <input [(ngModel)]="address.home" placeholder="title"/>
       </label>
     </div>
 
     <h4>{{address.numberOfApartment}}</h4>
-    <div>
+    <div *ngIf="isOwner">
     <label>NumberOfApartment:
         <input [(ngModel)]="address.numberOfApartment" type="number" placeholder="title"/>
       </label>
     </div>
 
-    <button (click)="goBack()">go back</button>
-    <button (click)="save()">save</button>
+    <div class="btn-group" role="group">
+      <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">go back</button>
+      <button *ngIf="isOwner" class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="save()">save</button>
+    </div>
 </div>

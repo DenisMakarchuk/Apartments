@@ -4,12 +4,14 @@ import { ApartmentView } from 'src/app/core/nswag.generated.service';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
 
-import { ApartmentUserService }  from 'src/app/core/nswag.generated.service';
-import { ApartmentSearchService } from 'src/app/core/nswag.generated.service';
+import { ApartmentUserService, ApartmentSearchService }  from 'src/app/core/nswag.generated.service';
+import { UserService } from 'src/app/core/nswag.generated.service';
 
 import { ApartmentDTO } from 'src/app/core/nswag.generated.service';
 import { AddressDTO } from 'src/app/core/nswag.generated.service';
 import { CountryDTO } from 'src/app/core/nswag.generated.service';
+
+import * as jwt_decode from 'jwt-decode';
 
 
 @Component({
@@ -23,13 +25,15 @@ export class ApartmentDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private apartmentService: ApartmentUserService,
     private location: Location,
-    private searchService: ApartmentSearchService
+    private searchService: ApartmentSearchService,
+    private authService: UserService
   ) { }
 
   ngOnInit(): void {
     this.getApartment();
+    this.getCountries();
   }
-
+  
   countries: CountryDTO[];
 
   apartmentView: ApartmentView;
@@ -40,16 +44,29 @@ export class ApartmentDetailComponent implements OnInit {
   getApartment(): void {
     const id = this.route.snapshot.paramMap.get('id');
     this.apartmentService.getApartmentById(id)
-      .subscribe(apartmentView => this.apartmentView = apartmentView);
+      .subscribe(apartmentView => {this.apartmentView = apartmentView;
 
       this.country = this.apartmentView?.country;
       this.address = this.apartmentView?.address;
       this.apartment = this.apartmentView?.apartment;
+      });
   }
 
   getCountries(): void {
     this.searchService.getAllCountries()
       .subscribe(countries => this.countries = countries);
+  }
+
+  get isOwner(){
+    var token = this.authService.getToken();
+      
+    var decodedoken = jwt_decode(token);
+    var currentUserId = decodedoken['id'];
+
+    if (currentUserId === this.apartment.ownerId) {
+      return true;
+    }
+    return false;
   }
 
   goBack(): void {

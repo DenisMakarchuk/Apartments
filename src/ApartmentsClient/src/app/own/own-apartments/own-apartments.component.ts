@@ -30,10 +30,7 @@ export class OwnApartmentsComponent implements OnInit {
   }
   
   getOwnApartments(){
-    this.ownApartments = [];
-    this.ownApartments.push(this.fakeDto);
-
-    //this.ownApartmentService.getAllApartmentByOwnerId()
-    //  .subscribe(ownApartments => this.ownApartments = ownApartments);
+    this.ownApartmentService.getAllApartmentByOwnerId()
+      .subscribe(ownApartments => this.ownApartments = ownApartments);
   }
 }
