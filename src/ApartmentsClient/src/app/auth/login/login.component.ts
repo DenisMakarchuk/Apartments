@@ -40,15 +40,17 @@ export class LoginComponent implements OnInit {
   login() {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value)
-      .subscribe(user => this.user = user);
-  
-      if (this.user != null) {
-        localStorage.setItem('access_token', this.user.token)
-        this.currentUser = this.user;
+      .subscribe(user => {this.user = user;
+                          localStorage.setItem('access_token', this.user.token);
+                          this.currentUser = this.user;
 
-        this.loginForm.reset();
-        this.router.navigate(['/profile']);
-      }
+                          this.loginForm.reset();
+                          this.router.navigate(['/profile']);
+                  });
+  
+      //if (this.user != null) {
+        
+      //}
     }
   }
 
