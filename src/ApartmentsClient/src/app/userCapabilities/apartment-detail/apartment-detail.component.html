@@ -1,29 +1,31 @@
 <div *ngIf="apartmentView">
+  <button *ngIf="isOwner && !isUpdating" class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="updating()">Edit</button>
+
     <h2>{{apartment.title | uppercase}}</h2>
     <div><span>id: </span>{{apartment.id}}</div>
 
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
       <label>Title:
         <input [(ngModel)]="apartment.title" placeholder="Title"/>
       </label>
     </div>
 
     <h4>{{apartment.text}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
         <label>Text:
           <input [(ngModel)]="apartment.text" placeholder="Text"/>
         </label>
     </div>
 
     <h4>{{apartment.area}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
         <label>Area:
           <input [(ngModel)]="apartment.area" placeholder="Area"/>
         </label>
     </div>
 
-    <h4 *ngIf="isOwner">{{apartment.isOpen}}</h4>
-    <div *ngIf="isOwner">
+    <h4 *ngIf="isOwner && isUpdating">{{apartment.isOpen}}</h4>
+    <div *ngIf="isOwner && isUpdating">
         <label>Is Open?:
             <div class="form-check">
                 <input [(ngModel)]="apartment.isOpen" class="form-check-input" type="boolean" type="radio" 
@@ -43,14 +45,14 @@
     </div>
 
     <h4>{{apartment.price}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
         <label>Price:
           <input [(ngModel)]="apartment.price"  type="number" placeholder="Price"/>
         </label>
     </div>
 
     <h4>{{apartment.numberOfRooms}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
         <label>Number Of Rooms:
           <input [(ngModel)]="apartment.numberOfRooms"  type="number" placeholder="Number Of Rooms"/>
         </label>
@@ -59,7 +61,7 @@
     <h2>Addpess</h2>
 
     <h4>{{country.name}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
       <label>Country</label>
       <select class="form-control" [(ngModel)]="country.id">
           <option value="">Choose country</option>
@@ -68,35 +70,52 @@
     </div>
 
     <h4>{{address.city}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
         <label>City:
         <input [(ngModel)]="address.city" placeholder="title"/>
       </label>
     </div>
 
     <h4>{{address.street}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
       <label>Street:
         <input [(ngModel)]="address.street" placeholder="title"/>
       </label>
     </div>
 
     <h4>{{address.home}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
     <label>Home:
         <input [(ngModel)]="address.home" placeholder="title"/>
       </label>
     </div>
 
     <h4>{{address.numberOfApartment}}</h4>
-    <div *ngIf="isOwner">
+    <div *ngIf="isOwner && isUpdating">
     <label>NumberOfApartment:
         <input [(ngModel)]="address.numberOfApartment" type="number" placeholder="title"/>
       </label>
     </div>
 
     <div class="btn-group" role="group">
+      <button *ngIf="!isUpdating" class="btn btn-success my-2 my-sm-0 btn-lg btn-block">Make Order</button>
+
       <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">go back</button>
-      <button *ngIf="isOwner" class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="save()">save</button>
+      <button *ngIf="isOwner && isUpdating" class="btn btn-success my-2 my-sm-0 btn-lg btn-block" (click)="save()">save</button>
+    
+      <button *ngIf="isOwner && isUpdating" class="btn btn-danger" (click)="delete()">Delete</button>
+    </div>
+
+    <app-order-create *ngIf="dates"></app-order-create>
+
+    <app-comment-create></app-comment-create>
+
+    <div *ngIf="apartmentComments">
+      <div *ngFor="let comment of apartmentComments">
+        <a routerLink="/comment/{{comment.id}}">
+          {{comment.title}}
+          {{comment.text}}
+        </a>
+      </div>
     </div>
 </div>

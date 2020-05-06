@@ -2,14 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { NgForm, FormControl, FormGroup, FormBuilder } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 
-import { ApartmentSearchService, UserService } from 'src/app/core/nswag.generated.service';
+import { ApartmentSearchService, UserService, OrderUserService } from 'src/app/core/nswag.generated.service';
 import { CountryDTO } from 'src/app/core/nswag.generated.service';
 
 
 import { SearchParameters } from 'src/app/core/nswag.generated.service';
 import { ISearchParameters } from 'src/app/core/nswag.generated.service';
 
-import { ApartmentSearchDTO } from 'src/app/core/nswag.generated.service';
+import { ApartmentSearchDTO, AddOrder } from 'src/app/core/nswag.generated.service';
 
 
 @Component({
@@ -24,6 +24,8 @@ export class ApartmentSearchComponent implements OnInit {
   apartments: ApartmentSearchDTO[];
   data: ISearchParameters;
 
+  addOrder: AddOrder;
+
   searchForm: FormGroup;
 
   countryId: string;
@@ -36,6 +38,7 @@ export class ApartmentSearchComponent implements OnInit {
 
   constructor(
     private searchService: ApartmentSearchService,
+    private orderService: OrderUserService,
     private formBuilder: FormBuilder,
     private authService: UserService,
     private avRoute: ActivatedRoute, 
@@ -62,8 +65,12 @@ export class ApartmentSearchComponent implements OnInit {
       .subscribe(countries => this.countries = countries);
   }
 
+  sendDates(){
+    this.searchService.sendDates();
+  }
 
   searchApartments(): void {
+    console.log(this.searchForm.value.dates);
     this.searchService.getAllApartments(this.searchForm.value)
       .subscribe(apartments => this.apartments = apartments);
   }

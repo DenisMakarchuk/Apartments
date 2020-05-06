@@ -10,6 +10,11 @@ import { RegisterComponent } from './auth/register/register.component';
 import { AuthGuard } from './auth/auth.guard';
 
 import { ApartmentCreateComponent } from './userCapabilities/apartment-create/apartment-create.component';
+import { CommentDetailComponent } from './userCapabilities/comment-detail/comment-detail.component';
+import { OrderDetailComponent } from './userCapabilities/order-detail/order-detail.component';
+import { AdminPanetComponent } from './admin-panet/admin-panet.component';
+import { ProfileDetailComponent } from './admin-panet/profile-detail/profile-detail.component';
+
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full' },
@@ -18,7 +23,15 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
   { path: 'apartment/:id', component: ApartmentDetailComponent, canActivate: [AuthGuard] },
-  { path: 'addapartment', component: ApartmentCreateComponent}
+  { path: 'addapartment', component: ApartmentCreateComponent, canActivate: [AuthGuard] },
+  { path: 'comment/:id', component: CommentDetailComponent, canActivate: [AuthGuard] },
+  { path: 'order/:id', component: OrderDetailComponent, canActivate: [AuthGuard] },
+  { path: 'admin', component: AdminPanetComponent, canActivate: [AuthGuard] },
+  { path: 'user/:id', component: ProfileDetailComponent, canActivate: [AuthGuard] }
+
+
+
+
 ];
 
 @NgModule({

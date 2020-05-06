@@ -32,11 +32,11 @@ import { AuthGuard } from './auth/auth.guard';
 import { OwnApartmentsComponent } from './own/own-apartments/own-apartments.component';
 import { OwnOrdersComponent } from './own/own-orders/own-orders.component';
 import { ApartmentCreateComponent } from './userCapabilities/apartment-create/apartment-create.component';
-import { ApartmentUpdateComponent } from './userCapabilities/apartment-update/apartment-update.component';
 import { CommentCreateComponent } from './userCapabilities/comment-create/comment-create.component';
-import { CommentUpdateComponent } from './userCapabilities/comment-update/comment-update.component';
 import { OrderCreateComponent } from './userCapabilities/order-create/order-create.component';
-import { OrderUpdateComponent } from './userCapabilities/order-update/order-update.component';
+import { OwnCommentsComponent } from './own/own-comments/own-comments.component';
+import { AdminPanetComponent } from './admin-panet/admin-panet.component';
+import { ProfileDetailComponent } from './admin-panet/profile-detail/profile-detail.component';
 
 
 @NgModule({
@@ -54,11 +54,11 @@ import { OrderUpdateComponent } from './userCapabilities/order-update/order-upda
     OwnApartmentsComponent,
     OwnOrdersComponent,
     ApartmentCreateComponent,
-    ApartmentUpdateComponent,
     CommentCreateComponent,
-    CommentUpdateComponent,
     OrderCreateComponent,
-    OrderUpdateComponent
+    OwnCommentsComponent,
+    AdminPanetComponent,
+    ProfileDetailComponent
   ],
   imports: [
     BrowserAnimationsModule,

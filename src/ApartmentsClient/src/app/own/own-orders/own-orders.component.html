@@ -1,1 +1,24 @@
-<p>own-orders works!</p>
+<div>
+    <div *ngIf="ownOrders">
+        <div class="card card-body alert alert-secondary" *ngFor="let order of ownOrders">
+            <a routerLink="/order/{{order.order.id}}">
+                <div class="col-md-4">
+                    <!-- <img src="..." class="card-img" alt="..."> -->
+                </div>
+                <div class="col">
+                    <div class="card-body">
+                        <h4 class="card-title">{{order.country.name}}</h4>
+                        <h6 class="card-text">City: {{order.address.city}}</h6>
+                        <h6 class="card-text">Rooms: {{order.apartment.numberOfRooms}}</h6>
+                        <h6 class="card-text">Dates: 
+                            <div *ngFor="let day of order.order.dates">
+                                {{day}}
+                            </div></h6>
+                        <p class="card-text">{{order.order.totalCoast}} $</p>
+                        <p class="card-text"><small class="text-muted">Lust time updated at {{order.order.update}}</small></p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>

@@ -74,8 +74,9 @@
         </div>
 
         <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" 
-        *ngIf="isLoggedIn"
-        routerLink="/apartment/{{ap.id}}">Details</button>
+            *ngIf="isLoggedIn"
+            (click)="sendDates()"
+            routerLink="/apartment/{{ap.id}}">Details</button>
       </div>
     </div>
     

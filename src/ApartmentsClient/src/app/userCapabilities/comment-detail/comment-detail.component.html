@@ -1,1 +1,26 @@
-<p>comment-detail works!</p>
+<div *ngIf="comment">
+    <button *ngIf="isAuther && !isUpdating" class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="updating()">Edit</button>
+  
+      <h2>{{comment.title | uppercase}}</h2>
+      <div><span>id: </span>{{comment.id}}</div>
+  
+      <div *ngIf="isAuther && isUpdating">
+        <label>Title:
+          <input [(ngModel)]="comment.title" placeholder="Title"/>
+        </label>
+      </div>
+  
+      <h4>{{comment.text}}</h4>
+      <div *ngIf="isAuther && isUpdating">
+          <label>Text:
+            <input [(ngModel)]="comment.text" placeholder="Text"/>
+          </label>
+      </div>
+  
+      <div class="btn-group" role="group">
+        <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">go back</button>
+        <button *ngIf="isAuther && isUpdating" class="btn btn-success my-2 my-sm-0 btn-lg btn-block" (click)="save()">save</button>
+      
+        <button *ngIf="isAuther && isUpdating" class="btn btn-danger" (click)="delete()">Delete</button>
+      </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="col col-lg-3">
+    <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
+        <button class="btn btn-dark"  
+        type="button" 
+        (click)="getUsers()"
+        data-toggle="collapse" 
+        data-target="#collapseUsers" 
+        aria-expanded="false" 
+        aria-controls="collapseApartments">Get Users</button>
+
+        <button class="btn btn-dark"
+        type="button" 
+        (click)="getAdmins()"
+        data-toggle="collapse" 
+        data-target="#collapseAdmins" 
+        aria-expanded="false" 
+        aria-controls="collapseComments">Get Admins</button>
+    </div>
+</div>
+
+<div class="col">
+    <div class="collapse" id="collapseUsers" *ngIf="users">
+        <div *ngFor="let user of users"> 
+            <a routerLink="/user/{{user.id}}">
+                <div class="col-md-4">
+                    <!-- <img src="..." class="card-img" alt="..."> -->
+                </div>
+                <div class="col">
+                    <div class="card-body">
+                        <h4 class="card-title">{{user.email}}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div> 
+        
+    <div class="collapse" id="collapseAdmins" *ngIf="admins">
+        <div *ngFor="let admin of admins"> 
+            <a routerLink="/user/{{admin.id}}">
+                <div class="col-md-4">
+                    <!-- <img src="..." class="card-img" alt="..."> -->
+                </div>
+                <div class="col">
+                    <div class="card-body">
+                        <h4 class="card-title">{{admin.email}}</h4>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>    
+</div>

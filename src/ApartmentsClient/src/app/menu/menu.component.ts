@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from 'src/app/core/nswag.generated.service';
+import * as jwt_decode from 'jwt-decode';
 
 
 @Component({
@@ -15,5 +16,19 @@ export class MenuComponent implements OnInit {
   }
 
   get isLoggedIn(): boolean {
-    return this.authService.isLoggedIn;}
+    return this.authService.isLoggedIn;
+  }
+
+  get isAdmin(){
+      var token = this.authService.getToken();
+        
+      var decodedoken = jwt_decode(token);
+      var currentRole = decodedoken['role'];
+  
+      if (currentRole.includes('Admin')) {
+        return true;
+      }
+      return false;
+  }
+  
 }

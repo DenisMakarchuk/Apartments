@@ -69,7 +69,7 @@ export class ApartmentCreateComponent implements OnInit {
       title: '',
       text: '',
       area: 0,
-      isOpen: false,
+      isOpen: true,
       price: 0,
       numberOfRooms: 0
       })
@@ -86,12 +86,14 @@ export class ApartmentCreateComponent implements OnInit {
 
   add(){
     this.apartmentService.createApartment(this.apartmentForm.value)
-      .subscribe(apartmentView => this.apartmentView = apartmentView);
+      .subscribe(apartmentView => 
+        {
+          this.apartmentView = apartmentView;
+          this.goBack();
+        });
   }
 
   goBack(): void {
     this.location.back();
   }
-
-
 }
