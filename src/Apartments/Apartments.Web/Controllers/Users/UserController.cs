@@ -57,7 +57,11 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.RegisterAsync(request.Email, request.Password, cancellationToken);
+                var result = await _service.RegisterAsync(request.Email, 
+                                                          request.Password,
+                                                          request.UserName,
+                                                          request.NickName,
+                                                          cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
@@ -88,7 +92,9 @@ namespace Apartments.Web.Controllers.Users
         {
             try
             {
-                var result = await _service.LoginAsync(request.Email, request.Password, cancellationToken);
+                var result = await _service.LoginAsync(request.UserName,
+                                                       request.Password,
+                                                       cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
@@ -136,7 +142,9 @@ namespace Apartments.Web.Controllers.Users
         {
             try
             {
-                var result = await _service.DeleteAsync(request.Email, request.Password, cancellationToken);
+                var result = await _service.DeleteAsync(request.UserName,
+                                                        request.Password,
+                                                        cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)

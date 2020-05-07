@@ -14,5 +14,7 @@ namespace Apartments.Domain.Admin.ViewModel
         public UserDTOAdministration Profile { get; set; }
 
         public IdentityUserAdministrationDTO IdentityUser { get; set; }
+
+        public List<string> Roles { get; set; }
     }
 }

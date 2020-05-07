@@ -28,7 +28,7 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<ApartmentDTO>>> 
+        Task<Result<IEnumerable<ApartmentView>>> 
             GetAllApartmentByOwnerIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>

@@ -89,7 +89,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeEmpty();
             }
         }
 
@@ -136,7 +136,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeEmpty();
             }
         }
 
@@ -240,7 +240,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().BeNull();
+                resultNegative.Message.Should().Contain("not exist");
             }
         }
     }

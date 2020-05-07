@@ -71,7 +71,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<UserAdministrationView>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserAdministrationView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -90,7 +90,7 @@ namespace Apartments.Web.Controllers.Admin
                 var result = await _service.GetUserByIdAsync(id, cancellationToken);
 
                 return result.Data == null ? NotFound(result.Message)
-                      : (IActionResult)Ok(result);
+                      : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)
             {
@@ -105,14 +105,14 @@ namespace Apartments.Web.Controllers.Admin
         /// <returns></returns>
         [HttpPut]
         [Route("roles/add/admin/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<UserAdministrationView>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserAdministrationView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
-            ChangeRoleToAdminAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
+            ChangeRoleAsync([FromBody] List<string> riles, string id, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!Guid.TryParse(id, out var _))
             {
@@ -121,44 +121,21 @@ namespace Apartments.Web.Controllers.Admin
 
             try
             {
-                var result = await _service.AddToAdminAsync(id, cancellationToken);
+                if (riles.Contains("Admin"))
+                {
+                    var result = await _service.AddToUserAsync(id, cancellationToken);
 
-                return result.Data == null ? NotFound(result.Message)
-                      : (IActionResult)Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+                    return result.Data == null ? NotFound(result.Message)
+                                               : (IActionResult)Ok(result.Data);
+                }
+                else
+                {
+                    var result = await _service.AddToAdminAsync(id, cancellationToken);
 
-        /// <summary>
-        /// Remove User from Admin role
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("roles/remove/admin/{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Result<UserAdministrationView>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [LogAttribute]
-        public async Task<IActionResult> 
-            ChangeRoleToUserAsync(string id, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            if (!Guid.TryParse(id, out var _))
-            {
-                return BadRequest("Invalid id");
-            }
+                    return result.Data == null ? NotFound(result.Message)
+                                               : (IActionResult)Ok(result.Data);
+                }
 
-            try
-            {
-                var result = await _service.AddToUserAsync(id, cancellationToken);
-
-                return result.Data == null ? NotFound(result.Message)
-                      : (IActionResult)Ok(result);
             }
             catch (InvalidOperationException ex)
             {

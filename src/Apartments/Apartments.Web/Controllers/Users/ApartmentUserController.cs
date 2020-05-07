@@ -76,7 +76,7 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpGet]
         [Route("owner/id")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApartmentDTO>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApartmentView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

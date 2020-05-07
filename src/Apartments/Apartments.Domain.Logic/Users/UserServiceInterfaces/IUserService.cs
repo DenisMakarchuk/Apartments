@@ -20,7 +20,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <param name="user"></param>
         /// <returns></returns>
         Task<Result<UserDTO>> 
-            CreateUserProfileAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken));
+            CreateUserProfileAsync(string identityId, 
+                                   string nickName,
+                                   CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get User by User Id

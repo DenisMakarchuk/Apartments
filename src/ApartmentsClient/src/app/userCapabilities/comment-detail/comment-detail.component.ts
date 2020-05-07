@@ -68,9 +68,9 @@ export class CommentDetailComponent implements OnInit {
 
   delete(){
     const id = this.route.snapshot.paramMap.get('id');
-    this.commentService.deleteCommentById(id);
+    this.commentService.deleteCommentById(id)    
+    .subscribe(()=>this.goBack());
 
-    this.goBack();
   }
 
   goBack(): void {

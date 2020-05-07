@@ -95,7 +95,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="userId"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<ApartmentDTO>>> 
+        public async Task<Result<IEnumerable<ApartmentView>>> 
             GetAllApartmentByOwnerIdAsync(string ownerId, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(ownerId);
@@ -103,16 +103,25 @@ namespace Apartments.Domain.Logic.Users.UserService
             try
             {
                 var apartments = await _db.Apartments.Where(_ => _.OwnerId == id)
-                    .Select(_ => _)
+                    .Include(_ => _.Address.Country).Include(_ => _.Address)
                     .AsNoTracking().ToListAsync(cancellationToken);
 
-                return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
-                    .Ok(_mapper.Map<IEnumerable<ApartmentDTO>>(apartments));
+                List<ApartmentView> result = new List<ApartmentView>();
+
+                foreach (var apartment in apartments)
+                {
+                    var view = MakeApartmentView(apartment);
+
+                    result.Add(view);
+                }
+
+                return (Result<IEnumerable<ApartmentView>>)Result<IEnumerable<ApartmentView>>
+                    .Ok(_mapper.Map<IEnumerable<ApartmentView>>(result));
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
-                    .Fail<IEnumerable<ApartmentDTO>>($"Source is null. {ex.Message}");
+                return (Result<IEnumerable<ApartmentView>>)Result<IEnumerable<ApartmentView>>
+                    .Fail<IEnumerable<ApartmentView>>($"Source is null. {ex.Message}");
             }
         }
 

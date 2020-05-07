@@ -199,7 +199,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                         .Should().BeEquivalentTo(item.CustomerId.ToString());
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeEmpty();
             }
         }
 
@@ -281,7 +281,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                         .Should().BeEquivalentTo(item.ApartmentId.ToString());
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeEmpty();
             }
         }
 

@@ -151,12 +151,12 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 foreach (var item in apartmentsInBase)
                 {
                     resultPositive.Data
-                        .Where(_ => _.Id == item.Id.ToString())
+                        .Where(_ => _.Apartment.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeEmpty();
             }
         }
 

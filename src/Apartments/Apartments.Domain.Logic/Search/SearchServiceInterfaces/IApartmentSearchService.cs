@@ -19,7 +19,7 @@ namespace Apartments.Domain.Logic.Search.SearchServiceInterfaces
         /// </summary>
         /// <param name="search"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<ApartmentSearchDTO>>> 
+        Task<Result<IEnumerable<ApartmentSearchView>>> 
             GetAllApartmentsAsync(SearchParameters search, CancellationToken cancellationToken);
 
         /// <summary>

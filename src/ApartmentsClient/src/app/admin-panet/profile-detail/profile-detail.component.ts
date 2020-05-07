@@ -38,19 +38,22 @@ export class ProfileDetailComponent implements OnInit {
 
   addToAdmin(){
     const id = this.route.snapshot.paramMap.get('id');
-    this.adminService.changeRoleToAdmin(id);
+    this.adminService.changeRoleToAdmin(id)
+    .subscribe(()=>this.goBack());
   }
 
   removeFromAdmin(){
     const id = this.route.snapshot.paramMap.get('id');
-    this.adminService.changeRoleToUser(id);
+    this.adminService.changeRoleToUser(id)
+    .subscribe(()=>this.goBack());
   }
 
   delete(){
     const id = this.route.snapshot.paramMap.get('id');
-    this.adminService.deleteUserById(id);
+    this.adminService.deleteUserById(id)
+    .subscribe(()=>this.goBack());
 
-    this.goBack();
+    
   }
 
   goBack(): void {

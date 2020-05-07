@@ -55,7 +55,8 @@ namespace Apartments.Domain.Logic.Users.UserService
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("id", user.Id)
+                new Claim("id", user.Id),
+                new Claim("name", user.UserName)
             };
 
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -105,21 +106,30 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserViewModel>> 
-            RegisterAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken))
+            RegisterAsync(string email,
+                          string password,
+                          string name,
+                          string nickName,
+                          CancellationToken cancellationToken = default(CancellationToken))
         {
             string defaultRole = "User";
 
-            var existingUser = await _userManager.FindByEmailAsync(email);
+            var existingUser = await _userManager.FindByNameAsync(name);
+            var existingEmail = await _userManager.FindByEmailAsync(email);
 
             if (existingUser != null)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null,"User with this Emai already exist");
+                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null,"User with this Name already exist");
+            }
+            else if(existingEmail != null)
+            {
+                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "User with this Email already exist");
             }
 
             var newUser = new IdentityUser
             {
                 Email = email,
-                UserName = email
+                UserName = name
             };
 
             if (!_userManager.Users.Any())
@@ -139,7 +149,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
-            var profile = await _service.CreateUserProfileAsync(newUser.Id, cancellationToken);
+            var profile = await _service.CreateUserProfileAsync(newUser.Id, nickName, cancellationToken);
 
             var token = await GenerateAuthanticationResult(newUser);
 
@@ -166,13 +176,13 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserViewModel>> 
-            LoginAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken))
+            LoginAsync(string name, string password, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByNameAsync(name);
 
             if (user == null)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "User with this Emai does not exist");
+                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "User with this Name does not exist");
             }
 
             var hasUserValidPassvord = await _userManager.CheckPasswordAsync(user, password);
@@ -214,9 +224,11 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 
-            DeleteAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken))
+            DeleteAsync(string name, 
+                        string password,
+                        CancellationToken cancellationToken = default(CancellationToken))
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByNameAsync(name);
 
             if (user == null)
             {

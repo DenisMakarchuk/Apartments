@@ -36,11 +36,12 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <returns></returns>        
         [LogAttribute]
         public async Task<Result<UserDTO>> 
-            CreateUserProfileAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken))
+            CreateUserProfileAsync(string identityId, string nick, CancellationToken cancellationToken = default(CancellationToken))
         {
             AddUser newProfile = new AddUser()
             {
-                Id = identityId
+                Id = identityId,
+                NickName = nick
             };
 
             var addedUser = _mapper.Map<User>(newProfile);

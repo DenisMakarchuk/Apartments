@@ -18,6 +18,8 @@ namespace Apartments.Data.ModelConfig
 
             builder.HasKey(_ => _.Id);
 
+            builder.Property(_ => _.NickName).IsRequired();
+
             builder.HasMany(_ => _.Apartments).WithOne(_ => _.Owner)
                 .HasForeignKey(_ => _.OwnerId)
                 .OnDelete(DeleteBehavior.Cascade);

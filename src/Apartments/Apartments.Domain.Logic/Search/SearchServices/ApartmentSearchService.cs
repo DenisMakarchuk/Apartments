@@ -35,7 +35,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// <param name="search"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<ApartmentSearchDTO>>> 
+        public async Task<Result<IEnumerable<ApartmentSearchView>>> 
             GetAllApartmentsAsync(SearchParameters search, CancellationToken cancellationToken = default(CancellationToken))
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
@@ -82,15 +82,34 @@ namespace Apartments.Domain.Logic.Search.SearchServices
 
             try
             {
-                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync(cancellationToken));
+                var searchResult = await apartments.Include(_ => _.Address.Country)
+                                             .Include(_ => _.Address)
+                                             .ToListAsync(cancellationToken);
 
-                return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
-                    .Ok(result);
+                List<ApartmentSearchView> result = new List<ApartmentSearchView>();
+
+                foreach (var apartment in searchResult)
+                {
+                    ApartmentSearchView view = new ApartmentSearchView()
+                    {
+
+                        Apartment = _mapper.Map<ApartmentSearchDTO>(apartment),
+
+                        Address = _mapper.Map<AddressSearchDTO>(apartment.Address),
+
+                        Country = _mapper.Map<CountrySearchDTO>(apartment.Address.Country)
+                    };
+
+                    result.Add(view);
+                }
+
+                return (Result<IEnumerable<ApartmentSearchView>>)Result<IEnumerable<ApartmentSearchView>>
+                    .Ok(_mapper.Map<IEnumerable<ApartmentSearchView>>(result));
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
-                    .Fail<IEnumerable<ApartmentSearchDTO>>($"Source is null. {ex.Message}");
+                return (Result<IEnumerable<ApartmentSearchView>>)Result<IEnumerable<ApartmentSearchView>>
+                    .Fail<IEnumerable<ApartmentSearchView>>($"Source is null. {ex.Message}");
             }
         }
 

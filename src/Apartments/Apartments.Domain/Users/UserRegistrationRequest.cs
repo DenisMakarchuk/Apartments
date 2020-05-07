@@ -8,6 +8,12 @@ namespace Apartments.Domain.Users.ViewModels
 {
     public class UserRegistrationRequest
     {
+        [MinLength(1)]
+        public string UserName { get; set; }
+
+        [MinLength(1)]
+        public string NickName { get; set; }
+
         [EmailAddress]
         public string Email { get; set; }
 

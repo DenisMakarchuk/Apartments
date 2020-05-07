@@ -127,7 +127,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeEmpty();
             }
         }
 
@@ -174,7 +174,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Should().BeEmpty();
             }
         }
 

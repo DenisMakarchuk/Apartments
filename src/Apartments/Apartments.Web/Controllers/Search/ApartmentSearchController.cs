@@ -35,7 +35,7 @@ namespace Apartments.Web.Controllers.Search
         /// <returns></returns>
         [HttpPost]
         [Route("parameters")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApartmentSearchDTO>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<ApartmentSearchView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]

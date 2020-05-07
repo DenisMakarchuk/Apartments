@@ -10,5 +10,7 @@ namespace Apartments.Domain.Users.AddDTO
     public class AddUser
     {
         public string Id { get; set; }
+
+        public string NickName { get; set; }
     }
 }

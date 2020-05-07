@@ -67,6 +67,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
@@ -74,7 +76,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 UserAdministrationView failView = new UserAdministrationView()
                 {
                     Profile = null,
-                    IdentityUser = identityUser
+                    IdentityUser = identityUser,
+                    Roles = roles.ToList<string>()
                 };
 
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -84,7 +87,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                IdentityUser = identityUser
+                IdentityUser = identityUser,
+                Roles = roles.ToList<string>()
             };
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -112,6 +116,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
@@ -119,7 +125,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 UserAdministrationView failView = new UserAdministrationView()
                 {
                     Profile = null,
-                    IdentityUser = identityUser
+                    IdentityUser = identityUser,
+                    Roles = roles.ToList<string>()
                 };
 
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -129,7 +136,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                IdentityUser = identityUser
+                IdentityUser = identityUser,
+                Roles = roles.ToList<string>()
             };
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -157,6 +165,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
@@ -164,7 +174,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 UserAdministrationView failView = new UserAdministrationView()
                 {
                     Profile = null,
-                    IdentityUser = identityUser
+                    IdentityUser = identityUser,
+                    Roles = roles.ToList<string>()
                 };
 
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -174,7 +185,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                IdentityUser = identityUser
+                IdentityUser = identityUser,
+                Roles = roles.ToList<string>()
             };
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
