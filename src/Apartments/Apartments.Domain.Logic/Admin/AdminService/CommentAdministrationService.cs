@@ -31,54 +31,74 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// <summary>
         /// Get all User Comments by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CommentDTOAdministration>>> 
-            GetAllCommentsByUserIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<CommentDTOAdministration>>> 
+            GetAllCommentsByUserIdAsync(PagedRequest<string> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Guid athorId = Guid.Parse(userId);
+            Guid athorId = Guid.Parse(request.Data);
 
             try
             {
-                var comments = await _db.Comments.Where(_ => _.AuthorId == athorId).Select(_ => _)
-                    .AsNoTracking().ToListAsync(cancellationToken);
+                var count = await _db.Comments.Where(_ => _.AuthorId == athorId).CountAsync();
 
-                return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                    .Ok(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments));
+                var comments = await _db.Comments.Where(_ => _.AuthorId == athorId)
+                                                 .Skip((request.PageNumber - 1) * request.PageSize)
+                                                 .Take(request.PageSize)
+                                                 .AsNoTracking().ToListAsync(cancellationToken);
+
+                PagedResponse<CommentDTOAdministration> response
+                    = new PagedResponse<CommentDTOAdministration>(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments),
+                                                                  count,
+                                                                  request.PageNumber,
+                                                                  request.PageSize);
+
+                return (Result<PagedResponse<CommentDTOAdministration>>)Result<PagedResponse<CommentDTOAdministration>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                    .Fail<IEnumerable<CommentDTOAdministration>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<CommentDTOAdministration>>)Result<PagedResponse<CommentDTOAdministration>>
+                    .Fail<PagedResponse<CommentDTOAdministration>>($"Source is null. {ex.Message}");
             }
         }
 
         /// <summary>
         /// Get all Apartment Comments by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="apartmentId"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CommentDTOAdministration>>> 
-            GetAllCommentsByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<CommentDTOAdministration>>> 
+            GetAllCommentsByApartmentIdAsync(PagedRequest<string> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Guid id = Guid.Parse(apartmentId);
+            Guid id = Guid.Parse(request.Data);
 
             try
             {
-                var comments = await _db.Comments.Where(_ => _.ApartmentId == id).Select(_ => _)
-                    .AsNoTracking().ToListAsync(cancellationToken);
+                var count = await _db.Comments.Where(_ => _.ApartmentId == id).CountAsync();
 
-                return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                    .Ok(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments));
+                var comments = await _db.Comments.Where(_ => _.ApartmentId == id)
+                                                 .Skip((request.PageNumber - 1) * request.PageSize)
+                                                 .Take(request.PageSize)
+                                                 .AsNoTracking().ToListAsync(cancellationToken);
+
+                PagedResponse<CommentDTOAdministration> response
+                = new PagedResponse<CommentDTOAdministration>(_mapper.Map<IEnumerable<CommentDTOAdministration>>(comments),
+                                                              count,
+                                                              request.PageNumber,
+                                                              request.PageSize);
+
+                return (Result<PagedResponse<CommentDTOAdministration>>)Result<PagedResponse<CommentDTOAdministration>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<CommentDTOAdministration>>)Result<IEnumerable<CommentDTOAdministration>>
-                    .Fail<IEnumerable<CommentDTOAdministration>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<CommentDTOAdministration>>)Result<PagedResponse<CommentDTOAdministration>>
+                    .Fail<PagedResponse<CommentDTOAdministration>>($"Source is null. {ex.Message}");
             }
         }
 

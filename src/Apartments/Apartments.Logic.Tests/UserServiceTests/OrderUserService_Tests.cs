@@ -189,17 +189,17 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var ordersInBase = await context.Orders.AsNoTracking().ToListAsync();
                 var userWithoutOrders = await context.Users.Where(_ => _.Id != userWithOrders.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllOrdersByCustomerIdAsync(userWithOrders.Id.ToString());
-                var resultNegative = await service.GetAllOrdersByCustomerIdAsync(userWithoutOrders.Id.ToString());
+                var resultPositive = await service.GetAllOrdersByCustomerIdAsync(userWithOrders.Id.ToString(), new Common.PagedRequest());
+                var resultNegative = await service.GetAllOrdersByCustomerIdAsync(userWithoutOrders.Id.ToString(), new Common.PagedRequest());
 
                 foreach (var item in ordersInBase)
                 {
-                    resultPositive.Data.FirstOrDefault()
+                    resultPositive.Data.Data.FirstOrDefault()
                         .Order.CustomerId
                         .Should().BeEquivalentTo(item.CustomerId.ToString());
                 }
 
-                resultNegative.Data.Should().BeEmpty();
+                resultNegative.Data.Data.Should().BeEmpty();
             }
         }
 
@@ -271,17 +271,17 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var ordersInBase = await context.Orders.AsNoTracking().ToListAsync();
                 var apartmentWithoutOrders = await context.Users.Where(_ => _.Id != apartmentWithOrders.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllOrdersByApartmentIdAsync(apartmentWithOrders.Id.ToString());
-                var resultNegative = await service.GetAllOrdersByApartmentIdAsync(apartmentWithoutOrders.Id.ToString());
+                var resultPositive = await service.GetAllOrdersByApartmentIdAsync(new Common.PagedRequest<string>(apartmentWithOrders.Id.ToString()));
+                var resultNegative = await service.GetAllOrdersByApartmentIdAsync(new Common.PagedRequest<string>(apartmentWithoutOrders.Id.ToString()));
 
                 foreach (var item in ordersInBase)
                 {
-                    resultPositive.Data.FirstOrDefault()
+                    resultPositive.Data.Data.FirstOrDefault()
                         .ApartmentId
                         .Should().BeEquivalentTo(item.ApartmentId.ToString());
                 }
 
-                resultNegative.Data.Should().BeEmpty();
+                resultNegative.Data.Data.Should().BeEmpty();
             }
         }
 

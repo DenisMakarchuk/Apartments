@@ -19,6 +19,8 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// Add Order to the DataBase
         /// </summary>
         /// <param name="order"></param>
+        /// <param name="customerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<OrderView>> 
             CreateOrderAsync(AddOrder order, string customerId, CancellationToken cancellationToken = default(CancellationToken));
@@ -26,23 +28,27 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Get all own Orders by User Id
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="customerId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<OrderView>>> 
-            GetAllOrdersByCustomerIdAsync(string customerId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Result<PagedResponse<OrderView>>> 
+            GetAllOrdersByCustomerIdAsync(string customerId, PagedRequest request, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get all Orders by Apartment Id
         /// </summary>
-        /// <param name="apartmentId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<OrderDTO>>> 
-            GetAllOrdersByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Result<PagedResponse<OrderDTO>>> 
+            GetAllOrdersByApartmentIdAsync(PagedRequest<string> request, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get Order by Order Id
         /// </summary>
         /// <param name="orderId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<OrderView>> 
             GetOrderByIdAsync(string orderId, CancellationToken cancellationToken = default(CancellationToken));
@@ -51,6 +57,7 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// Update Order in DataBase
         /// </summary>
         /// <param name="order"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<OrderView>> 
             UpdateOrderAsync(OrderDTO order, CancellationToken cancellationToken = default(CancellationToken));
@@ -59,6 +66,8 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// Delete own Order by Order Id
         /// </summary>
         /// <param name="orderId"></param>
+        /// <param name="customerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> 
             DeleteOrderByIdAsync(string orderId, string customerId, CancellationToken cancellationToken = default(CancellationToken));

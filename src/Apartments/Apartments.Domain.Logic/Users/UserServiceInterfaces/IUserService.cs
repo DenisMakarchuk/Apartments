@@ -17,7 +17,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Add User to the DataBase
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="identityId"></param>
+        /// <param name="nickName"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserDTO>> 
             CreateUserProfileAsync(string identityId, 
@@ -27,7 +29,8 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Get User by User Id
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="identityId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserDTO>> 
             GetUserProfileByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken));
@@ -35,7 +38,8 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Delete User by User Id
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="identityId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result>
             DeleteUserProfileByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken));

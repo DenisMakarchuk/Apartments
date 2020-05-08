@@ -35,7 +35,8 @@ namespace Apartments.Web.Controllers.Users
         /// <summary>
         /// Add Identity User & Profile to the DB
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
@@ -79,6 +80,7 @@ namespace Apartments.Web.Controllers.Users
         /// Login
         /// </summary>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
@@ -128,6 +130,7 @@ namespace Apartments.Web.Controllers.Users
         /// Delete account
         /// </summary>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]

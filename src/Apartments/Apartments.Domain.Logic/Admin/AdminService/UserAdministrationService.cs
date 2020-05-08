@@ -31,6 +31,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get User profile by Id. Id must be verified to convert to Guid at the web level 
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTOAdministration>> 
@@ -64,6 +65,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Delete User by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 

@@ -27,6 +27,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Get IdentityUser with User Profile by IdentityId
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserAdministrationView>> 
             GetUserByIdAsync(string id, CancellationToken cancellationToken);
@@ -35,6 +36,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Delete IdentityUser & User Profile
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> 
             DeleteByIdAsync(string id, CancellationToken cancellationToken);
@@ -43,6 +45,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Add User to Admin role
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserAdministrationView>> 
             AddToAdminAsync(string id, CancellationToken cancellationToken);
@@ -51,6 +54,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Remove User from Admin role
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserAdministrationView>> 
             AddToUserAsync(string id, CancellationToken cancellationToken);

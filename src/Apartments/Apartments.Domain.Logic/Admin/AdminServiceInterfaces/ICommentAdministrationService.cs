@@ -16,23 +16,26 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// <summary>
         /// Get all User Comments by User Id
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<CommentDTOAdministration>>> 
-            GetAllCommentsByUserIdAsync(string userId, CancellationToken cancellationToken);
+        Task<Result<PagedResponse<CommentDTOAdministration>>> 
+            GetAllCommentsByUserIdAsync(PagedRequest<string> request, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get all Apartment Comments by Apartment Id
         /// </summary>
-        /// <param name="apartmentId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<CommentDTOAdministration>>> 
-            GetAllCommentsByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken);
+        Task<Result<PagedResponse<CommentDTOAdministration>>> 
+            GetAllCommentsByApartmentIdAsync(PagedRequest<string> request, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get Comment by Comment Id
         /// </summary>
         /// <param name="commentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<CommentDTOAdministration>> 
             GetCommentByIdAsync(string commentId, CancellationToken cancellationToken);
@@ -41,6 +44,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Update Comment in DataBase
         /// </summary>
         /// <param name="comment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<CommentDTOAdministration>> 
             UpdateCommentAsync(CommentDTOAdministration comment, CancellationToken cancellationToken);
@@ -49,6 +53,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Delete Comment by Comment Id
         /// </summary>
         /// <param name="commentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> 
             DeleteCommentByIdAsync(string commentId, CancellationToken cancellationToken);

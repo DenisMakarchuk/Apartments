@@ -36,6 +36,7 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Get all Identity Users in role
         /// </summary>
+        /// <param name="role"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("roles/{role}")]
@@ -68,6 +69,7 @@ namespace Apartments.Web.Controllers.Admin
         /// Get IdentityUser with User Profile by IdentityId
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{id}")]
@@ -99,9 +101,11 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         /// <summary>
-        /// Add User to Admin role
+        /// Add/remove admin role
         /// </summary>
+        /// <param name="riles"></param>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("roles/add/admin/{id}")]
@@ -147,6 +151,7 @@ namespace Apartments.Web.Controllers.Admin
         /// Delete IdentityUser & User Profile
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("{id}")]

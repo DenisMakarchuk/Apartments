@@ -32,27 +32,27 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Get all User Comments from the DB by User Id
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("user/{userId}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CommentDTOAdministration>))]
+        [HttpPost]
+        [Route("userId")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<CommentDTOAdministration>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
-            GetAllCommentsByUserIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
+            GetAllCommentsByUserIdAsync([FromBody] PagedRequest<string> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!Guid.TryParse(userId, out var _))
+            if (request is null || !Guid.TryParse(request.Data, out var _))
             {
                 return BadRequest();
             }
 
             try
             {
-                var result = await _service.GetAllCommentsByUserIdAsync(userId, cancellationToken);
+                var result = await _service.GetAllCommentsByUserIdAsync(request, cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
@@ -67,27 +67,27 @@ namespace Apartments.Web.Controllers.Admin
         /// <summary>
         /// Get all Comments by Apartment Id
         /// </summary>
-        /// <param name="apartmentId"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("apartment/{apartmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CommentDTOAdministration>))]
+        [HttpPost]
+        [Route("apartmentId")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<CommentDTOAdministration>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
-            GetAllCommentsByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
+            GetAllCommentsByApartmentIdAsync([FromBody] PagedRequest<string> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!Guid.TryParse(apartmentId, out var _))
+            if (request is null || !Guid.TryParse(request.Data, out var _))
             {
                 return BadRequest();
             }
 
             try
             {
-                var result = await _service.GetAllCommentsByApartmentIdAsync(apartmentId, cancellationToken);
+                var result = await _service.GetAllCommentsByApartmentIdAsync(request, cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)

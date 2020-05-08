@@ -18,6 +18,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
+        /// <param name="name"></param>
+        /// <param name="nickName"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserViewModel>> 
             RegisterAsync(string email, 
@@ -29,8 +32,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Login User
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserViewModel>> 
             LoginAsync(string name, string password, CancellationToken cancellationToken = default(CancellationToken));
@@ -38,8 +42,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Delete User own profile & Identity User
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> 
             DeleteAsync(string name, string password, CancellationToken cancellationToken = default(CancellationToken));

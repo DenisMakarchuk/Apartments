@@ -1,4 +1,5 @@
-﻿using Apartments.Data.Context;
+﻿using Apartments.Common;
+using Apartments.Data.Context;
 using Apartments.Data.DataModels;
 using Apartments.Domain.Logic.Users.UserService;
 using Apartments.Domain.Users.AddDTO;
@@ -116,18 +117,18 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
                 var userWithoutComments = await context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllCommentsByAuthorIdAsync(userWithComments.Id.ToString());
-                var resultNegative = await service.GetAllCommentsByAuthorIdAsync(userWithoutComments.Id.ToString());
+                var resultPositive = await service.GetAllCommentsByAuthorIdAsync(userWithComments.Id.ToString(), new Common.PagedRequest());
+                var resultNegative = await service.GetAllCommentsByAuthorIdAsync(userWithoutComments.Id.ToString(), new Common.PagedRequest());
 
                 foreach (var item in commentsInBase)
                 {
-                    resultPositive.Data
+                    resultPositive.Data.Data
                         .Where(_ => _.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
 
-                resultNegative.Data.Should().BeEmpty();
+                resultNegative.Data.Data.Should().BeEmpty();
             }
         }
 
@@ -163,18 +164,18 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
                 var apartmentWithoutComments = context.Apartments.Where(_ => _.Id != apartmentWithComments.Id).FirstOrDefault();
 
-                var resultPositive = await service.GetAllCommentsByApartmentIdAsync(apartmentWithComments.Id.ToString());
-                var resultNegative = await service.GetAllCommentsByApartmentIdAsync(apartmentWithoutComments.Id.ToString());
+                var resultPositive = await service.GetAllCommentsByApartmentIdAsync(new PagedRequest<string>(apartmentWithComments.Id.ToString()));
+                var resultNegative = await service.GetAllCommentsByApartmentIdAsync(new PagedRequest<string>(apartmentWithoutComments.Id.ToString()));
 
                 foreach (var item in commentsInBase)
                 {
-                    resultPositive.Data
+                    resultPositive.Data.Data
                         .Where(_ => _.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
 
-                resultNegative.Data.Should().BeEmpty();
+                resultNegative.Data.Data.Should().BeEmpty();
             }
         }
 

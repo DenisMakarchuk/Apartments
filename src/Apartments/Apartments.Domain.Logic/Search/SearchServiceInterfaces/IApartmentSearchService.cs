@@ -17,15 +17,17 @@ namespace Apartments.Domain.Logic.Search.SearchServiceInterfaces
         /// <summary>
         /// Get all Apartments by Parameters
         /// </summary>
-        /// <param name="search"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<ApartmentSearchView>>> 
-            GetAllApartmentsAsync(SearchParameters search, CancellationToken cancellationToken);
+        Task<Result<PagedResponse<ApartmentSearchView>>> 
+            GetAllApartmentsAsync(PagedRequest<SearchParameters> request, CancellationToken cancellationToken);
 
         /// <summary>
         /// Get Apartment by Id
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<ApartmentSearchView>> 
             GetApartmentByIdAsync(string apartmentId, CancellationToken cancellationToken);
@@ -33,6 +35,7 @@ namespace Apartments.Domain.Logic.Search.SearchServiceInterfaces
         /// <summary>
         /// Get all countries from DB
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<IEnumerable<CountrySearchDTO>>> 
             GetAllCountriesAsync(CancellationToken cancellationToken);
@@ -41,6 +44,7 @@ namespace Apartments.Domain.Logic.Search.SearchServiceInterfaces
         /// Get Country by Id
         /// </summary>
         /// <param name="countryId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<CountrySearchDTO>> 
             GetCountryByIdAsync(string countryId, CancellationToken cancellationToken);

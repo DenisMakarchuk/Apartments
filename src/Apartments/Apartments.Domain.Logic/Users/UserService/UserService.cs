@@ -32,8 +32,10 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Create User profile with identityId
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>        
+        /// <param name="identityId"></param>
+        /// <param name="nick"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTO>> 
             CreateUserProfileAsync(string identityId, string nick, CancellationToken cancellationToken = default(CancellationToken))
@@ -79,7 +81,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Get User profile by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="identityId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTO>> 
@@ -111,7 +114,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Delete User by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="identityId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 

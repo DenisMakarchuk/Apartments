@@ -103,6 +103,9 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// </summary>
         /// <param name="email"></param>
         /// <param name="password"></param>
+        /// <param name="name"></param>
+        /// <param name="nickName"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserViewModel>> 
@@ -171,8 +174,9 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Login User
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserViewModel>> 
@@ -219,8 +223,9 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Delete User own profile & Identity User
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 
