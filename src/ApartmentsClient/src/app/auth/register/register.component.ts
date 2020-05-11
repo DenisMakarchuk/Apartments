@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 
-import { UserService } from 'src/app/core/nswag.generated.service';
-import { UserViewModel } from 'src/app/core/nswag.generated.service';
-import { UserRegistrationRequest } from 'src/app/core/nswag.generated.service';
+import { UserService } from 'src/app/services/nswag.generated.service';
+import { UserViewModel } from 'src/app/services/nswag.generated.service';
 
 import { Router } from '@angular/router';
 
@@ -16,12 +15,7 @@ export class RegisterComponent implements OnInit {
 
   registerForm: FormGroup;
 
-  registerRequest: UserRegistrationRequest;
   user: UserViewModel;
-  currentUser = {};
-
-  email: string;
-  password: string;
 
   constructor( 
     private registerService: UserService,
@@ -29,6 +23,8 @@ export class RegisterComponent implements OnInit {
     public router: Router
     ) { 
       this.registerForm = this.fb.group({
+        userName: '',
+        nickName: '',
         email: '',
         password: ''
       });
@@ -40,17 +36,16 @@ export class RegisterComponent implements OnInit {
   register() {
     if (this.registerForm.valid) {
       this.registerService.register(this.registerForm.value)
-      .subscribe(user => this.user = user);
+      .subscribe(user => 
+        {this.user = user;
   
-      if (this.user != null) {
-        localStorage.setItem('access_token', this.user.token)
-        this.currentUser = this.user;
-  
-        this.registerForm.reset();
-        this.router.navigate(['/profile']);
-      }
+        if (this.user != null) {
+          localStorage.setItem('access_token', this.user.token)
+    
+          this.registerForm.reset();
+          this.router.navigate(['/profile']);
+        }
+      });
     }
   }
-
-
 }

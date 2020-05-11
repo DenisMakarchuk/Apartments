@@ -1,14 +1,27 @@
 <div>
     <form [formGroup]="loginForm" (ngSubmit)="login()">
         <h3>Please sign in</h3>
+
         <div class="form-group">
-            <label for="inputEmail">Email address</label>
-            <input type="email" class="form-control" id="inputEmail" formControlName="email" placeholder="Enter email" required>
+            <label for="inputName">Name</label>
+            <input type="string" 
+                   id="inputName" 
+                   class="form-control" 
+                   formControlName="userName" 
+                   placeholder="Enter unique Name" 
+                   required>
         </div>
+
         <div class="form-group">
             <label for="inputPassword">Password</label>
-            <input type="password" id="inputPassword" class="form-control" formControlName="password" placeholder="Password" required>
+            <input type="password" 
+                   id="inputPassword" 
+                   class="form-control" 
+                   formControlName="password" 
+                   placeholder="Password" 
+                   required>
         </div>
+
         <button type="submit" class="btn btn-block btn btn-success">Sign up</button>
     </form>
 </div>

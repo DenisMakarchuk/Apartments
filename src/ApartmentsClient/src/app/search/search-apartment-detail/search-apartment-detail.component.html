@@ -1,0 +1,26 @@
+<div *ngIf="apartmentView">
+    <h2>{{apartment.title | uppercase}}</h2>
+    <h1>{{request.pageSize}}</h1>
+  
+    <h4>Area: {{apartment.area}}</h4>
+    <h4>Rooms: {{apartment.numberOfRooms}}</h4>
+    <h4>Price: {{apartment.price}} $</h4>
+
+    <h2>Addpess:</h2>
+  
+    <h4>Country: {{country.name}}</h4>
+    <h4>City: {{address.city}}</h4>
+    <h4>Street: {{address.street}}</h4>
+    <h4>Home: {{address.home}}</h4>
+    <h4>Apartmewnt № {{address.numberOfApartment}}</h4>
+
+    <h2>About the apartment:</h2>
+    <h4>{{apartment.text}}</h4>
+  
+    <div class="btn-group" role="group">
+        <button *ngIf="canMakeOrder" class="btn btn-success my-2 my-sm-0 btn-lg btn-block" (click)="makeOrder()">Make Order</button>
+  
+        <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">go back</button>
+    </div>
+  
+</div>

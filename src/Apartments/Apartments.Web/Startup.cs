@@ -95,6 +95,7 @@ namespace Apartments.Web
             });
 
             services.AddControllers()
+                .AddNewtonsoftJson()
                 .AddFluentValidation(fv =>
                 {
                     fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;

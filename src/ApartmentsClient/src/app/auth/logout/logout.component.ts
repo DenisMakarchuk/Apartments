@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { UserService } from 'src/app/core/nswag.generated.service';
+import { UserService } from 'src/app/services/nswag.generated.service';
 
 @Component({
   selector: 'app-logout',

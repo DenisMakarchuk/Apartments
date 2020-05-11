@@ -1,6 +1,6 @@
 import { Injectable, Injector } from '@angular/core';
 import { HttpInterceptor } from '@angular/common/http';
-import { UserService } from 'src/app/core/nswag.generated.service';
+import { LoggedService } from '../services/logged.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ export class TokenInterceptorService implements HttpInterceptor {
   constructor(private injector: Injector) { }
 
   intercept(req, next){
-    let authService = this.injector.get(UserService)
+    let authService = this.injector.get(LoggedService)
 
     let tokenReq = req.clone({
       setHeaders: {

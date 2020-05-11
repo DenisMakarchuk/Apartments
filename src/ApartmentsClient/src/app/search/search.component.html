@@ -1,0 +1,76 @@
+<div class="row">
+    <form class="col col-lg-4" [formGroup]="searchForm" #formDir="ngForm" novalidate>
+        <div class="form-group">
+            <label>Country</label>
+            <select class="form-control" formControlName="countryId">
+                <option value="">Choose country</option>
+                <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
+            </select>
+        </div>
+      
+        <div class="form-group">
+            <label>City</label>
+    
+            <input formControlName="cityName" type="text" class="form-control" placeholder="City">
+        </div>
+  
+        <div class="form-group">
+            <label>Rooms</label>
+    
+            <div class="input-group">
+                <input class="form-control" type="number" placeholder="Min" formControlName="roomsFrom">
+                <input class="form-control" type="number" placeholder="Max" formControlName="roomsTill">
+            </div>
+        </div>
+  
+        <div class="form-group">
+            <label>Price</label>
+    
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">$</span>
+                </div>
+        
+                <input class="form-control" type="number" placeholder="Min" formControlName="priceFrom">
+                <input class="form-control" type="number" placeholder="Max" formControlName="priceTill">
+            </div>
+        </div>
+  
+        <div class="form-group">
+            <label>Dates</label>
+    
+            <link rel="stylesheet" href="https://unpkg.com/ngx-bootstrap/datepicker/bs-datepicker.css">
+    
+            <div class="form-group">
+                <input type="text"
+                    placeholder="Dates"
+                    class="form-control"
+                    bsDaterangepicker
+                    formControlName="needDates">
+            </div>
+        </div>
+
+        <form class="col-16" [formGroup]="requestForm" #formDir="ngForm" novalidate>
+            <label>Apartments on the page</label>
+        
+            <div class="form-group">
+                <input type="text"
+                    placeholder="Items"
+                    class="form-control"
+                    formControlName="pageSize">
+            </div>
+        </form>   
+      
+        <button class="btn btn-success my-2 my-sm-0 btn-lg btn-block" 
+                type="submit" 
+                (click)="searchApartments()"
+                routerLink="apartments">Search</button>
+    </form>
+
+
+
+  
+    <div class="col">
+        <router-outlet></router-outlet>
+    </div>
+</div>

@@ -149,7 +149,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 Order orderAfterAdding = await _db.Orders
                     .Where(_ => _.CustomerId == addedOrder.CustomerId)
                     .Where(_=>_.Dates
-                        .Where(_=>_.Date == order.Dates.First())
+                        .Where(_=>_.Date.Value.Date == order.Dates.First().Date)
                         .FirstOrDefault() != null)
                     .Include(_ => _.Dates)
                     .Include(_ => _.Apartment)

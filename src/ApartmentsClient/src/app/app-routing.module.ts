@@ -1,37 +1,29 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { ApartmentSearchComponent } from './apartment-search/apartment-search.component';
-import { ProfileComponent } from './profile/profile.component';
 import { LoginComponent } from './auth/login/login.component';
-import { ApartmentDetailComponent } from './userCapabilities/apartment-detail/apartment-detail.component';
-
 import { RegisterComponent } from './auth/register/register.component';
 import { AuthGuard } from './auth/auth.guard';
-
-import { ApartmentCreateComponent } from './userCapabilities/apartment-create/apartment-create.component';
-import { CommentDetailComponent } from './userCapabilities/comment-detail/comment-detail.component';
-import { OrderDetailComponent } from './userCapabilities/order-detail/order-detail.component';
-import { AdminPanetComponent } from './admin-panet/admin-panet.component';
-import { ProfileDetailComponent } from './admin-panet/profile-detail/profile-detail.component';
-
+import { SearchComponent } from './search/search.component';
+import { SearchViewComponent } from './search/search-view/search-view.component';
+import { ProfilePanelComponent } from './profile/profile-panel/profile-panel.component';
+import { SearchApartmentDetailComponent } from './search/search-apartment-detail/search-apartment-detail.component';
+import { OrderDetailComponent } from './user/order/order-detail/order-detail.component';
+import { OwnOrdersComponent } from './user/order/own-orders/own-orders.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full' },
-  { path: 'search', component: ApartmentSearchComponent },
+  { path: 'search', 
+  component: SearchComponent,
+  children: [
+    {path: 'apartments', component: SearchViewComponent},
+    {path: 'apartment/:id', component: SearchApartmentDetailComponent, canActivate: [AuthGuard]}
+  ]},
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
-  { path: 'apartment/:id', component: ApartmentDetailComponent, canActivate: [AuthGuard] },
-  { path: 'addapartment', component: ApartmentCreateComponent, canActivate: [AuthGuard] },
-  { path: 'comment/:id', component: CommentDetailComponent, canActivate: [AuthGuard] },
-  { path: 'order/:id', component: OrderDetailComponent, canActivate: [AuthGuard] },
-  { path: 'admin', component: AdminPanetComponent, canActivate: [AuthGuard] },
-  { path: 'user/:id', component: ProfileDetailComponent, canActivate: [AuthGuard] }
-
-
-
-
+  { path: 'profile', component: ProfilePanelComponent },
+  { path: 'orders', component: OwnOrdersComponent },
+  { path: 'order/:id', component: OrderDetailComponent }
 ];
 
 @NgModule({
