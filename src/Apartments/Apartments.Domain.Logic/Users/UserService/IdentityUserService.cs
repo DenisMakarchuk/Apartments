@@ -45,7 +45,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="user"></param>
         /// <returns></returns>
         [LogAttribute]
-        private async Task<Result<string>> GenerateAuthanticationResult(IdentityUser user)
+        private async Task<Result<string>> GenerateAuthanticationResult(IdentityUser user, string nickName)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
@@ -56,7 +56,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("id", user.Id),
-                new Claim("name", user.UserName)
+                new Claim("name", nickName)
             };
 
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -154,7 +154,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             var profile = await _service.CreateUserProfileAsync(newUser.Id, nickName, cancellationToken);
 
-            var token = await GenerateAuthanticationResult(newUser);
+            var token = await GenerateAuthanticationResult(newUser, nickName);
 
             if (profile.IsError || string.IsNullOrEmpty(token.Data))
             {
@@ -198,7 +198,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id, cancellationToken);
 
-            var token = await GenerateAuthanticationResult(user);
+            var token = await GenerateAuthanticationResult(user, profile.Data.NickName);
 
             if (profile.IsError || string.IsNullOrEmpty(token.Data))
             {

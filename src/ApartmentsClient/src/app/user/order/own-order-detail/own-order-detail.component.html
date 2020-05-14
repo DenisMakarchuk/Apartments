@@ -1,0 +1,31 @@
+<div *ngIf="order">
+      <h2>{{order.apartment.title | uppercase}}</h2>
+
+      <h4>Dates:</h4>
+      <div *ngFor="let date of order.order.dates">
+        <h6>{{date  | date: 'dd.MMM.yyyy'}}</h6> 
+      </div>
+
+      <h4>Total price: {{order.order.totalCoast}} $</h4>
+  
+      <h4>Area: {{order.apartment.area}}</h4>
+      <h4>Rooms: {{order.apartment.numberOfRooms}}</h4>
+  
+      <h2>Addpess:</h2>
+    
+      <h4>Country: {{order.country.name}}</h4>
+      <h4>City: {{order.address.city}}</h4>
+      <h4>Street: {{order.address.street}}</h4>
+      <h4>Home: {{order.address.home}}</h4>
+      <h4>Apartmewnt № {{order.address.numberOfApartment}}</h4>
+  
+      <h2>About the apartment:</h2>
+      <h4>{{order.apartment.text}}</h4>
+  
+      <div class="btn-group" role="group">
+        <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">Go back</button>
+      
+        <button class="btn btn-danger" (click)="delete()">Delete</button>
+      </div>
+  
+</div>

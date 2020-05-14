@@ -1,26 +1,45 @@
-<div *ngIf="apartmentView">
-    <h2>{{apartment.title | uppercase}}</h2>
-    <h1>{{request.pageSize}}</h1>
+<div *ngIf="apartment">
+    <h2>{{apartment.apartment.title | uppercase}}</h2>
   
-    <h4>Area: {{apartment.area}}</h4>
-    <h4>Rooms: {{apartment.numberOfRooms}}</h4>
-    <h4>Price: {{apartment.price}} $</h4>
+    <h4 *ngIf="apartment.apartment.area">Area: {{apartment.apartment.area}}</h4>
+    <h4>Rooms: {{apartment.apartment.numberOfRooms}}</h4>
+    <h4>Price: {{apartment.apartment.price}} $</h4>
 
     <h2>Addpess:</h2>
   
-    <h4>Country: {{country.name}}</h4>
-    <h4>City: {{address.city}}</h4>
-    <h4>Street: {{address.street}}</h4>
-    <h4>Home: {{address.home}}</h4>
-    <h4>Apartmewnt № {{address.numberOfApartment}}</h4>
+    <h4>Country: {{apartment.country.name}}</h4>
+    <h4>City: {{apartment.address.city}}</h4>
+    <h4>Street: {{apartment.address.street}}</h4>
+    <h4 *ngIf="apartment.address.home">Home: {{apartment.address.home}}</h4>
+    <h4 *ngIf="apartment.address.numberOfApartment">Apartmewnt № {{apartment.address.numberOfApartment}}</h4>
 
     <h2>About the apartment:</h2>
-    <h4>{{apartment.text}}</h4>
+    <h4>{{apartment.apartment.text}}</h4>
   
-    <div class="btn-group" role="group">
-        <button *ngIf="canMakeOrder" class="btn btn-success my-2 my-sm-0 btn-lg btn-block" (click)="makeOrder()">Make Order</button>
+    <div class="btn-group my-2 my-sm-0 btn-lg btn-block" role="group">
+        <button *ngIf="canMakeOrder" class="btn btn-success" 
+        (click)="makeOrder()">Make Order</button>
   
-        <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">go back</button>
+        <button class="btn btn-warning" (click)="goBack()">Go back</button>
     </div>
-  
+
+    <div>
+        <div class="form-group col">
+            <button class="btn btn-dark btn-block"  
+            type="button" 
+            data-toggle="collapse" 
+            data-target="#collapseAddComment" 
+            aria-expanded="false" 
+            aria-controls="collapseAddComment">New comment</button>
+        </div>
+
+        <div class="form-group col">
+            <div class="collapse" id="collapseAddComment">
+                <app-add-comment></app-add-comment>
+            </div> 
+        </div>
+     
+        <app-apartment-comments></app-apartment-comments>
+    </div>
+      
 </div>

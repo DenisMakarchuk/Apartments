@@ -1,0 +1,18 @@
+<div>
+    <form [formGroup]="commentForm" (ngSubmit)="add()" #formDir="ngForm" class="was-validated" novalidate>
+        <div class="form-group">
+            <textarea formControlName="text" 
+                      type="text" 
+                      class="form-control" 
+                      placeholder="Text"
+                      required
+                      minlength="4"
+                      maxlength="255"></textarea>
+
+            <div class="invalid-feedback">
+                Comment must have from 4 till 255 items!
+            </div>
+        </div>
+        <button class="btn btn-success my-2 my-sm-0 btn-lg btn-block" type="submit">Add comment</button>
+    </form>
+</div>

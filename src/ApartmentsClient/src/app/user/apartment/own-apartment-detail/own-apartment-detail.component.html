@@ -1,0 +1,120 @@
+<div class="text-center" *ngIf="apartment">
+    <h2>{{apartment.apartment.title | uppercase}}</h2>
+    <div *ngIf="isUpdating">
+        <label >Title:</label>
+        <input [(ngModel)]="apartment.apartment.title" placeholder="Title"/>
+    </div>
+  
+    <h4>{{apartment.apartment.text}}</h4>
+    <div *ngIf="isUpdating">
+        <label >Text:</label>
+        <textarea class="form-control" [(ngModel)]="apartment.apartment.text" rows="3"></textarea>
+    </div>
+  
+    <div *ngIf="apartment.apartment.area || isUpdating">
+        <h4>Area: {{apartment.apartment.area}}</h4>
+        <div *ngIf="isUpdating">
+            <input [(ngModel)]="apartment.apartment.area" placeholder="Area"/>
+        </div>
+    </div>
+ 
+    <div *ngIf="isUpdating">
+        <label>Is Open?:</label>
+        <div class="form-check">
+            <input [(ngModel)]="apartment.apartment.isOpen" 
+                class="form-check-input" 
+                type="boolean" 
+                type="radio" 
+                name="isOpen" 
+                id="true" 
+                value="true" 
+                checked>
+            <label class="form-check-label" for="true">Open</label>
+        </div>
+        <div class="form-check">
+            <input [(ngModel)]="apartment.apartment.isOpen" 
+                class="form-check-input" 
+                type="boolean" 
+                type="radio" 
+                name="isOpen" 
+                id="false" 
+                value="false">
+            <label class="form-check-label" for="false">Close</label>
+        </div>
+    </div>
+ 
+    <h4>Price: {{apartment.apartment.price}}</h4>
+    <div *ngIf="isUpdating">
+        <input [(ngModel)]="apartment.apartment.price"  type="number" placeholder="Price"/>
+    </div>
+  
+    <h4>Number Of Rooms: {{apartment.apartment.numberOfRooms}}</h4>
+    <div *ngIf="isUpdating">
+        <input [(ngModel)]="apartment.apartment.numberOfRooms"  type="number" placeholder="Number Of Rooms"/>
+    </div>
+            
+    <h2>Addpess</h2>
+   
+    <h4>Country: {{apartment.country.name}}</h4>
+    <div *ngIf="isUpdating" class="col">
+        <select class="form-control" [(ngModel)]="apartment.country.id">
+            <option value="">Choose country</option>
+            <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
+        </select>
+    </div>
+  
+    <h4>City: {{apartment.address.city}}</h4>
+    <div *ngIf="isUpdating">
+        <input [(ngModel)]="apartment.address.city" placeholder="title"/>
+    </div>
+  
+    <h4>Street: {{apartment.address.street}}</h4>
+    <div *ngIf="isUpdating">
+        <input [(ngModel)]="apartment.address.street" placeholder="title"/>
+    </div>
+  
+    <div *ngIf="apartment.address.home || isUpdating">
+        <h4>Home: {{apartment.address.home}}</h4>
+        <div *ngIf="isUpdating">
+            <input [(ngModel)]="apartment.address.home" placeholder="Home"/>
+        </div>
+    </div>
+  
+    <div *ngIf="apartment.address.numberOfApartment || isUpdating">
+        <h4>Number Of Apartment:{{apartment.address.numberOfApartment}}</h4>
+        <div *ngIf="isUpdating">
+            <input [(ngModel)]="apartment.address.numberOfApartment" type="number" placeholder="title"/>
+        </div>
+    </div>
+  
+    <div class="btn-group-vertical col-4 form-group" role="group">
+        <button class="btn btn-warning" (click)="goBack()">Go back</button>
+        <button *ngIf="!isUpdating" class="btn btn-success" (click)="updating()">Edit</button>
+
+        <button *ngIf="isUpdating" class="btn btn-success" (click)="save()">save</button>
+       
+        <button *ngIf="!isUpdating" class="btn btn-danger" (click)="delete()">Delete</button>
+    </div>
+
+    <div class="col form-group" *ngIf="!isUpdating">
+        <div class="form-group col">
+            <button class="btn btn-dark btn-block"  
+            type="button" 
+            data-toggle="collapse" 
+            data-target="#collapseAddComment" 
+            aria-expanded="false" 
+            aria-controls="collapseAddComment">New comment</button>
+        </div>
+
+        <div class="form-group col">
+            <div class="collapse" id="collapseAddComment">
+                <app-add-comment></app-add-comment>
+            </div> 
+        </div>
+
+        <app-apartment-orders></app-apartment-orders>
+     
+        <app-apartment-comments></app-apartment-comments>
+    </div>
+
+</div>

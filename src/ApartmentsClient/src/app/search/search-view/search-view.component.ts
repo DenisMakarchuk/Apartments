@@ -1,14 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
 
-import { ApartmentSearchService, OrderUserService } from 'src/app/services/nswag.generated.service';
+import { ApartmentSearchService } from 'src/app/services/nswag.generated.service';
 import { LoggedService } from 'src/app/services/logged.service';
-import { CountryDTO,
-         ApartmentSearchDTO,
-         AddressSearchDTO,
-         CountrySearchDTO
-} from 'src/app/services/nswag.generated.service';
 
 import { PagedRequestOfSearchParameters, PagedResponseOfApartmentSearchView } from 'src/app/services/nswag.generated.service';
 import { SearchParametersService } from 'src/app/services/search-parameters.service';
@@ -20,25 +13,14 @@ import { SearchParametersService } from 'src/app/services/search-parameters.serv
 })
 export class SearchViewComponent implements OnInit {
 
-  countries: CountryDTO[];
   pages: number[] = [];
-
-  country: CountrySearchDTO;
-  address: AddressSearchDTO;
-  apartment: ApartmentSearchDTO;
 
   request: PagedRequestOfSearchParameters;
   response: PagedResponseOfApartmentSearchView;
 
-  searchForm: FormGroup;
-  requestForm: FormGroup;
-
   constructor(
     private searchService: ApartmentSearchService,
-    private fb: FormBuilder,
     private authService: LoggedService,
-    private avRoute: ActivatedRoute, 
-    private router: Router,
     private postman: SearchParametersService
   ) {
     this.postman.request$

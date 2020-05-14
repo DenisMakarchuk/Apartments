@@ -1,5 +1,5 @@
 <div>
-    <form [formGroup]="registerForm" (ngSubmit)="register()">
+    <form  class="was-validated" novalidate [formGroup]="registerForm" (ngSubmit)="register()">
         <h3>Please sign up</h3>
 
         <div class="form-group">
@@ -10,6 +10,13 @@
                    formControlName="userName" 
                    placeholder="Enter unique Name" 
                    required>
+
+            <div class="valid-tooltip">
+                Looks good!
+            </div>
+            <div class="invalid-tooltip">
+                Please, enter the unique Name!
+            </div>
         </div>
 
         <div class="form-group">
@@ -20,6 +27,13 @@
                    formControlName="nickName" 
                    placeholder="Enter NickName" 
                    required>
+
+            <div class="valid-tooltip">
+                Looks good!
+            </div>
+            <div class="invalid-tooltip">
+                Please, enter NickName!
+            </div>
         </div>
 
         <div class="form-group">
@@ -30,6 +44,13 @@
                    formControlName="email" 
                    placeholder="Enter email" 
                    required>
+
+            <div class="valid-feedback">
+                Looks good!
+            </div>
+            <div class="invalid-feedback">
+                Please, enter valid email!
+            </div>
         </div>
 
         <div class="form-group">
@@ -39,7 +60,15 @@
                    class="form-control" 
                    formControlName="password" 
                    placeholder="Password" 
-                   required>
+                   required
+                   minlength="8">
+
+            <div class="valid-feedback">
+                Looks good!
+            </div>
+            <div class="invalid-feedback">
+                Please, enter the password!
+            </div>
         </div>
 
         <button type="submit" class="btn btn-block btn btn-success">Sign up</button>

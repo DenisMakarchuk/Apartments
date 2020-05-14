@@ -1,0 +1,41 @@
+<div class="form-group">
+    <form [formGroup]="itemsCountForm" #formDir="ngForm" novalidate>
+        <div class="col-12">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Users on the page</div>
+                </div>
+                <input type="number" formControlName="pageSize" class="form-control">
+
+                <div class="input-group-append">
+                    <button class="btn btn-success" (click)="getUsers()">Show users</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="usersOnPage">
+    <div class="form-group card" *ngFor="let user of usersOnPage">
+        <a class="btn btn-light text-left" routerLink="/user/{{user.id}}">
+            <div class="card-body">
+                <h2 class="card-title">{{user.email}}</h2>
+                <h6>{{user.userName}}</h6> 
+             </div>
+        </a>
+    </div>
+</div>
+
+<div *ngIf="usersOnPage" class="form-group text-center">
+    <div class="form-group btn-group col-4">
+        <button class="btn btn-warning col-8" (click)="previousePage()">< Previous</button>
+        <button class="btn btn-warning col-8" (click)="nextPage()">Next ></button>
+    </div>
+    <br>
+    <div class="form-group btn-group mr-2">
+        <div *ngFor="let page of pages">
+            <button [ngClass]="page === currentUserPage ? 'btn btn-success':'btn btn-warning'" 
+                (click)="getPage(page)">{{page}}</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="form-group">
+    <form [formGroup]="requestForm" #formDir="ngForm" novalidate>
+        <div class="col-12">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Comments on the page</div>
+                </div>
+                <input type="number" formControlName="pageSize" class="form-control">
+
+                <div class="input-group-append">
+                    <button class="btn btn-success" (click)="getOrders()">Show orders</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="response">
+    <div class="form-group card" *ngFor="let or of response.data">
+        <div class="card-body">
+            <h2 class="card-title">{{or.apartment.title}}</h2>
+            <h4 class="card-text">Price: {{or.order.totalCoast}}</h4>
+            <h4 class="card-text">Dates:</h4>
+            <div *ngFor="let date of or.order.dates">
+                <h6>{{date  | date: 'dd.MMM.yyyy'}}</h6> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="response" class="form-group text-center">
+    <div class="form-group btn-group col-4">
+        <button class="btn btn-warning col-8" (click)="previousePage()">< Previous</button>
+        <button class="btn btn-warning col-8" (click)="nextPage()">Next ></button>
+    </div>
+    <br>
+    <div class="form-group btn-group mr-2">
+        <div *ngFor="let page of pages">
+            <button [ngClass]="page === response.pageNumber ? 'btn btn-success':'btn btn-warning'" 
+                (click)="getPage(page)">{{page}}</button>
+        </div>
+    </div>
+</div>

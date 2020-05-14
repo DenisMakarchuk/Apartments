@@ -1545,6 +1545,12 @@ export class ApartmentSearchService {
         let url_ = this.baseUrl + "/api/search/apartments/parameters";
         url_ = url_.replace(/[?&]$/, "");
 
+        request.data.priceFrom = request.data.priceFrom === null ? 0 : request.data.priceFrom;
+        request.data.priceTill = request.data.priceTill === null ? 0 : request.data.priceTill;
+
+        request.data.roomsFrom = request.data.roomsFrom === null ? 0 : request.data.roomsFrom;
+        request.data.roomsTill = request.data.roomsTill === null ? 0 : request.data.roomsTill;
+
         const content_ = JSON.stringify(request);
 
         let options_ : any = {
@@ -1803,6 +1809,85 @@ export class ApartmentSearchService {
             }));
         }
         return _observableOf<CountrySearchDTO>(<any>null);
+    }
+}
+
+@Injectable()
+export class MakeDatesArrayHelperService {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ? baseUrl : "https://localhost:44318";
+    }
+
+    getDatesArray(dates: Date[]): Observable<Date[]> {
+        let url_ = this.baseUrl + "/api/MakeDatesArrayHelper/makeDatesArray";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(dates);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",			
+            headers: new HttpHeaders({
+                "Content-Type": "application/json", 
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetDatesArray(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetDatesArray(<any>response_);
+                } catch (e) {
+                    return <Observable<Date[]>><any>_observableThrow(e);
+                }
+            } else
+                return <Observable<Date[]>><any>_observableThrow(response_);
+        }));
+    }
+
+    protected processGetDatesArray(response: HttpResponseBase): Observable<Date[]> {
+        const status = response.status;
+        const responseBlob = 
+            response instanceof HttpResponse ? response.body : 
+            (<any>response).error instanceof Blob ? (<any>response).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200!.push(new Date(item));
+            }
+            return _observableOf(result200);
+            }));
+        } else if (status === 400) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            let result400: any = null;
+            let resultData400 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result400 = ProblemDetails.fromJS(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+            }));
+        } else if (status === 500) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("A server side error occurred.", status, _responseText, _headers);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf<Date[]>(<any>null);
     }
 }
 
@@ -3133,25 +3218,17 @@ export interface IPagedResponseOfCommentDTO {
     hasPreviousPage?: boolean;
 }
 
-export class PagedRequestOfString implements IPagedRequestOfString {
+export class PagedRequestOfString extends PagedRequest implements IPagedRequestOfString {
     data?: string | undefined;
-    pageNumber?: number;
-    pageSize?: number;
 
     constructor(data?: IPagedRequestOfString) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
+        super(data);
     }
 
     init(_data?: any) {
+        super.init(_data);
         if (_data) {
             this.data = _data["data"];
-            this.pageNumber = _data["pageNumber"];
-            this.pageSize = _data["pageSize"];
         }
     }
 
@@ -3165,16 +3242,13 @@ export class PagedRequestOfString implements IPagedRequestOfString {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["data"] = this.data;
-        data["pageNumber"] = this.pageNumber;
-        data["pageSize"] = this.pageSize;
+        super.toJSON(data);
         return data; 
     }
 }
 
-export interface IPagedRequestOfString {
+export interface IPagedRequestOfString extends IPagedRequest {
     data?: string | undefined;
-    pageNumber?: number;
-    pageSize?: number;
 }
 
 export class OrderView implements IOrderView {
@@ -3735,6 +3809,7 @@ export interface IApartmentSearchView {
 
 export class ApartmentSearchDTO implements IApartmentSearchDTO {
     id?: string | undefined;
+    ownerId?: string | undefined;
     isOpen?: boolean;
     price?: number;
     numberOfRooms?: number;
@@ -3755,6 +3830,7 @@ export class ApartmentSearchDTO implements IApartmentSearchDTO {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.ownerId = _data["ownerId"];
             this.isOpen = _data["isOpen"];
             this.price = _data["price"];
             this.numberOfRooms = _data["numberOfRooms"];
@@ -3775,6 +3851,7 @@ export class ApartmentSearchDTO implements IApartmentSearchDTO {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["ownerId"] = this.ownerId;
         data["isOpen"] = this.isOpen;
         data["price"] = this.price;
         data["numberOfRooms"] = this.numberOfRooms;
@@ -3788,6 +3865,7 @@ export class ApartmentSearchDTO implements IApartmentSearchDTO {
 
 export interface IApartmentSearchDTO {
     id?: string | undefined;
+    ownerId?: string | undefined;
     isOpen?: boolean;
     price?: number;
     numberOfRooms?: number;
@@ -3889,25 +3967,17 @@ export interface ICountrySearchDTO {
     name?: string | undefined;
 }
 
-export class PagedRequestOfSearchParameters implements IPagedRequestOfSearchParameters {
+export class PagedRequestOfSearchParameters extends PagedRequest implements IPagedRequestOfSearchParameters {
     data?: SearchParameters | undefined;
-    pageNumber?: number;
-    pageSize?: number;
 
     constructor(data?: IPagedRequestOfSearchParameters) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
+        super(data);
     }
 
     init(_data?: any) {
+        super.init(_data);
         if (_data) {
             this.data = _data["data"] ? SearchParameters.fromJS(_data["data"]) : <any>undefined;
-            this.pageNumber = _data["pageNumber"];
-            this.pageSize = _data["pageSize"];
         }
     }
 
@@ -3921,16 +3991,13 @@ export class PagedRequestOfSearchParameters implements IPagedRequestOfSearchPara
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["data"] = this.data ? this.data.toJSON() : <any>undefined;
-        data["pageNumber"] = this.pageNumber;
-        data["pageSize"] = this.pageSize;
+        super.toJSON(data);
         return data; 
     }
 }
 
-export interface IPagedRequestOfSearchParameters {
+export interface IPagedRequestOfSearchParameters extends IPagedRequest {
     data?: SearchParameters | undefined;
-    pageNumber?: number;
-    pageSize?: number;
 }
 
 export class SearchParameters implements ISearchParameters {
@@ -4207,6 +4274,7 @@ export interface IUserAdministrationView {
 
 export class UserDTOAdministration implements IUserDTOAdministration {
     id?: string | undefined;
+    nickName?: string | undefined;
     update?: Date;
 
     constructor(data?: IUserDTOAdministration) {
@@ -4221,6 +4289,7 @@ export class UserDTOAdministration implements IUserDTOAdministration {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.nickName = _data["nickName"];
             this.update = _data["update"] ? new Date(_data["update"].toString()) : <any>undefined;
         }
     }
@@ -4235,6 +4304,7 @@ export class UserDTOAdministration implements IUserDTOAdministration {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["nickName"] = this.nickName;
         data["update"] = this.update ? this.update.toISOString() : <any>undefined;
         return data; 
     }
@@ -4242,6 +4312,7 @@ export class UserDTOAdministration implements IUserDTOAdministration {
 
 export interface IUserDTOAdministration {
     id?: string | undefined;
+    nickName?: string | undefined;
     update?: Date;
 }
 

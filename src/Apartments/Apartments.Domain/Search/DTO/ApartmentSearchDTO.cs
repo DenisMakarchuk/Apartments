@@ -8,6 +8,8 @@ namespace Apartments.Domain.Search.DTO
     {
         public string Id { get; set; }
 
+        public string OwnerId { get; set; }
+
         public bool IsOpen { get; set; }
         public decimal Price { get; set; }
 

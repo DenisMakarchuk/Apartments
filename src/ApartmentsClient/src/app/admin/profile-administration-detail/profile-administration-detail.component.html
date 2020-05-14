@@ -1,0 +1,21 @@
+<div class="form-group text-center" *ngIf="user">
+    <h2>{{user.identityUser.userName | uppercase}}</h2>
+    
+    <h4>NickName: {{user.profile.nickName}}</h4>
+    <h4>Email: {{user.identityUser.email}}</h4>
+
+    <h4>Roles:</h4>
+    <div *ngFor="let role of user.roles">
+      <h6>{{role}}</h6> 
+    </div>
+
+    <p class="card-text"><small class="text-muted">Lust time updated at {{user.profile.update | date: 'dd.MMM.yyyy'}}</small></p>
+
+    <div class="btn-group-vertical col-4" role="group">
+      <button class="btn btn-warning" (click)="goBack()">Go back</button>
+      <button class="btn btn-success" (click)="changeRole()">Change Role</button>
+      <button class="btn btn-danger" (click)="deleteUser()">Delete</button>
+    </div>
+
+    <app-comments-administration></app-comments-administration>
+</div>
