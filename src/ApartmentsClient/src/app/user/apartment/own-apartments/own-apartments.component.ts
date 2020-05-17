@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { ApartmentImageService } from 'src/app/services/nswag.generated.service';
 
 import { ApartmentUserService,
   CommentDTO,
@@ -16,9 +17,12 @@ export class OwnApartmentsComponent implements OnInit {
   requestForm: FormGroup;
   pages: number[] = [];
 
+  mainImages: {[id:string]: string} = { };
+
   constructor(
     private apartmentService: ApartmentUserService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private imageService: ApartmentImageService
     ) { 
     this.requestForm = this.fb.group({
       pageNumber: 1,
@@ -33,6 +37,12 @@ export class OwnApartmentsComponent implements OnInit {
     this.apartmentService.getAllApartmentByOwnerId(this.requestForm.value)
     .subscribe(response => {
       this.response = response;
+
+      if (this.response.data) {
+        for(let ap of this.response.data){
+          this.getImages(ap.apartment.id)
+        }
+      }
     
       this.pages = [];
       for (let index = 1; index <= response.totalPages; index++) {
@@ -62,4 +72,15 @@ export class OwnApartmentsComponent implements OnInit {
     }
   }
 
+  getImages(id: string){
+    this.imageService.getImageNamesList(id)
+    .subscribe(allImages =>{
+      if (allImages != null && allImages.length > 0) {
+        this.imageService.getImage(id, allImages[0])
+        .subscribe(currentImage => {
+        this.mainImages[id] = currentImage;
+        })
+      }
+    })
+  }
 }

@@ -26,6 +26,8 @@ using Apartments.Domain.Logic.Options;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Logic.Users.UserService;
 using Apartments.Domain.Logic.Validation;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace Apartments.Web
 {
@@ -139,6 +141,12 @@ namespace Apartments.Web
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
+                    RequestPath = "/Resources"
+            });
 
             app.UseCors("CorsPolicy");
             //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));

@@ -1,4 +1,27 @@
 <div class="text-center" *ngIf="apartment">
+    <div class="row">
+        <div class="col col-lg-3">
+            <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
+                <button class="btn btn-dark"  
+                type="button" 
+                data-toggle="collapse" 
+                data-target="#collapseUpload" 
+                aria-expanded="false" 
+                aria-controls="collapseUpload">Image uploading</button>
+            </div>
+        </div>
+    
+        <div class="col">
+                <div class="collapse" id="collapseUpload">
+                    <app-apartment-image-upload></app-apartment-image-upload>
+                </div>    
+        </div>
+    </div>
+    
+    <div class="col-8 mx-auto">
+        <app-apartment-all-images-names></app-apartment-all-images-names>
+    </div>
+
     <h2>{{apartment.apartment.title | uppercase}}</h2>
     <div *ngIf="isUpdating">
         <label >Title:</label>

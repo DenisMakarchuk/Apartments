@@ -12,6 +12,8 @@ using Apartments.Domain.Logic.Search.SearchServices;
 using Apartments.Domain.Logic.Users.UserService;
 using Apartments.Data.Context;
 using Microsoft.AspNetCore.Identity;
+using Apartments.Domain.Logic.Images.ImageInterfaces;
+using Apartments.Domain.Logic.Images.ImageServices;
 
 namespace Apartments.Domain.Logic
 {
@@ -35,6 +37,9 @@ namespace Apartments.Domain.Logic
 
             services.AddScoped<IUserAdministrationService, UserAdministrationService>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddScoped<IImageWriter, ImageWriter>();
+            services.AddScoped<IExistsImahesOperator, ExistsImahesOperator>();
 
             return services;
         }

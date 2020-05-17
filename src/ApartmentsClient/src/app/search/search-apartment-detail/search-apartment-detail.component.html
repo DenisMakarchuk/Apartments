@@ -1,4 +1,6 @@
 <div *ngIf="apartment">
+    <app-apartment-all-images-names></app-apartment-all-images-names>
+
     <h2>{{apartment.apartment.title | uppercase}}</h2>
   
     <h4 *ngIf="apartment.apartment.area">Area: {{apartment.apartment.area}}</h4>

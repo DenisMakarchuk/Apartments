@@ -15,7 +15,8 @@ import {  ApartmentUserService,
           ApartmentSearchService,
           CommentAdministrationService,
           UserAdministrationService,
-          MakeDatesArrayHelperService
+          MakeDatesArrayHelperService,
+          ApartmentImageService
         } from '../app/services/nswag.generated.service';
 import { TokenInterceptorService } from './auth/token-interceptor.service';
 import { LoggedService } from '../app/services/logged.service';
@@ -47,6 +48,8 @@ import { ProfileAdministrationDetailComponent } from './admin/profile-administra
 import { CommentsAdministrationComponent } from './admin/comments-administration/comments-administration.component';
 import { AdministrationCommentDetailComponent } from './admin/administration-comment-detail/administration-comment-detail.component';
 import { ApartmentOrdersComponent } from './user/order/apartment-orders/apartment-orders.component';
+import { ApartmentImageUploadComponent } from './images/apartment-images/apartment-image-upload/apartment-image-upload.component';
+import { ApartmentAllImagesNamesComponent } from './images/apartment-images/apartment-all-images-names/apartment-all-images-names.component';
 
 
 @NgModule({
@@ -63,7 +66,21 @@ import { ApartmentOrdersComponent } from './user/order/apartment-orders/apartmen
     OwnOrdersComponent, 
     OwnCommentsComponent, 
     OwnCommentDetailComponent, 
-    OwnOrderDetailComponent, OwnApartmentsComponent, OwnApartmentDetailComponent, AddApartmentComponent, AddCommentComponent, ApartmentCommentsComponent, AdminPanelComponent, UserAdministrationComponent, AdminAdministrationComponent, ProfileAdministrationDetailComponent, CommentsAdministrationComponent, AdministrationCommentDetailComponent, ApartmentOrdersComponent
+    OwnOrderDetailComponent, 
+    OwnApartmentsComponent, 
+    OwnApartmentDetailComponent, 
+    AddApartmentComponent, 
+    AddCommentComponent, 
+    ApartmentCommentsComponent, 
+    AdminPanelComponent,
+    UserAdministrationComponent, 
+    AdminAdministrationComponent, 
+    ProfileAdministrationDetailComponent, 
+    CommentsAdministrationComponent, 
+    AdministrationCommentDetailComponent, 
+    ApartmentOrdersComponent, 
+    ApartmentImageUploadComponent, 
+    ApartmentAllImagesNamesComponent
   ],
   imports: [
     BrowserModule,
@@ -90,7 +107,8 @@ import { ApartmentOrdersComponent } from './user/order/apartment-orders/apartmen
     UserAdministrationService,
     LoggedService,
     SearchParametersService,
-    MakeDatesArrayHelperService
+    MakeDatesArrayHelperService,
+    ApartmentImageService
   ],
   bootstrap: [AppComponent]
 })
