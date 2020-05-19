@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="!isregistered">
     <form  class="was-validated" novalidate [formGroup]="registerForm" (ngSubmit)="register()">
         <h3>Please sign up</h3>
 
@@ -11,10 +11,10 @@
                    placeholder="Enter unique Name" 
                    required>
 
-            <div class="valid-tooltip">
+            <div class="valid-feedback">
                 Looks good!
             </div>
-            <div class="invalid-tooltip">
+            <div class="invalid-feedback">
                 Please, enter the unique Name!
             </div>
         </div>
@@ -28,10 +28,10 @@
                    placeholder="Enter NickName" 
                    required>
 
-            <div class="valid-tooltip">
+            <div class="valid-feedback">
                 Looks good!
             </div>
-            <div class="invalid-tooltip">
+            <div class="invalid-feedback">
                 Please, enter NickName!
             </div>
         </div>
@@ -73,4 +73,10 @@
 
         <button type="submit" class="btn btn-block btn btn-success">Sign up</button>
     </form>
+</div>
+
+<div *ngIf="isregistered">
+    <div class="alert alert-success text-center">
+        Please, confirm your email!
+    </div>
 </div>

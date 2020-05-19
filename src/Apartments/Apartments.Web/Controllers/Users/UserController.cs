@@ -41,7 +41,7 @@ namespace Apartments.Web.Controllers.Users
         [AllowAnonymous]
         [HttpPost]
         [Route("registration")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserViewModel))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -58,16 +58,49 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.RegisterAsync(request.Email, 
-                                                          request.Password,
-                                                          request.UserName,
-                                                          request.NickName,
-                                                          cancellationToken);
+                var result = await _service.RegisterAsync(request, cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
                     : result.IsSuccess
-                    ? (IActionResult)Ok(result.Data)
+                    ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Email confirmation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("confirm/email")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            ConfirmEmail([FromQuery]string userId, [FromQuery] string token)
+        {
+            if (userId == null || token == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var result = await _service.ConfirmEmail(userId, token);
+
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)

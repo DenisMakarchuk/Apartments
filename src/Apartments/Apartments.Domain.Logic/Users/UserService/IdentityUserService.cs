@@ -1,4 +1,5 @@
 ﻿using Apartments.Common;
+using Apartments.Domain.Logic.Email;
 using Apartments.Domain.Logic.Options;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.ViewModels;
@@ -24,19 +25,23 @@ namespace Apartments.Domain.Logic.Users.UserService
         private readonly UserManager<IdentityUser> _userManager;
         private readonly JwtSettings _jwtSettings;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailConfirmation _emailConfirmation;
 
         IUserService _service;
 
         public IdentityUserService(UserManager<IdentityUser> userManager, 
                                     JwtSettings jwtSettings, 
                                     IUserService service,
-                                    RoleManager<IdentityRole> roleManager)
+                                    RoleManager<IdentityRole> roleManager,
+                                    IEmailConfirmation emailConfirmation)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings;
 
             _service = service;
             _roleManager = roleManager;
+
+            _emailConfirmation = emailConfirmation;
         }
 
         /// <summary>
@@ -101,38 +106,32 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Create User profile & Identity User
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="password"></param>
-        /// <param name="name"></param>
-        /// <param name="nickName"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<UserViewModel>> 
-            RegisterAsync(string email,
-                          string password,
-                          string name,
-                          string nickName,
+        public async Task<Result> 
+            RegisterAsync(UserRegistrationRequest request,
                           CancellationToken cancellationToken = default(CancellationToken))
         {
             string defaultRole = "User";
 
-            var existingUser = await _userManager.FindByNameAsync(name);
-            var existingEmail = await _userManager.FindByEmailAsync(email);
+            var existingUser = await _userManager.FindByNameAsync(request.UserName);
+            var existingEmail = await _userManager.FindByEmailAsync(request.Email);
 
             if (existingUser != null)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null,"User with this Name already exist");
+                return (Result)Result.NotOk("User with this Name already exist");
             }
             else if(existingEmail != null)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "User with this Email already exist");
+                return (Result)Result.NotOk("User with this Email already exist");
             }
 
             var newUser = new IdentityUser
             {
-                Email = email,
-                UserName = name
+                Email = request.Email,
+                UserName = request.UserName
             };
 
             if (!_userManager.Users.Any())
@@ -140,35 +139,54 @@ namespace Apartments.Domain.Logic.Users.UserService
                 defaultRole = "Admin";
             }
 
-            var createUser = await _userManager.CreateAsync(newUser, password);
+            var createUser = await _userManager.CreateAsync(newUser, request.Password);
 
             if (!createUser.Succeeded)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>
-                    .Fail<UserViewModel>(createUser.Errors
+                return (Result)Result.Fail(createUser.Errors
                                                 .Select(_ => _.Description)
                                                 .Join("\n"));
             }
 
             await _userManager.AddToRoleAsync(newUser, defaultRole);
 
-            var profile = await _service.CreateUserProfileAsync(newUser.Id, nickName, cancellationToken);
+            var profile = await _service.CreateUserProfileAsync(newUser.Id, request.NickName, cancellationToken);
 
-            var token = await GenerateAuthanticationResult(newUser, nickName);
-
-            if (profile.IsError || string.IsNullOrEmpty(token.Data))
+            if (profile.IsError)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>($"{profile.Message}\n" +
-                    $"or token is null");
+                return (Result)Result.Fail($"{profile.Message}");
             }
 
-            UserViewModel result = new UserViewModel()
-            {
-                Profile = profile.Data,
-                Token = token.Data
-            };
+            return await _emailConfirmation.MakeConfirmMessage(newUser, request.CallBackUrl, cancellationToken);
+        }
 
-            return (Result<UserViewModel>)Result<UserViewModel>.Ok(result);
+        /// <summary>
+        /// Email confirmation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public async Task<Result> ConfirmEmail(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Result.NotOk("User with this id is not exists!");
+            }
+
+            var decodedTokenBytes = Convert.FromBase64String(token);
+            string decodedTokenString = Encoding.UTF8.GetString(decodedTokenBytes);
+
+            var result = await _userManager.ConfirmEmailAsync(user, decodedTokenString);
+            if (result.Succeeded)
+            {
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail(result.Errors.Select(x => x.Description)
+                                            .Join("\n"));
+            }
         }
 
         /// <summary>
@@ -194,6 +212,11 @@ namespace Apartments.Domain.Logic.Users.UserService
             if (!hasUserValidPassvord)
             {
                 return (Result<UserViewModel>)Result<string>.NotOk<UserViewModel>(null, "User/password combination is wrong");
+            }
+
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+            {
+                return (Result<UserViewModel>)Result<string>.NotOk<UserViewModel>(null, "Email is not confirmed!");
             }
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id, cancellationToken);

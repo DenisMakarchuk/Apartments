@@ -17,6 +17,8 @@ export class RegisterComponent implements OnInit {
 
   user: UserViewModel;
 
+  isregistered = false;
+
   constructor( 
     private registerService: UserService,
     public fb: FormBuilder,
@@ -26,7 +28,8 @@ export class RegisterComponent implements OnInit {
         userName: '',
         nickName: '',
         email: '',
-        password: ''
+        password: '',
+        callBackUrl: 'http://localhost:4200/confirmation'
       });
     }
 
@@ -36,15 +39,9 @@ export class RegisterComponent implements OnInit {
   register() {
     if (this.registerForm.valid) {
       this.registerService.register(this.registerForm.value)
-      .subscribe(user => 
-        {this.user = user;
-  
-        if (this.user != null) {
-          localStorage.setItem('access_token', this.user.token)
-    
-          this.registerForm.reset();
-          this.router.navigate(['/profile']);
-        }
+      .subscribe(() => 
+      {
+        this.isregistered = true;
       });
     }
   }

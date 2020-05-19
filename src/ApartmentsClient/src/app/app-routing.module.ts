@@ -17,6 +17,7 @@ import { OwnApartmentDetailComponent } from './user/apartment/own-apartment-deta
 import { AddApartmentComponent } from './user/apartment/add-apartment/add-apartment.component';
 import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { ProfileAdministrationDetailComponent } from './admin/profile-administration-detail/profile-administration-detail.component';
+import { EmailConfirmationComponent } from './auth/email-confirmation/email-confirmation.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full' },
@@ -37,7 +38,8 @@ const routes: Routes = [
   { path: 'apartment/:id', component: OwnApartmentDetailComponent, canActivate: [AuthGuard] },
   { path: 'addapartment', component: AddApartmentComponent, canActivate: [AuthGuard] },
   { path: 'admin', component: AdminPanelComponent, canActivate: [AuthGuard] },
-  { path: 'user/:id', component: ProfileAdministrationDetailComponent, canActivate: [AuthGuard] }
+  { path: 'user/:id', component: ProfileAdministrationDetailComponent, canActivate: [AuthGuard] },
+  { path: 'confirmation', component: EmailConfirmationComponent }
 ];
 
 

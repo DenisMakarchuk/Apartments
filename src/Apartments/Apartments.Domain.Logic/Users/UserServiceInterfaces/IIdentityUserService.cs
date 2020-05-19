@@ -16,18 +16,20 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Create User profile & Identity User
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="password"></param>
-        /// <param name="name"></param>
-        /// <param name="nickName"></param>
+        /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<UserViewModel>> 
-            RegisterAsync(string email, 
-                          string password,
-                          string name,
-                          string nickName,
+        Task<Result> 
+            RegisterAsync(UserRegistrationRequest request,
                           CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Email confirmation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        Task<Result> ConfirmEmail(string userId, string token);
 
         /// <summary>
         /// Login User

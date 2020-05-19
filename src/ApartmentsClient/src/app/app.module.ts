@@ -50,6 +50,7 @@ import { AdministrationCommentDetailComponent } from './admin/administration-com
 import { ApartmentOrdersComponent } from './user/order/apartment-orders/apartment-orders.component';
 import { ApartmentImageUploadComponent } from './images/apartment-images/apartment-image-upload/apartment-image-upload.component';
 import { ApartmentAllImagesNamesComponent } from './images/apartment-images/apartment-all-images-names/apartment-all-images-names.component';
+import { EmailConfirmationComponent } from './auth/email-confirmation/email-confirmation.component';
 
 
 @NgModule({
@@ -80,7 +81,7 @@ import { ApartmentAllImagesNamesComponent } from './images/apartment-images/apar
     AdministrationCommentDetailComponent, 
     ApartmentOrdersComponent, 
     ApartmentImageUploadComponent, 
-    ApartmentAllImagesNamesComponent
+    ApartmentAllImagesNamesComponent, EmailConfirmationComponent
   ],
   imports: [
     BrowserModule,

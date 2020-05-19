@@ -2,6 +2,7 @@
 using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Admin.ViewModel;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
+using Apartments.Domain.Logic.Email;
 using Apartments.Domain.Logic.Options;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -23,14 +24,17 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUserAdministrationService _service;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
 
         public IdentityUserAdministrationService(UserManager<IdentityUser> userManager, 
                                                  IUserAdministrationService service,
-                                                 IMapper mapper)
+                                                 IMapper mapper,
+                                                 IEmailSender emailSender)
         {
             _userManager = userManager;
             _service = service;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -142,6 +146,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 Roles = roles.ToList<string>()
             };
 
+            await _emailSender.SendEmailAsync(user.Email, "Changed role", "You are Administrator now!", cancellationToken);
+
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
                 .Ok(view);
         }
@@ -191,6 +197,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 IdentityUser = identityUser,
                 Roles = roles.ToList<string>()
             };
+
+            await _emailSender.SendEmailAsync(user.Email, "Changed role", "You are not Administrator now!", cancellationToken);
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
                 .Ok(view);

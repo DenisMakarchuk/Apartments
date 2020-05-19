@@ -35,7 +35,7 @@ namespace Apartments.Web.Controllers.Images
         /// <returns></returns>
         [HttpPost]
         [Route("upload")]
-        [RequestSizeLimit(1048000)]
+        [RequestSizeLimit(2048000)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]

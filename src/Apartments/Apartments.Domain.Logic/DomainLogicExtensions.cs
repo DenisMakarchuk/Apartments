@@ -14,6 +14,8 @@ using Apartments.Data.Context;
 using Microsoft.AspNetCore.Identity;
 using Apartments.Domain.Logic.Images.ImageInterfaces;
 using Apartments.Domain.Logic.Images.ImageServices;
+using Apartments.Domain.Users;
+using Apartments.Domain.Logic.Email;
 
 namespace Apartments.Domain.Logic
 {
@@ -40,6 +42,11 @@ namespace Apartments.Domain.Logic
 
             services.AddScoped<IImageWriter, ImageWriter>();
             services.AddScoped<IExistsImahesOperator, ExistsImahesOperator>();
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.AddTransient<IEmailConfirmation, EmailConfirmation>();
+
+            services.Configure<AuthMessageSenderOptions>(config);
 
             return services;
         }

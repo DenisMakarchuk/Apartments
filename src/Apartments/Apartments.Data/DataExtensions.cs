@@ -27,8 +27,10 @@ namespace Apartments.Data
                 opt.Password.RequireNonAlphanumeric = false;
 
                 opt.User.RequireUniqueEmail = true;
+                opt.SignIn.RequireConfirmedEmail = true;
             })
-                .AddEntityFrameworkStores<IdentityContext>();
+                .AddEntityFrameworkStores<IdentityContext>()
+                .AddDefaultTokenProviders();
 
             return services;
         }
