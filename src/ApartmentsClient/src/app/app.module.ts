@@ -51,6 +51,8 @@ import { ApartmentOrdersComponent } from './user/order/apartment-orders/apartmen
 import { ApartmentImageUploadComponent } from './images/apartment-images/apartment-image-upload/apartment-image-upload.component';
 import { ApartmentAllImagesNamesComponent } from './images/apartment-images/apartment-all-images-names/apartment-all-images-names.component';
 import { EmailConfirmationComponent } from './auth/email-confirmation/email-confirmation.component';
+import { ForgotComponent } from './auth/forgot-password/forgot/forgot.component';
+import { ResetComponent } from './auth/forgot-password/reset/reset.component';
 
 
 @NgModule({
@@ -81,7 +83,7 @@ import { EmailConfirmationComponent } from './auth/email-confirmation/email-conf
     AdministrationCommentDetailComponent, 
     ApartmentOrdersComponent, 
     ApartmentImageUploadComponent, 
-    ApartmentAllImagesNamesComponent, EmailConfirmationComponent
+    ApartmentAllImagesNamesComponent, EmailConfirmationComponent, ForgotComponent, ResetComponent
   ],
   imports: [
     BrowserModule,

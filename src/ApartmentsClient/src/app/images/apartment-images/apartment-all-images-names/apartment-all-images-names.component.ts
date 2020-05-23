@@ -12,13 +12,17 @@ import * as jwt_decode from 'jwt-decode';
 })
 export class ApartmentAllImagesNamesComponent implements OnInit {
 
+  spinning = false;
+  spinningDel = false;
+  errorMessage: string;
+
   imagesCount: number[] = [];
   currentImageNumber = 1;
 
   allImages: string[];
   currentImage: string;
 
-  isCustomer = false;
+  isOwner = false;
   currentApartmentId = this.route.snapshot.paramMap.get('id');
 
   constructor(
@@ -30,27 +34,52 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
 
   ngOnInit(): void {
     this.getImages();
-    this.IsCustomer();
+    this.IsOwner();
   }
 
-  IsCustomer(){
+  IsOwner(){
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.searchService.getApartmentById(this.currentApartmentId)
     .subscribe(apartment => {
-      
+      this.spinning = false;
+
       var token = this.authService.getToken();
         
       var decodedoken = jwt_decode(token);
       var currentUserId = decodedoken['id'];
       
       if (apartment.apartment.ownerId === currentUserId) {
-        this.isCustomer = true;
+        this.isOwner = true;
+      }
+    },
+    error=>{
+      this.spinning = false;
+
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  404) {
+        this.errorMessage = "Error 404: " + error.response;
+      }
+      else{
+        this.errorMessage = "An error occurred.";
       }
     });
   }
 
   getImages(){
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.imageService.getImageNamesList(this.currentApartmentId)
     .subscribe(allImages =>{
+      this.spinning = false;
+
       this.allImages = allImages;
 
       this.imagesCount = [];
@@ -59,6 +88,25 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
       };
 
       this.getImage(this.currentImageNumber);
+    },
+    error=>{
+      this.spinning = false;
+
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      if (error.status ===  404) {
+        this.errorMessage = "Error 404: " + error.response;
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
     })
   }
 
@@ -77,11 +125,37 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
   }
 
   getImage(imageNumber: number){
+    this.errorMessage = null;
+    this.spinning = true;
+
     if (this.allImages != null && imageNumber > 0 && imageNumber <= this.allImages.length) {
       this.currentImageNumber = imageNumber;
       this.imageService.getImage(this.currentApartmentId, this.allImages[imageNumber-1])
-      .subscribe(currentImage => this.currentImage = currentImage)
+      .subscribe(currentImage => {
+        this.spinning = false;
+        this.currentImage = currentImage;
+      },
+      error=>{
+        this.spinning = false;
+  
+        if (error.status ===  500) {
+          this.errorMessage = "Error 500: Internal Server Error";
+        }
+        if (error.status ===  400) {
+          this.errorMessage = "Error 400: " + error.response;
+        }
+        if (error.status ===  403) {
+          this.errorMessage = "Error 403: You are not authorized";
+        }
+        if (error.status ===  404) {
+          this.errorMessage = "Error 404: " + error.response;
+        }
+        else{
+          this.errorMessage = "An error occurred.";
+        }
+      })
     }
+    this.spinning = false;
   }
 
   show(){
@@ -89,12 +163,36 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
   }
 
   deleteImage(){
+    this.errorMessage = null;
+    this.spinningDel = true;
+
     if (this.allImages != null && this.currentImageNumber > 0 && this.currentImageNumber <= this.allImages.length) {
       this.imageService.delete(this.currentApartmentId, this.allImages[this.currentImageNumber-1])
       .subscribe(() => {
+        this.spinningDel = false;
+
         this.currentImage = null;
         this.currentImageNumber = 1;
         this.getImages();
+      },
+      error=>{
+        this.spinningDel = false;
+  
+        if (error.status ===  500) {
+          this.errorMessage = "Error 500: Internal Server Error";
+        }
+        if (error.status ===  400) {
+          this.errorMessage = "Error 400: " + error.response;
+        }
+        if (error.status ===  403) {
+          this.errorMessage = "Error 403: You are not authorized";
+        }
+        if (error.status ===  404) {
+          this.errorMessage = "Error 404: " + error.response;
+        }
+        else{
+          this.errorMessage = "An error occurred.";
+        }
       })
     }
   }

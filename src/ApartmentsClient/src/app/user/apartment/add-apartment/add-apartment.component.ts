@@ -1,15 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm, FormControl, FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 
 import { ApartmentView } from 'src/app/services/nswag.generated.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 import { ApartmentUserService }  from 'src/app/services/nswag.generated.service';
 import { ApartmentSearchService } from 'src/app/services/nswag.generated.service';
 
-import { ApartmentDTO, AddApartment } from 'src/app/services/nswag.generated.service';
-import { AddressDTO, AddAddress } from 'src/app/services/nswag.generated.service';
 import { CountryDTO } from 'src/app/services/nswag.generated.service';
 
 @Component({
@@ -19,38 +17,19 @@ import { CountryDTO } from 'src/app/services/nswag.generated.service';
 })
 export class AddApartmentComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   countries: CountryDTO[];
 
   apartmentView: ApartmentView;
-  country: CountryDTO;
-
-  address: AddressDTO;
-  addAddress: AddAddress;
-
-  apartment: ApartmentDTO;
-  addApartment: AddApartment;
 
   apartmentForm: FormGroup;
   addressForm: FormGroup;
 
-  countryId: string;
-  city: string;
-  street: string;
-  home: string;
-  numberOfApartment: number;
-
-  title: string;
-  text: string;
-  area: number;
-  isOpen: boolean;
-  price: number;
-  numberOfRooms: number;
-
   constructor(
-    private route: ActivatedRoute,
     private apartmentService: ApartmentUserService,
     private formBuilder: FormBuilder,
-    private avRoute: ActivatedRoute, 
     private router: Router,
     private location: Location,
     private searchService: ApartmentSearchService
@@ -79,17 +58,65 @@ export class AddApartmentComponent implements OnInit {
   }
 
   getCountries(): void {
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.searchService.getAllCountries()
-      .subscribe(countries => this.countries = countries);
+      .subscribe(countries => {
+        this.spinning = false;
+
+        this.countries = countries;
+      },
+      error=>{
+        this.spinning = false;
+
+        if (error.status ===  500) {
+          this.errorMessage = "Error 500: Internal Server Error";
+        }
+        if (error.status ===  400) {
+          this.errorMessage = "Error 400: " + error.response;
+        }
+        else{
+          this.errorMessage = "Unsuspected Error";
+        }
+      });
   }
 
   add(){
-    this.apartmentService.createApartment(this.apartmentForm.value)
+    this.errorMessage = null;
+    this.spinning = true;
+
+    if (this.apartmentForm.valid) {
+      this.apartmentService.createApartment(this.apartmentForm.value)
       .subscribe(apartmentView => 
         {
+          this.spinning = false;
+
           this.apartmentView = apartmentView;
           this.router.navigate(['/apartment', apartmentView.apartment.id ]);
+        },
+        error=>{
+          this.spinning = false;
+  
+          if (error.status ===  500) {
+            this.errorMessage = "Error 500: Internal Server Error";
+          }
+          if (error.status ===  400) {
+            this.errorMessage = "Error 400: " + error.response;
+          }
+          if (error.status ===  403) {
+            this.errorMessage = "Error 403: You are not authorized";
+          }
+          else{
+            this.errorMessage = "Unsuspected Error";
+          }
         });
+    }
+    else
+    {
+      this.spinning = false;
+      this.errorMessage = "Invalid data entry";
+    }
   }
 
   goBack(): void {

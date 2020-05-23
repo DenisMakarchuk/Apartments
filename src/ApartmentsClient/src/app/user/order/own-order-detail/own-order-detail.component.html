@@ -1,3 +1,15 @@
+<div *ngIf="errorMessage">
+  <div class="alert alert-danger" role="alert">
+      {{errorMessage}}
+  </div>
+</div>
+
+<div *ngIf="spinning"  class="d-flex justify-content-center">
+  <div class="spinner-border text-success" role="status">
+      <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
 <div *ngIf="order">
       <h2>{{order.apartment.title | uppercase}}</h2>
 
@@ -25,7 +37,13 @@
       <div class="btn-group" role="group">
         <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">Go back</button>
       
-        <button class="btn btn-danger" (click)="delete()">Delete</button>
+        <button class="btn btn-danger" (click)="delete()">
+          <span *ngIf="spinningDel" 
+          class="spinner-border spinner-border customSpin" 
+          role="status" 
+          aria-hidden="true"></span>
+          
+          Delete</button>
       </div>
   
 </div>

@@ -1,3 +1,9 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
 <div>
     <form class="was-validated" novalidate [formGroup]="loginForm" (ngSubmit)="login()">
         <h3>Please sign in</h3>
@@ -37,6 +43,15 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-block btn btn-success">Sign up</button>
+        <button type="submit" class="btn btn-block btn btn-success">
+            <span *ngIf="spinning" 
+            class="spinner-border spinner-border customSpin" 
+            role="status" 
+            aria-hidden="true"></span>
+            Sign In</button>
     </form>
+</div>
+
+<div class="text-center m-3">
+    <button [routerLink]="['/forgot-password']" class="btn btn-outline-dark">Forgot password</button>
 </div>

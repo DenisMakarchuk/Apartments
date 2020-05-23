@@ -1,3 +1,9 @@
+<div *ngIf="errorMessage">
+  <div class="alert alert-danger" role="alert">
+      {{errorMessage}}
+  </div>
+</div>
+
 <div>
     <div *ngIf="addressImage" class="col-8">
         <img [src]="addressImage" class="card-img">
@@ -18,7 +24,16 @@
           <label *ngIf="selectedFile" class="custom-file-label" for="inputGroupFile04">{{selectedFile.name}}</label>
         </div>
         <div class="input-group-append">
-          <button [ngClass]="selectedFile ? 'btn btn-success':'btn btn-success disabled'" (click)="onUpload()" type="button" id="inputGroupFileAddon04">Upload</button>
+          <button [ngClass]="selectedFile ? 'btn btn-success':'btn btn-success disabled'" 
+                  (click)="onUpload()" 
+                  type="button" 
+                  id="inputGroupFileAddon04">
+                  <span *ngIf="spinning" 
+                  class="spinner-border spinner-border customSpin" 
+                  role="status" 
+                  aria-hidden="true"></span>
+                  
+                  Upload</button>
         </div>
     </div>
 </div>

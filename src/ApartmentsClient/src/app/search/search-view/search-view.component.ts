@@ -14,6 +14,9 @@ import { SearchParametersService } from 'src/app/services/search-parameters.serv
 })
 export class SearchViewComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   pages: number[] = [];
 
   request: PagedRequestOfSearchParameters;
@@ -34,24 +37,33 @@ export class SearchViewComponent implements OnInit {
     .subscribe(response => {
       this.response = response;
 
-      if (this.response.data) {
+      if (this.response?.data) {
         for(let ap of this.response.data){
           this.getImages(ap.apartment.id)
         }
+
+        this.pages = [];
+        for (let index = 1; index <= response.totalPages; index++) {
+          this.pages.push(index);
+        }
       }
       
-      this.pages = [];
-      for (let index = 1; index <= response.totalPages; index++) 
-        this.pages.push(index);
     });
   }
 
   ngOnInit(): void {
+    this.postman.getRequestInfo();
+    this.postman.getResponseInfo();
   }
 
   newPage(): void {
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.searchService.getAllApartments(this.request)
       .subscribe(response => {
+
+        this.spinning = false;
         this.response = response;
 
         this.pages = [];
@@ -62,6 +74,19 @@ export class SearchViewComponent implements OnInit {
         this.postman.getRequestInfo();
         this.postman.getResponseInfo();
         };
+      },
+      error=>{
+        this.spinning = false;
+
+        if (error.status ===  500) {
+          this.errorMessage = "Error 500: Internal Server Error";
+        }
+        if (error.status ===  400) {
+          this.errorMessage = "Error 400: " + error.title;
+        }
+        else{
+          this.errorMessage = "An error occurred.";
+        }
       });
   }
 

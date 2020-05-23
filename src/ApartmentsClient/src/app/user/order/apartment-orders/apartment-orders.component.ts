@@ -10,6 +10,9 @@ import { OrderUserService, PagedResponseOfOrderView} from 'src/app/services/nswa
 })
 export class ApartmentOrdersComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   response: PagedResponseOfOrderView;
   requestForm: FormGroup;
   pages: number[] = [];
@@ -29,13 +32,34 @@ export class ApartmentOrdersComponent implements OnInit {
   }
 
   getOrders(){
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.orderService.getAllOrdersByApartmentId(this.requestForm.value)
     .subscribe(response => {
       this.response = response;
     
+      this.spinning = false;
+
       this.pages = [];
       for (let index = 1; index <= response.totalPages; index++) {
         this.pages.push(index);
+      }
+    },
+    error=>{
+      this.spinning = false;
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
       }
     });
   }

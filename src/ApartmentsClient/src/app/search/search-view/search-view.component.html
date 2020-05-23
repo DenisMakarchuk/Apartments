@@ -1,3 +1,9 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
 <div *ngIf="response">
     <div class="form-group card" *ngFor="let ap of response.data">
         <div class="row no-gutters">
@@ -20,6 +26,12 @@
                 *ngIf="isLoggedIn"
                 routerLink="/search/apartment/{{ap.apartment.id}}">Details</button>
         </div>
+    </div>
+</div>
+
+<div *ngIf="spinning"  class="d-flex justify-content-center">
+    <div class="spinner-border text-success" role="status">
+      <span class="sr-only">Loading...</span>
     </div>
 </div>
 

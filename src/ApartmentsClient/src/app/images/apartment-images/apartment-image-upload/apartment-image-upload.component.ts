@@ -9,6 +9,9 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class ApartmentImageUploadComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   addressImage: string;
 
   selectedFile: File;
@@ -27,10 +30,31 @@ export class ApartmentImageUploadComponent implements OnInit {
   }
 
   onUpload() {
+    this.spinning = true;
+    this.errorMessage = null;
+
     this.imageService.uploadImage(this.selectedFile, this.route.snapshot.paramMap.get('id'))
     .subscribe(addressImage =>{
+      this.spinning = false;
+
       this.addressImage = addressImage;
       this.selectedFile = null;
+    },
+    error=>{
+      this.spinning = false;
+  
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
     })
   }
 }

@@ -31,8 +31,8 @@ export class AdministrationCommentDetailComponent implements OnInit {
   get isAdmin(){
     var token = this.authService.getToken();
         
-    var decodedoken = jwt_decode(token);
-    var currentRole = decodedoken['role'];
+    var decodedtoken = jwt_decode(token);
+    var currentRole = decodedtoken['role'];
 
     if (currentRole.includes('Admin')) {
       return true;

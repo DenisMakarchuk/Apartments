@@ -12,6 +12,10 @@ import * as jwt_decode from 'jwt-decode';
 })
 export class OwnCommentDetailComponent implements OnInit {
 
+  spinning = false;
+  spinningDel = false;
+  errorMessage: string;
+
   comment: CommentDTO;
   isUpdating = false;
 
@@ -51,9 +55,35 @@ export class OwnCommentDetailComponent implements OnInit {
   }
 
   getComment(){
+    this.errorMessage = null;
+    this.spinning = true;
+
     const id = this.route.snapshot.paramMap.get('id');
     this.commentService.getCommentById(id)
-    .subscribe(comment => this.comment = comment)
+    .subscribe(comment => {
+
+      this.spinning = false;
+      this.comment = comment;
+    },
+    error=>{
+      this.spinning = false;
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      if (error.status ===  404) {
+        this.errorMessage = "Error 404: " + error.response;
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
+    })
   }
 
   updating(){
@@ -61,17 +91,64 @@ export class OwnCommentDetailComponent implements OnInit {
   }
 
   save(): void {
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.commentService.updateComment(this.comment)
       .subscribe(comment => {
+
+        this.spinning = false;
         this.comment = comment;
         this.isUpdating = false;
+    },
+    error=>{
+      this.spinning = false;
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
     });
   }
 
   delete(){
+    this.errorMessage = null;
+    this.spinningDel = true;
+
     const id = this.route.snapshot.paramMap.get('id');
     this.commentService.deleteCommentById(id)
-    .subscribe(()=>this.goBack());
+    .subscribe(()=>{
+
+      this.spinningDel = false;
+      this.goBack()
+    },
+    error=>{
+      this.spinningDel = false;
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      if (error.status ===  404) {
+        this.errorMessage = "Error 404: " + error.response;
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
+    });
   }
 
   goBack(){

@@ -20,6 +20,9 @@
         </li>
       </ul>
 
+      <div class="nav-item" *ngIf="isLoggedIn">
+       <a class="navbar-brand">{{currentEmail}}</a>
+      </div>
 
       <div class="btn-group col-2" *ngIf="!isLoggedIn" role="group" aria-label="Basic example">
         <a class="btn btn-success col-8" [routerLink]="['/login']" routerLinkActive="active">Sing In</a>

@@ -1,3 +1,9 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
 <div>
     <form [formGroup]="commentForm" (ngSubmit)="add()" #formDir="ngForm" class="was-validated" novalidate>
         <div class="form-group">
@@ -13,6 +19,12 @@
                 Comment must have from 4 till 255 items!
             </div>
         </div>
-        <button class="btn btn-success my-2 my-sm-0 btn-lg btn-block" type="submit">Add comment</button>
+        <button class="btn btn-success my-2 my-sm-0 btn-lg btn-block" type="submit">
+            <span *ngIf="spinning" 
+                    class="spinner-border spinner-border customSpin" 
+                    role="status" 
+                    aria-hidden="true"></span>
+
+            Add comment</button>
     </form>
 </div>

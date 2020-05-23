@@ -56,6 +56,8 @@ namespace Apartments.Web.Controllers.Images
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
+                    : !result.IsSuccess
+                    ? BadRequest(result.Message)
                     : (IActionResult)Ok(result.Data);
             }
             catch (InvalidOperationException ex)

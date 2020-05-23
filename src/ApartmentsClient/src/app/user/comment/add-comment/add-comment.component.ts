@@ -12,6 +12,9 @@ import * as jwt_decode from 'jwt-decode';
 })
 export class AddCommentComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   commentForm: FormGroup;
 
   constructor(
@@ -45,10 +48,38 @@ export class AddCommentComponent implements OnInit {
   }
  
   add(){
-     this.commentService.createComment(this.commentForm.value)
-     .subscribe(data =>
-       this.commentForm.reset()
-     );
-  }
+    this.errorMessage = null;
+    this.spinning = true;
+
+    if (this.commentForm.valid) {
+      this.commentService.createComment(this.commentForm.value)
+      .subscribe(data =>
+        {
+          this.spinning = false;
  
+          this.commentForm.reset();}
+      ),
+      error=>{
+        this.spinning = false;
+ 
+        if (error.status ===  500) {
+          this.errorMessage = "Error 500: Internal Server Error";
+        }
+        if (error.status ===  400) {
+          this.errorMessage = "Error 400: " + error.response;
+        }
+        if (error.status ===  403) {
+          this.errorMessage = "Error 403: You are not authorized";
+        }
+        else{
+          this.errorMessage = "Unsuspected Error";
+        }
+      };
+    }    
+    else
+    {
+      this.spinning = false;
+      this.errorMessage = "Invalid data entry";
+    }
+  }
 }

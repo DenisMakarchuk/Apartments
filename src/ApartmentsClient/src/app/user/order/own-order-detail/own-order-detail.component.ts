@@ -11,6 +11,10 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class OwnOrderDetailComponent implements OnInit {
 
+  spinning = false;
+  spinningDel = false;
+  errorMessage: string;
+
   order: OrderView;
 
   constructor(
@@ -24,15 +28,67 @@ export class OwnOrderDetailComponent implements OnInit {
   }
 
   getOrder(){
+    this.errorMessage = null;
+    this.spinning = true;
+
     const id = this.route.snapshot.paramMap.get('id');
     this.orderService.getOrderById(id)
-    .subscribe(order => this.order = order)
+    .subscribe(order => {
+      this.spinning = false;
+
+      this.order = order;
+    },
+    error=>{
+      this.spinning = false;
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      if (error.status ===  404) {
+        this.errorMessage = "Error 404: " + error.response;
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
+    })
   }
 
   delete(){
+    this.errorMessage = null;
+    this.spinningDel = true;
+
     const id = this.route.snapshot.paramMap.get('id');
     this.orderService.deleteOrderById(id)
-    .subscribe(()=>this.goBack());
+    .subscribe(()=>{
+      this.spinningDel = false;
+
+      this.goBack();
+    },
+    error=>{
+      this.spinningDel = false;
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      if (error.status ===  404) {
+        this.errorMessage = "Error 404: " + error.response;
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
+    });
   }
 
   goBack(){

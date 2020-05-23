@@ -23,6 +23,14 @@ export class ProfileAdministrationDetailComponent implements OnInit {
     this.getUser();
   }
 
+  get isUserAdmin(){
+    if (this.user.roles.includes('Admin')) {
+      return true;
+    }
+
+    return false;
+  }
+
   goBack(){
     this.location.back();
   }

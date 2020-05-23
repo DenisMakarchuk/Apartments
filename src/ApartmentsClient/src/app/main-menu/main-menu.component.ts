@@ -30,4 +30,11 @@ export class MainMenuComponent implements OnInit {
       return false;
   }
 
+  get currentEmail(): string{
+    var token = this.authService.getToken();
+        
+      var decodedoken = jwt_decode(token);
+      return decodedoken['email'];
+  }
+
 }

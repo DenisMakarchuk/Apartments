@@ -18,6 +18,8 @@ import { AddApartmentComponent } from './user/apartment/add-apartment/add-apartm
 import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
 import { ProfileAdministrationDetailComponent } from './admin/profile-administration-detail/profile-administration-detail.component';
 import { EmailConfirmationComponent } from './auth/email-confirmation/email-confirmation.component';
+import { ForgotComponent } from './auth/forgot-password/forgot/forgot.component';
+import { ResetComponent } from './auth/forgot-password/reset/reset.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/search', pathMatch: 'full' },
@@ -39,7 +41,9 @@ const routes: Routes = [
   { path: 'addapartment', component: AddApartmentComponent, canActivate: [AuthGuard] },
   { path: 'admin', component: AdminPanelComponent, canActivate: [AuthGuard] },
   { path: 'user/:id', component: ProfileAdministrationDetailComponent, canActivate: [AuthGuard] },
-  { path: 'confirmation', component: EmailConfirmationComponent }
+  { path: 'confirmation', component: EmailConfirmationComponent },
+  { path: 'forgot-password', component: ForgotComponent },
+  { path: 'reset-password', component: ResetComponent }
 ];
 
 

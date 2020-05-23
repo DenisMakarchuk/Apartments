@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Internal;
 using Apartments.Domain.Users.ViewModels;
 using System.Threading;
+using Apartments.Domain.Users;
 
 namespace Apartments.Web.Controllers.Users
 {
@@ -193,5 +194,76 @@ namespace Apartments.Web.Controllers.Users
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("forgot/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            ForgotPasswordAsync([FromBody]ForgotPasswordModel request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (request is null || string.IsNullOrEmpty(request.LogInNameOrEmail) || !ModelState.IsValid)
+            {
+                return BadRequest("Invalid data entry!");
+            }
+
+            try
+            {
+                var result = await _service.ForgotPasswordAsync(request,
+                                                        cancellationToken);
+
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpDelete]
+        [Route("reset/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            ResetPasswordAsync([FromBody]ResetPasswordModel model, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var result = await _service.ResetPasswordAsync(model, cancellationToken);
+
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
     }
 }

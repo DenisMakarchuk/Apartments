@@ -13,8 +13,9 @@
 
     <div class="btn-group-vertical col-4" role="group">
       <button class="btn btn-warning" (click)="goBack()">Go back</button>
-      <button class="btn btn-success" (click)="changeRole()">Change Role</button>
-      <button class="btn btn-danger" (click)="deleteUser()">Delete</button>
+      <button *ngIf="!isUserAdmin" class="btn btn-success" (click)="changeRole()">Add to Administrator role</button>
+      <button *ngIf="isUserAdmin" class="btn btn-success" (click)="changeRole()">Remove from Administrator role</button>
+      <button class="btn btn-danger" (click)="deleteUser()">Delete User</button>
     </div>
 
     <app-comments-administration></app-comments-administration>

@@ -9,6 +9,9 @@ import { CommentUserService, PagedResponseOfCommentDTO } from 'src/app/services/
 })
 export class OwnCommentsComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   response: PagedResponseOfCommentDTO;
   requestForm: FormGroup;
   pages: number[] = [];
@@ -27,13 +30,34 @@ export class OwnCommentsComponent implements OnInit {
   }
 
   getOwnComments(){
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.commentService.getAllCommentsByAuthorId(this.requestForm.value)
     .subscribe(response => {
+
+      this.spinning = false;
       this.response = response;
     
       this.pages = [];
       for (let index = 1; index <= response.totalPages; index++) {
         this.pages.push(index);
+      }
+    },
+    error=>{
+      this.spinning = false;
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
       }
     });
   }

@@ -18,7 +18,6 @@ export class LogoutComponent implements OnInit {
   doLogout() {
     let removeToken = localStorage.removeItem('access_token');
     if (removeToken == null) {
-      this.authService.logOut();
       this.router.navigate(['/search']);
     }
   }

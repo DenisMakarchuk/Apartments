@@ -2,16 +2,19 @@
 using Apartments.Domain.Logic.Email;
 using Apartments.Domain.Logic.Options;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
+using Apartments.Domain.Users;
 using Apartments.Domain.Users.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,7 +28,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         private readonly UserManager<IdentityUser> _userManager;
         private readonly JwtSettings _jwtSettings;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly IEmailConfirmation _emailConfirmation;
+        private readonly IEmailMaker _emailMaker;
 
         IUserService _service;
 
@@ -33,7 +36,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                                     JwtSettings jwtSettings, 
                                     IUserService service,
                                     RoleManager<IdentityRole> roleManager,
-                                    IEmailConfirmation emailConfirmation)
+                                    IEmailMaker emailMaker)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings;
@@ -41,7 +44,55 @@ namespace Apartments.Domain.Logic.Users.UserService
             _service = service;
             _roleManager = roleManager;
 
-            _emailConfirmation = emailConfirmation;
+            _emailMaker = emailMaker;
+        }
+
+        /// <summary>
+        /// Check has the string email format
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return false;
+            }
+
+            try
+            {
+                email = Regex.Replace(email, @"(@)(.+)$", DomainMapper,
+                                      RegexOptions.None, TimeSpan.FromMilliseconds(200));
+
+                string DomainMapper(Match match)
+                {
+                    var idn = new IdnMapping();
+
+                    var domainName = idn.GetAscii(match.Groups[2].Value);
+
+                    return match.Groups[1].Value + domainName;
+                }
+            }
+            catch (RegexMatchTimeoutException e)
+            {
+                return false;
+            }
+            catch (ArgumentException e)
+            {
+                return false;
+            }
+
+            try
+            {
+                return Regex.IsMatch(email,
+                    @"^(?("")("".+?(?<!\\)""@)|(([0-9a-z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-z])@))" +
+                    @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-z][-0-9a-z]*[0-9a-z]*\.)+[a-z0-9][\-a-z0-9]{0,22}[a-z0-9]))$",
+                    RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+            }
+            catch (RegexMatchTimeoutException)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -157,7 +208,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 return (Result)Result.Fail($"{profile.Message}");
             }
 
-            return await _emailConfirmation.MakeConfirmMessage(newUser, request.CallBackUrl, cancellationToken);
+            return await _emailMaker.MakeConfirmEmailMessageAsync(newUser, request.CallBackUrl, cancellationToken);
         }
 
         /// <summary>
@@ -287,6 +338,65 @@ namespace Apartments.Domain.Logic.Users.UserService
             }
 
             return await Task.FromResult(Result.Ok());
+        }
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<Result> ForgotPasswordAsync(ForgotPasswordModel request, CancellationToken cancellationToken = default)
+        {
+            IdentityUser user;
+
+            if (IsValidEmail(request.LogInNameOrEmail))
+            {
+                user = await _userManager.FindByEmailAsync(request.LogInNameOrEmail);
+            }
+            else 
+            {
+                user = await _userManager.FindByNameAsync(request.LogInNameOrEmail);
+            }
+
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                return await Task.FromResult(Result.Ok());
+            }
+
+            return await _emailMaker.MakeConfirmPasswordResetMessageAsync(user, request.CallBackUrl, cancellationToken);
+        }
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<Result> ResetPasswordAsync(ResetPasswordModel model, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return Result.Ok();
+            }
+
+            var decodedTokenBytes = Convert.FromBase64String(model.Token);
+            string decodedTokenString = Encoding.UTF8.GetString(decodedTokenBytes);
+
+            var result = await _userManager.ResetPasswordAsync(user, decodedTokenString, model.Password);
+            if (result.Succeeded)
+            {
+                return await _emailMaker.JustSendEmailAsync(user.Email,
+                                                            "Password was successfully reset! Сlick here to enter the application",
+                                                            model.CallBackUrl, 
+                                                            cancellationToken);
+            }
+            else
+            {
+                return Result.Fail(result.Errors.Select(x => x.Description)
+                                            .Join("\n"));
+            }
         }
     }
 }

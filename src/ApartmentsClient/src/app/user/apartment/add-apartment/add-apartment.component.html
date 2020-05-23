@@ -1,3 +1,9 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
 <div class="row">
     <form  [formGroup]="apartmentForm" (ngSubmit)="add()" #formDir="ngForm"  class="was-validated" novalidate>
         <form [formGroup]="addressForm" (ngSubmit)="add()" #formDir="ngForm"  class="was-validated" novalidate>
@@ -32,7 +38,6 @@
                 <div class="invalid-feedback">
                     Please, enter the Street!
                 </div>
-
             </div>
     
             <div>
@@ -126,7 +131,13 @@
         </div>
   
         <div class="btn-group my-2 my-sm-0 btn-lg btn-block" role="group">
-            <button class="btn btn-success" type="submit">Save</button>
+            <button class="btn btn-success" type="submit">
+                <span *ngIf="spinning" 
+                class="spinner-border spinner-border customSpin" 
+                role="status" 
+                aria-hidden="true"></span>
+    
+                Save</button>
             <button class="btn btn-warning" (click)="goBack()">Go back</button>
         </div>
     </form>

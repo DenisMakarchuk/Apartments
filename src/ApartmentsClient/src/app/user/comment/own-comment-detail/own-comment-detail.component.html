@@ -1,18 +1,50 @@
+<div *ngIf="errorMessage">
+  <div class="alert alert-danger" role="alert">
+      {{errorMessage}}
+  </div>
+</div>
+
 <div class="form-group text-center" *ngIf="comment">
   <h2>{{comment.title | uppercase}}</h2>
   
   <h4>{{comment.text}}</h4>
-  <div class="form-group" *ngIf="isUpdating">
+  <div class="form-group" *ngIf="isUpdating" class="was-validated">
     <label>Text:</label>
-    <textarea [(ngModel)]="comment.text" type="text" class="form-control" placeholder="Text"></textarea>
+    <textarea [(ngModel)]="comment.text" 
+              type="text" 
+              class="col-8" 
+              placeholder="Text"
+              required
+              minlength="4"
+              maxlength="255"></textarea>
+
+    <div class="invalid-feedback">
+      Comment must have from 4 till 255 items!
+    </div>
   </div>
   
   <div class="btn-group-vertical col-4" role="group">
     <button class="btn btn-warning btn-block" (click)="goBack()">Go back</button>
     <button *ngIf="!isUpdating && isAuthor && !isAdmin" class="btn btn-success btn-block" (click)="updating()">Edit</button>
-    <button *ngIf="isUpdating && isAuthor && !isAdmin" class="btn btn-success btn-block" (click)="save()">Save</button>
+    <button *ngIf="isUpdating && isAuthor && !isAdmin" 
+            class="btn btn-success btn-block" 
+            (click)="save()">
+            <span *ngIf="spinning" 
+            class="spinner-border spinner-border customSpin" 
+            role="status" 
+            aria-hidden="true"></span>
+
+            Save</button>
       
-    <button *ngIf="!isUpdating && isAuthor && !isAdmin" class="btn btn-danger" (click)="delete()">Delete</button>
+    <button *ngIf="!isUpdating && isAuthor && !isAdmin" 
+            class="btn btn-danger" 
+            (click)="delete()">
+            <span *ngIf="spinningDel" 
+            class="spinner-border spinner-border customSpin" 
+            role="status" 
+            aria-hidden="true"></span>
+            
+            Delete</button>
   </div>
 
   <app-administration-comment-detail></app-administration-comment-detail>

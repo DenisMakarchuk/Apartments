@@ -15,6 +15,9 @@ import { SearchParametersService } from 'src/app/services/search-parameters.serv
 })
 export class SearchComponent implements OnInit {
 
+  spinning = false;
+  errorMessage: string;
+
   countries: CountryDTO[];
   pages: number[] = [];
 
@@ -50,11 +53,27 @@ export class SearchComponent implements OnInit {
   }
 
   getCountries(): void {
+    this.errorMessage = null;
+
     this.searchService.getAllCountries()
-      .subscribe(countries => this.countries = countries);
+      .subscribe(countries => this.countries = countries,
+        error=>{
+          if (error.status ===  500) {
+            this.errorMessage = "Error 500: Internal Server Error";
+          }
+          if (error.status ===  400) {
+            this.errorMessage = "Error 400: " + error.title;
+          }
+          else{
+            this.errorMessage = "Unsuspected Error";
+          }
+        });
   }
 
   searchApartments(): void {
+    this.spinning = true;
+    this.errorMessage = null;
+
     this.dateService.getDatesArray(this.requestForm.value.data.needDates === null ? [] : this.requestForm.value.data.needDates)
     .subscribe(dates => {
       this.requestForm.value.data.needDates = dates;
@@ -63,10 +82,38 @@ export class SearchComponent implements OnInit {
         .subscribe(response => {
           this.response = response;
 
+          this.spinning = false;
+
           this.postman.setSearchInfo(this.requestForm.value, this.response);
           this.postman.getRequestInfo();
           this.postman.getResponseInfo();
+        },
+        error=>{
+          this.spinning = false;
+
+          if (error.status ===  500) {
+            this.errorMessage = "Error 500: Internal Server Error";
+          }
+          if (error.status ===  400) {
+            this.errorMessage = "Error 400: " + error.title;
+          }
+          else{
+            this.errorMessage = "An error occurred.";
+          }
         });
+    },
+    error=>{
+      this.spinning = false;
+
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.title;
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
     });
   }
 }

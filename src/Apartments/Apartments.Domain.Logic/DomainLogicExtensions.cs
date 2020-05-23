@@ -44,7 +44,7 @@ namespace Apartments.Domain.Logic
             services.AddScoped<IExistsImahesOperator, ExistsImahesOperator>();
 
             services.AddTransient<IEmailSender, EmailSender>();
-            services.AddTransient<IEmailConfirmation, EmailConfirmation>();
+            services.AddTransient<IEmailMaker, EmailMaker>();
 
             services.Configure<AuthMessageSenderOptions>(config);
 

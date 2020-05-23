@@ -21,6 +21,10 @@ import * as jwt_decode from 'jwt-decode';
 })
 export class SearchApartmentDetailComponent implements OnInit {
 
+  spinning = false;
+  spinningOrder = false;
+  errorMessage: string;
+
   request: PagedRequestOfSearchParameters;
 
   addOrder: AddOrder;
@@ -53,8 +57,31 @@ export class SearchApartmentDetailComponent implements OnInit {
   }
 
   getApartment(): void {
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.searchService.getApartmentById(this.getApartmentId())
-      .subscribe(apartment => this.apartment = apartment);
+      .subscribe(apartment => {
+
+        this.spinning = false;
+        this.apartment = apartment
+      },
+      error=>{
+        this.spinning = false;
+  
+        if (error.status ===  500) {
+          this.errorMessage = "Error 500: Internal Server Error";
+        }
+        if (error.status ===  400) {
+          this.errorMessage = "Error 400: " + error.response;
+        }
+        if (error.status ===  404) {
+          this.errorMessage = "Error 404: " + error.response;
+        }
+        else{
+          this.errorMessage = "An error occurred.";
+        }
+      });
   }
 
   getApartmentId(): string {
@@ -63,14 +90,35 @@ export class SearchApartmentDetailComponent implements OnInit {
   }
 
   makeOrder(){
+    this.errorMessage = null;
+    this.spinningOrder = true;
+
     this.addOrder = new AddOrder();
     this.addOrder.apartmentId = this.getApartmentId();
     this.addOrder.dates = this.request.data.needDates;
 
     this.orderService.createOrder(this.addOrder)
     .subscribe(orderView => {
+
+      this.spinningOrder = false;
       this.orderView = orderView;
       this.router.navigate(['/order', orderView.order.id ]);
+    },
+    error=>{
+      this.spinningOrder = false;
+  
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
     });
   }
 

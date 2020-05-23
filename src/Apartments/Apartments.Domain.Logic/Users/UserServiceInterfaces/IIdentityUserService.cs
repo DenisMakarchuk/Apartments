@@ -1,4 +1,5 @@
 ﻿using Apartments.Common;
+using Apartments.Domain.Users;
 using Apartments.Domain.Users.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -50,5 +51,23 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <returns></returns>
         Task<Result> 
             DeleteAsync(string name, string password, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result>
+            ForgotPasswordAsync(ForgotPasswordModel request, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result>
+            ResetPasswordAsync(ResetPasswordModel model, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

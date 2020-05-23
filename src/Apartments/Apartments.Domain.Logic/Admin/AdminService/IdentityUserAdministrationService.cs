@@ -146,7 +146,16 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 Roles = roles.ToList<string>()
             };
 
-            await _emailSender.SendEmailAsync(user.Email, "Changed role", "You are Administrator now!", cancellationToken);
+            var sendingResult = await _emailSender.SendEmailAsync(user.Email,
+                                            "Changed role",
+                                            "You have been added the administrator role! Do not reply to this message, it was generated automatically!", 
+                                            cancellationToken);
+
+            if (sendingResult.IsError)
+            {
+                return (Result<UserAdministrationView>)Result<UserAdministrationView>
+                    .Fail<UserAdministrationView>(sendingResult.Message);
+            }
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
                 .Ok(view);
@@ -198,7 +207,16 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 Roles = roles.ToList<string>()
             };
 
-            await _emailSender.SendEmailAsync(user.Email, "Changed role", "You are not Administrator now!", cancellationToken);
+            var sendingResult = await _emailSender.SendEmailAsync(user.Email,
+                                            "Changed role",
+                                            "You have been removed from the administrator role! Do not reply to this message, it was generated automatically!",
+                                            cancellationToken);
+
+            if (sendingResult.IsError)
+            {
+                return (Result<UserAdministrationView>)Result<UserAdministrationView>
+                    .Fail<UserAdministrationView>(sendingResult.Message);
+            }
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
                 .Ok(view);

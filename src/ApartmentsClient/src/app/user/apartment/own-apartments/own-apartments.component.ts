@@ -3,7 +3,6 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { ApartmentImageService } from 'src/app/services/nswag.generated.service';
 
 import { ApartmentUserService,
-  CommentDTO,
   PagedResponseOfApartmentView } from 'src/app/services/nswag.generated.service';
 
 @Component({
@@ -12,6 +11,9 @@ import { ApartmentUserService,
   styleUrls: ['./own-apartments.component.scss']
 })
 export class OwnApartmentsComponent implements OnInit {
+
+  spinning = false;
+  errorMessage: string;
 
   response: PagedResponseOfApartmentView;
   requestForm: FormGroup;
@@ -34,8 +36,13 @@ export class OwnApartmentsComponent implements OnInit {
   }
 
   getOwnApartments(){
+    this.errorMessage = null;
+    this.spinning = true;
+
     this.apartmentService.getAllApartmentByOwnerId(this.requestForm.value)
     .subscribe(response => {
+
+      this.spinning = false;
       this.response = response;
 
       if (this.response.data) {
@@ -47,6 +54,22 @@ export class OwnApartmentsComponent implements OnInit {
       this.pages = [];
       for (let index = 1; index <= response.totalPages; index++) {
         this.pages.push(index);
+      }
+    },
+    error=>{
+      this.spinning = false;
+
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
       }
     });
   }
@@ -75,6 +98,7 @@ export class OwnApartmentsComponent implements OnInit {
   getImages(id: string){
     this.imageService.getImageNamesList(id)
     .subscribe(allImages =>{
+      
       if (allImages != null && allImages.length > 0) {
         this.imageService.getImage(id, allImages[0])
         .subscribe(currentImage => {
