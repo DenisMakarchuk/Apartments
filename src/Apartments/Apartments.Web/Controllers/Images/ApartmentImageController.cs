@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Apartments.Common;
-using Apartments.Domain.Image;
+using Apartments.Domain.ImageModels;
 using Apartments.Domain.Logic;
 using Apartments.Domain.Logic.Images.ImageInterfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

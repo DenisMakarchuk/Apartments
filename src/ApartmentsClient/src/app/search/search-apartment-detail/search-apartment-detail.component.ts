@@ -6,7 +6,7 @@ import { Location } from '@angular/common';
 import { ApartmentSearchService, OrderUserService }  from 'src/app/services/nswag.generated.service';
 import { ApartmentSearchView } from 'src/app/services/nswag.generated.service';
 
-import { AddOrder, OrderView } from 'src/app/services/nswag.generated.service';
+import { AddOrder, OrderDTO } from 'src/app/services/nswag.generated.service';
 import { PagedRequestOfSearchParameters } from 'src/app/services/nswag.generated.service';
 import { SearchParametersService } from 'src/app/services/search-parameters.service';
 
@@ -28,7 +28,7 @@ export class SearchApartmentDetailComponent implements OnInit {
   request: PagedRequestOfSearchParameters;
 
   addOrder: AddOrder;
-  orderView: OrderView;
+  orderDto: OrderDTO;
 
   apartment: ApartmentSearchView;
 
@@ -89,6 +89,38 @@ export class SearchApartmentDetailComponent implements OnInit {
     return id;
   }
 
+  formAnOrder(){
+    this.errorMessage = null;
+    this.spinningOrder = true;
+
+    this.addOrder = new AddOrder();
+    this.addOrder.apartmentId = this.getApartmentId();
+    this.addOrder.dates = this.request.data.needDates;
+
+    this.orderService.formationOrder(this.addOrder)
+    .subscribe(orderDto => {
+
+      this.spinningOrder = false;
+      this.orderDto = orderDto;
+    },
+    error=>{
+      this.spinningOrder = false;
+  
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
+    });
+  }
+
   makeOrder(){
     this.errorMessage = null;
     this.spinningOrder = true;
@@ -101,7 +133,6 @@ export class SearchApartmentDetailComponent implements OnInit {
     .subscribe(orderView => {
 
       this.spinningOrder = false;
-      this.orderView = orderView;
       this.router.navigate(['/order', orderView.order.id ]);
     },
     error=>{

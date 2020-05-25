@@ -110,6 +110,45 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
+        /// Order formation
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="customerId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<Result<OrderDTO>>
+            FormationOrderAsync(AddOrder order, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var apartmentId = Guid.Parse(order.ApartmentId);
+
+                if (!await IsApartmentFree(order.Dates, apartmentId))
+                {
+                    return (Result<OrderDTO>)Result<OrderDTO>
+                        .NotOk<OrderDTO>(null, $"Cannot add order. Dates are not free!");
+                };
+
+                var apartment = await _db.Apartments.Where(_ => _.Id == apartmentId)
+                                       .FirstOrDefaultAsync();
+
+                OrderDTO dto = new OrderDTO()
+                {
+                    TotalCoast = MakeTotalCoast(apartment.Price.Value, order.Dates),
+                    Dates = order.Dates
+                };
+
+                return (Result<OrderDTO>)Result<OrderDTO>
+                        .Ok(dto);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return (Result<OrderDTO>)Result<OrderDTO>
+                    .Fail<OrderDTO>($"Source is null. {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Add Order to the DataBase
         /// </summary>
         /// <param name="order"></param>

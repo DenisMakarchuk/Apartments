@@ -16,6 +16,16 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
     public interface IOrderUserService
     {
         /// <summary>
+        /// Order formation
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="customerId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result<OrderDTO>>
+            FormationOrderAsync(AddOrder order, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
         /// Add Order to the DataBase
         /// </summary>
         /// <param name="order"></param>

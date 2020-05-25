@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder } from '@angular/forms';
+import { Validators } from '@angular/forms';
 
 import { ApartmentView } from 'src/app/services/nswag.generated.service';
 import { Router } from '@angular/router';
@@ -35,21 +36,21 @@ export class AddApartmentComponent implements OnInit {
     private searchService: ApartmentSearchService
   ) { 
     this.addressForm = this.formBuilder.group({
-      countryId: '',
-      city: '',
-      street: '',
+      countryId: ['', [Validators.required]],
+      city: ['', [Validators.required, Validators.minLength(1)]],
+      street: ['', [Validators.required, Validators.minLength(1)]],
       home: '',
       numberOfApartment: 0
     })
     
     this.apartmentForm = this.formBuilder.group({
       address: this.addressForm,
-      title: '',
-      text: '',
+      title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(120)]],
+      text: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(500)]],
       area: 0,
       isOpen: true,
-      price: 0,
-      numberOfRooms: 0
+      price: ['', [Validators.required, Validators.min(1)]],
+      numberOfRooms: ['', [Validators.required, Validators.min(1)]]
       })
   }
 
@@ -57,6 +58,34 @@ export class AddApartmentComponent implements OnInit {
     this.getCountries();
   }
 
+  get _title(){
+    return this.apartmentForm.get('title');
+  }
+
+  get _text(){
+    return this.apartmentForm.get('text');
+  }
+
+  get _price(){
+    return this.apartmentForm.get('price');
+  }
+
+  get _country(){
+    return this.addressForm.get('countryId');
+  }
+
+  get _city(){
+    return this.addressForm.get('city');
+  }
+
+  get _street(){
+    return this.addressForm.get('street');
+  }
+
+  get _numberOfRooms(){
+    return this.apartmentForm.get('numberOfRooms');
+  }
+  
   getCountries(): void {
     this.errorMessage = null;
     this.spinning = true;

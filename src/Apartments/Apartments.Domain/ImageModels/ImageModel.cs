@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Apartments.Domain.Image
+namespace Apartments.Domain.ImageModels
 {
     public class ImageModel
     {

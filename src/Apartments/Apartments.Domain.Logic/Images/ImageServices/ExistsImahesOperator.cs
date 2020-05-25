@@ -129,18 +129,26 @@ namespace Apartments.Domain.Logic.Images.ImageServices
 
             var fullPath = Path.Combine(path, imageName);
 
-            var checkDirectory = IsExists(path, fullPath);
-            if (!checkDirectory.IsSuccess)
+            var pathMini = Path.Combine(Directory.GetCurrentDirectory(),
+                            $"Resources\\ApartmentImages\\{apartmentId}Mini");
+
+            var fullPathMini = Path.Combine(pathMini, imageName);
+
+            var checkDirectory = IsExists(path, imageName);
+            var checkDirectoryMini = IsExists(pathMini, imageName);
+
+            if (!checkDirectory.IsSuccess || !checkDirectoryMini.IsSuccess)
             {
-                if (checkDirectory.IsError)
+                if (checkDirectory.IsError || checkDirectoryMini.IsError)
                 {
-                    return Result.Fail(checkDirectory.Message);
+                    return Result.Fail(checkDirectory?.Message + checkDirectoryMini?.Message);
                 }
 
-                return Result.NotOk(checkDirectory.Message);
+                return Result.NotOk(checkDirectory?.Message + checkDirectoryMini?.Message);
             }
 
             File.Delete(fullPath);
+            File.Delete(fullPathMini);
 
             return Result.Ok();
         }

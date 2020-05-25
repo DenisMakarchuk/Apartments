@@ -39,13 +39,50 @@ namespace Apartments.Web.Controllers.Users
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost]
+        [Route("formation")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderDTO))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            FormationOrderAsync([FromBody, CustomizeValidator]AddOrder order, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            //todo: rewrite, because there is no time to write as it should
+
+            if (order is null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _service.FormationOrderAsync(order, cancellationToken);
+
+                return result.IsError ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess ? (IActionResult)Ok(result.Data)
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Add Order to the DataBase
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [HttpPost]
         [Route("")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(OrderView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
-        public async Task<IActionResult> 
+        public async Task<IActionResult>
             CreateOrderAsync([FromBody, CustomizeValidator]AddOrder order, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (order is null || !ModelState.IsValid)
