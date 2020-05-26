@@ -79,6 +79,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             return view;
         }
 
+        [LogAttribute]
         private decimal MakeTotalCoast(decimal coastByDay, IEnumerable<DateTime> dates)
         {
             decimal totalCoast = 0m;
@@ -91,6 +92,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             return totalCoast;
         }
 
+        [LogAttribute]
         private List<BusyDate> MakeListBusyDates(IEnumerable<DateTime> dates, Guid apartmentId)
         {
             List<BusyDate> busyDates = new List<BusyDate>();
@@ -116,6 +118,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="customerId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result<OrderDTO>>
             FormationOrderAsync(AddOrder order, CancellationToken cancellationToken = default(CancellationToken))
         {

@@ -148,7 +148,7 @@ namespace Apartments.Web.Controllers.Admin
         }
 
         /// <summary>
-        /// Delete IdentityUser & User Profile
+        /// Delete IdentityUser & User Apartments
         /// </summary>
         /// <param name="id"></param>
         /// <param name="cancellationToken"></param>

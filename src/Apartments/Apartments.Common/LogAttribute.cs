@@ -13,7 +13,8 @@ namespace Apartments.Common
 
         public override void OnEntry(MethodExecutionArgs args)
         {
-            string fileName = $"{args.Method.MetadataToken}" + _extension;
+            string fileName = $"{DateTime.UtcNow.ToString("ddmmyyyyhhmmssffffff")}_{args.Method.Name}"
+                                + Guid.NewGuid().ToString() + _extension;
             var directiryPath = $"Resources\\Logs\\OnEntry";
             var fullDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), directiryPath);
             var fullPath = Path.Combine(fullDirectoryPath, fileName);
@@ -38,7 +39,8 @@ namespace Apartments.Common
 
         public override void OnExit(MethodExecutionArgs args)
         {
-            string fileName = $"{args.Method.MetadataToken}" + _extension;
+            string fileName = $"{DateTime.UtcNow.ToString("ddmmyyyyhhmmssffffff")}_{args.Method.Name}"
+                                + Guid.NewGuid().ToString() + _extension;
             var directiryPath = $"Resources\\Logs\\OnExit";
             var fullDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), directiryPath);
             var fullPath = Path.Combine(fullDirectoryPath, fileName);
@@ -63,7 +65,8 @@ namespace Apartments.Common
 
         public override void OnException(MethodExecutionArgs args)
         {
-            string fileName = $"{args.Method.MetadataToken}" + _extension;
+            string fileName = $"{DateTime.UtcNow.ToString("ddmmyyyyhhmmssffffff")}_{args.Method.Name}"
+                                + Guid.NewGuid().ToString() + _extension;
             var directiryPath = $"Resources\\Logs\\OnException";
             var fullDirectoryPath = Path.Combine(Directory.GetCurrentDirectory(), directiryPath);
             var fullPath = Path.Combine(fullDirectoryPath, fileName);

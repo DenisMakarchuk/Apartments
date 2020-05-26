@@ -189,11 +189,6 @@ namespace Apartments.Domain.Logic.Users.UserService
                 UserName = request.UserName
             };
 
-            if (!_userManager.Users.Any())
-            {
-                defaultRole = "Admin";
-            }
-
             var createUser = await _userManager.CreateAsync(newUser, request.Password);
 
             if (!createUser.Succeeded)
@@ -221,6 +216,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="userId"></param>
         /// <param name="token"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> ConfirmEmail(string userId, string token)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -356,6 +352,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="request"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> ForgotPasswordAsync(ForgotPasswordModel request, CancellationToken cancellationToken = default)
         {
             IdentityUser user;
@@ -383,6 +380,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <param name="model"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [LogAttribute]
         public async Task<Result> ResetPasswordAsync(ResetPasswordModel model, CancellationToken cancellationToken = default(CancellationToken))
         {
             var user = await _userManager.FindByIdAsync(model.UserId);

@@ -23,6 +23,7 @@ namespace Apartments.Domain.Logic.Email
 
         public AuthMessageSenderOptions Options { get; }
 
+        [LogAttribute]
         public async Task<Result> SendEmailAsync(string email, 
                                    string subject, 
                                    string message, 

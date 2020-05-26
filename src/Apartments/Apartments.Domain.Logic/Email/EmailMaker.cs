@@ -20,6 +20,7 @@ namespace Apartments.Domain.Logic.Email
             _emailSender = emailSender;
         }
 
+        [LogAttribute]
         public async Task<Result> JustSendEmailAsync(string email, string message, string callBackUrl = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var subject = "Reset Password";
@@ -37,6 +38,7 @@ namespace Apartments.Domain.Logic.Email
             return await _emailSender.SendEmailAsync(email, subject, finalMessage, cancellationToken);
         }
 
+        [LogAttribute]
         public async Task<Result> MakeConfirmEmailMessageAsync(IdentityUser user, string callBackUrl, CancellationToken cancellationToken = default(CancellationToken))
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -54,6 +56,7 @@ namespace Apartments.Domain.Logic.Email
             return await _emailSender.SendEmailAsync(emailForSending, subject, message, cancellationToken);
         }
 
+        [LogAttribute]
         public async Task<Result> MakeConfirmPasswordResetMessageAsync(IdentityUser user, string callBackUrl, CancellationToken cancellationToken = default)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);

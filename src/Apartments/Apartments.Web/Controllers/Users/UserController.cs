@@ -264,6 +264,5 @@ namespace Apartments.Web.Controllers.Users
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-
     }
 }

@@ -96,10 +96,6 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
         this.imagesCount.push(index);
       };
 
-      if (this.currentImageNumber > this.imagesCount.length && this.currentImageNumber > 1) {
-        this.currentImageNumber -= 1;
-      }
-      
       this.getImage(this.currentImageNumber);
     },
     error=>{
@@ -176,6 +172,11 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
     this.spinningDel = true;
 
     if (this.allImages != null && this.currentImageNumber > 0 && this.currentImageNumber <= this.allImages.length) {
+
+      if (this.currentImageNumber > 1) {
+        this.currentImageNumber -= 1;
+      }
+      
       this.imageService.delete(this.currentApartmentId, this.allImages[this.currentImageNumber-1])
       .subscribe(() => {
         this.spinningDel = false;

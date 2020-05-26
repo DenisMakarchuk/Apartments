@@ -137,17 +137,28 @@ namespace Apartments.Domain.Logic.Images.ImageServices
             var checkDirectory = IsExists(path, imageName);
             var checkDirectoryMini = IsExists(pathMini, imageName);
 
-            if (!checkDirectory.IsSuccess || !checkDirectoryMini.IsSuccess)
+            if (!checkDirectory.IsSuccess)
             {
-                if (checkDirectory.IsError || checkDirectoryMini.IsError)
+                if (checkDirectory.IsError)
                 {
-                    return Result.Fail(checkDirectory?.Message + checkDirectoryMini?.Message);
+                    return Result.Fail(checkDirectory?.Message);
                 }
 
-                return Result.NotOk(checkDirectory?.Message + checkDirectoryMini?.Message);
+                return Result.NotOk(checkDirectory?.Message);
             }
 
             File.Delete(fullPath);
+
+            if (!checkDirectoryMini.IsSuccess)
+            {
+                if (checkDirectoryMini.IsError)
+                {
+                    return Result.Fail(checkDirectoryMini?.Message);
+                }
+
+                return Result.NotOk(checkDirectoryMini?.Message);
+            }
+
             File.Delete(fullPathMini);
 
             return Result.Ok();
