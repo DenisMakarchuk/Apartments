@@ -154,6 +154,7 @@ export class OwnApartmentDetailComponent implements OnInit {
   goBack(){
     if (this.isUpdating) {
       this.isUpdating = false;
+      this.getApartment();
     }
     else{
       this.location.back();

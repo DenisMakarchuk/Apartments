@@ -3,6 +3,7 @@ import { ApartmentImageService } from 'src/app/services/nswag.generated.service'
 import { ActivatedRoute } from '@angular/router';
 import { LoggedService } from 'src/app/services/logged.service';
 import { ApartmentSearchService }  from 'src/app/services/nswag.generated.service';
+import { GetImagesService } from 'src/app/services/get-images.service';
 import * as jwt_decode from 'jwt-decode';
 
 @Component({
@@ -29,8 +30,16 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
     private route: ActivatedRoute,
     private imageService: ApartmentImageService,
     private searchService: ApartmentSearchService,
-    private authService: LoggedService
-  ) { }
+    private authService: LoggedService,
+    private postman: GetImagesService
+  ) { 
+    this.postman.go$
+    .subscribe(go => {
+      if (go) {
+        this.getImages();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.getImages();
@@ -87,6 +96,10 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
         this.imagesCount.push(index);
       };
 
+      if (this.currentImageNumber > this.imagesCount.length && this.currentImageNumber > 1) {
+        this.currentImageNumber -= 1;
+      }
+      
       this.getImage(this.currentImageNumber);
     },
     error=>{
@@ -102,7 +115,7 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
         this.errorMessage = "Error 403: You are not authorized";
       }
       if (error.status ===  404) {
-        this.errorMessage = "Error 404: " + error.response;
+        this.errorMessage = null;
       }
       else{
         this.errorMessage = "An error occurred.";
@@ -158,10 +171,6 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
     this.spinning = false;
   }
 
-  show(){
-    this.getImages();
-  }
-
   deleteImage(){
     this.errorMessage = null;
     this.spinningDel = true;
@@ -172,7 +181,6 @@ export class ApartmentAllImagesNamesComponent implements OnInit {
         this.spinningDel = false;
 
         this.currentImage = null;
-        this.currentImageNumber = 1;
         this.getImages();
       },
       error=>{

@@ -15,6 +15,7 @@ import { SearchParametersService } from 'src/app/services/search-parameters.serv
 })
 export class SearchComponent implements OnInit {
 
+  isResult = false;
   spinning = false;
   errorMessage: string;
 
@@ -83,6 +84,7 @@ export class SearchComponent implements OnInit {
           this.response = response;
 
           this.spinning = false;
+          this.isResult = true;
 
           this.postman.setSearchInfo(this.requestForm.value, this.response);
           this.postman.getRequestInfo();

@@ -111,9 +111,13 @@ namespace Apartments.Domain.Logic.Users.UserService
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("id", user.Id),
-                new Claim("name", nickName)
+                new Claim("id", user.Id)
             };
+
+            if (nickName != null)
+            {
+                claims.Add(new Claim("name", nickName));
+            }
 
             var userClaims = await _userManager.GetClaimsAsync(user);
             claims.AddRange(userClaims);
@@ -272,7 +276,7 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id, cancellationToken);
 
-            var token = await GenerateAuthanticationResult(user, profile.Data.NickName);
+            var token = await GenerateAuthanticationResult(user, profile?.Data?.NickName);
 
             if (profile.IsError || string.IsNullOrEmpty(token.Data))
             {
@@ -282,7 +286,13 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             if (!profile.IsSuccess)
             {
-                return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "Profile is not exist");
+                UserViewModel notOkResult = new UserViewModel()
+                {
+                    Profile = null,
+                    Token = token.Data
+                };
+
+                return (Result<UserViewModel>)Result<UserViewModel>.Ok<UserViewModel>(notOkResult);
             }
 
             UserViewModel result = new UserViewModel()

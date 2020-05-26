@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Router } from '@angular/router';
 
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { UserService } from 'src/app/services/nswag.generated.service';
 import { UserViewModel } from 'src/app/services/nswag.generated.service';
 
@@ -26,12 +26,20 @@ export class LoginComponent implements OnInit {
     public fb: FormBuilder,
     public router: Router) { 
       this.loginForm = this.fb.group({
-        userName: '',
-        password: ''
-      });
-    }
+        userName: ['', [Validators.required]],
+        password: ['', [Validators.required, Validators.minLength(8)]]
+    });
+  }
 
   ngOnInit(): void {
+  }
+
+  get _userName(){
+    return this.loginForm.get('userName');
+  }
+
+  get _password(){
+    return this.loginForm.get('password');
   }
 
   login() {

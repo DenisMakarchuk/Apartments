@@ -21,6 +21,8 @@ import {  ApartmentUserService,
 import { TokenInterceptorService } from './auth/token-interceptor.service';
 import { LoggedService } from '../app/services/logged.service';
 import { SearchParametersService } from '../app/services/search-parameters.service';
+import { GetCommentsService } from './services/getComments.service';
+import { GetImagesService } from './services/get-images.service';
 
 import { AppComponent } from './app.component';
 import { MainMenuComponent } from './main-menu/main-menu.component';
@@ -101,6 +103,8 @@ import { ResetComponent } from './auth/forgot-password/reset/reset.component';
       useClass: TokenInterceptorService,
       multi: true
     },
+    GetCommentsService,
+    GetImagesService,
     ApartmentUserService,
     CommentUserService,
     OrderUserService,

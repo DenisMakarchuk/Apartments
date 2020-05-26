@@ -28,23 +28,23 @@
 
 <div *ngIf="response">
     <div class="form-group card" *ngFor="let comm of response.data">
-        <a *ngIf="isAuthor(comm)" class="btn btn-light text-left" routerLink="/comment/{{comm.id}}">
+        <a *ngIf="isAuthor(comm) || isAdmin" class="btn btn-light text-left" routerLink="/comment/{{comm.id}}">
             <div class="card-body">
-                <h2 class="card-title">{{comm.title}}</h2>
-                <h6>{{comm.text}}</h6> 
+                <small  class="card-title">{{comm.title}}</small>
+                <h4>{{comm.text}}</h4> 
              </div>
         </a>
 
-        <div *ngIf="!isAuthor(comm)" class="card border-dark text-left">
+        <div *ngIf="!isAuthor(comm) && !isAdmin" class="card border-dark text-left">
             <div class="card-body">
-                <h2 class="card-title">{{comm.title}}</h2>
-                <h6>{{comm.text}}</h6> 
+                <small  class="card-title">{{comm.title}}</small>
+                <h4>{{comm.text}}</h4> 
             </div>
         </div>
     </div>
 </div>
 
-<div *ngIf="spinning"  class="d-flex justify-content-center">
+<div *ngIf="spinning && !response"  class="d-flex justify-content-center">
     <div class="spinner-border text-success" role="status">
         <span class="sr-only">Loading...</span>
     </div>
@@ -59,7 +59,12 @@
     <div class="form-group btn-group mr-2">
         <div *ngFor="let page of pages">
             <button [ngClass]="page === response.pageNumber ? 'btn btn-success':'btn btn-warning'" 
-                (click)="getPage(page)">{{page}}</button>
+                (click)="getPage(page)">
+                <span *ngIf="spinning && page === requestForm.value.pageNumber" 
+                class="spinner-border spinner-border customSpin" 
+                role="status" 
+                aria-hidden="true"></span>
+                {{page}}</button>
         </div>
     </div>
 </div>

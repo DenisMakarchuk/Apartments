@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<div *ngIf="currentImage && !spinningDel"> 
+<div *ngIf="currentImage && !spinningDel" class="m-3"> 
   <div id="carouselExampleFade" class="carousel slide carousel-fade m-3" data-ride="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active">
@@ -45,5 +45,3 @@
     <button *ngIf="isOwner" class="btn btn-danger border btn-sm" (click)="deleteImage()">Delete Image</button>
   </div>
 </div>
-<button *ngIf="isOwner" class="btn btn-success border btn-sm" (click)="show()">Show Updates</button>
-

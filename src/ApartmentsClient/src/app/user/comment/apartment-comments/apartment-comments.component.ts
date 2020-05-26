@@ -4,8 +4,9 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { CommentUserService,
   CommentDTO,
   PagedResponseOfCommentDTO
-} from 'src/app/services/nswag.generated.service'
-import { LoggedService } from 'src/app/services/logged.service'
+} from 'src/app/services/nswag.generated.service';
+import { GetCommentsService } from 'src/app/services/getComments.service';
+import { LoggedService } from 'src/app/services/logged.service';
 import * as jwt_decode from 'jwt-decode';
 
 @Component({
@@ -27,16 +28,36 @@ export class ApartmentCommentsComponent implements OnInit {
     private commentService: CommentUserService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private authService: LoggedService
+    private authService: LoggedService,
+    private postman: GetCommentsService
   ) { 
     this.requestForm = this.fb.group({
       data: this.route.snapshot.paramMap.get('id'),
       pageNumber: 1,
       pageSize: 20
-    })
+    });
+
+    this.postman.go$
+    .subscribe(go => {
+      if (go) {
+        this.getComments();
+      }
+    });
   }
 
   ngOnInit(): void {
+  }
+
+  get isAdmin(){
+    var token = this.authService.getToken();
+      
+    var decodedoken = jwt_decode(token);
+    var currentRole = decodedoken['role'];
+
+    if (currentRole.includes('Admin')) {
+      return true;
+    }
+    return false;
   }
 
   isAuthor(comment: CommentDTO){

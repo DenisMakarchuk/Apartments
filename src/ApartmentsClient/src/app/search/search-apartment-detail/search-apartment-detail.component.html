@@ -13,24 +13,53 @@
 <div *ngIf="apartment">
     <app-apartment-all-images-names></app-apartment-all-images-names>
 
-    <h2>{{apartment.apartment.title | uppercase}}</h2>
-  
-    <h4 *ngIf="apartment.apartment.area">Area: {{apartment.apartment.area}}</h4>
-    <h4>Rooms: {{apartment.apartment.numberOfRooms}}</h4>
-    <h4>Price: {{apartment.apartment.price}} $</h4>
+    <div class="text-center shadow mb-3 bg-white rounded">
+        <label class="h1">{{apartment.apartment.title | uppercase}}</label>
+    </div>
 
-    <h2>Addpess:</h2>
-  
-    <h4>Country: {{apartment.country.name}}</h4>
-    <h4>City: {{apartment.address.city}}</h4>
-    <h4>Street: {{apartment.address.street}}</h4>
-    <h4 *ngIf="apartment.address.home">Home: {{apartment.address.home}}</h4>
-    <h4 *ngIf="apartment.address.numberOfApartment">Apartmewnt № {{apartment.address.numberOfApartment}}</h4>
+    <div class="form-row shadow mb-3 bg-white rounded">
+        <div class="form-group col-md-4" *ngIf="apartment.apartment.area">
+            <label class="h4">Area: {{apartment.apartment.area}}</label>
+        </div>
 
-    <h2>About the apartment:</h2>
-    <h4>{{apartment.apartment.text}}</h4>
+        <div class="form-group col-md-4">
+            <label class="h4">Rooms: {{apartment.apartment.numberOfRooms}}</label>
+        </div>
+
+        <div class="form-group col-md-4">
+            <label class="h4">Price: {{apartment.apartment.price}} $</label>
+        </div>
+    </div>
   
-    <div *ngIf="orderDto">
+    <div class="form-row shadow mb-3 bg-white rounded">
+
+        <div class="form-group col-md-12 text-center">
+            <label class="h2">Addpess:</label>
+        </div>
+        <div class="form-group col-md-12">
+            <label class="h4">Country: {{apartment.country.name}}</label>
+        </div>
+        <div class="form-group col-md-12">
+            <label class="h4">City: {{apartment.address.city}}</label>
+        </div>
+        <div class="form-group col-md-12">
+            <label class="h4">Street: {{apartment.address.street}}</label>
+        </div>
+        <div *ngIf="apartment.address.home" class="form-group col-md-12">
+            <label class="h4">Home: {{apartment.address.home}}</label>
+        </div>
+        <div *ngIf="apartment.address.numberOfApartment" class="form-group col-md-12">
+            <label class="h4">Apartmewnt № {{apartment.address.numberOfApartment}}</label>
+        </div>
+    </div>
+
+    <div class="text-center shadow mb-3 bg-white rounded">
+        <label class="h2">About the apartment:</label><br>            
+        <label class="h4">{{apartment.apartment.text}}</label>
+    </div>
+
+    <div *ngIf="orderDto" class="alert alert-success">
+        <h2 class="text-center">Information about order:</h2>
         <h4>Dates:</h4>
         <div *ngFor="let date of orderDto.dates">
           <h6>{{date  | date: 'dd MMMM yyyy'}}</h6> 

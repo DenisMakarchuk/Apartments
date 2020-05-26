@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { LoggedService } from 'src/app/services/logged.service'
 import { CommentUserService } from 'src/app/services/nswag.generated.service'
+import { GetCommentsService } from 'src/app/services/getComments.service';
 import * as jwt_decode from 'jwt-decode';
 
 @Component({
@@ -13,6 +14,7 @@ import * as jwt_decode from 'jwt-decode';
 export class AddCommentComponent implements OnInit {
 
   spinning = false;
+  isAdded = false;
   errorMessage: string;
 
   commentForm: FormGroup;
@@ -21,16 +23,21 @@ export class AddCommentComponent implements OnInit {
     private commentService: CommentUserService,
     private route: ActivatedRoute,
     private fb: FormBuilder,
-    private authService: LoggedService
+    private authService: LoggedService,
+    private postman: GetCommentsService
   ) { 
     this.commentForm = this.fb.group({
       apartmentId: this.getApartmentId(),
       title: this.getNickName(),
-      text: ''
+      text: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(255)]]
     });
   }
 
   ngOnInit(): void {
+  }
+
+  get _comment(){
+    return this.commentForm.get('text');
   }
 
   getApartmentId(): string {
@@ -51,13 +58,18 @@ export class AddCommentComponent implements OnInit {
     this.errorMessage = null;
     this.spinning = true;
 
+    this.commentForm.value.apartmentId = this.getApartmentId();
+    this.commentForm.value.title = this.getNickName();
+
     if (this.commentForm.valid) {
       this.commentService.createComment(this.commentForm.value)
       .subscribe(data =>
         {
           this.spinning = false;
- 
-          this.commentForm.reset();}
+          this.isAdded = true;
+          this.postman.go(true);
+          this.commentForm.reset();
+        }
       ),
       error=>{
         this.spinning = false;

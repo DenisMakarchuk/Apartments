@@ -9,7 +9,7 @@
         <div class="col-12">
             <div class="input-group was-validated">
                 <div class="input-group-prepend">
-                    <div class="input-group-text">Comments on the page</div>
+                    <div class="input-group-text">Orders on the page</div>
                 </div>
                 
                 <input type="number" formControlName="pageSize" class="col" required min="1">
@@ -32,7 +32,7 @@
             <h4 class="card-text">Price: {{or.totalCoast}} $</h4>
             <h4 class="card-text">Dates:</h4>
             <div *ngFor="let date of or.dates">
-                <h6>{{date  | date: 'dd.MMM.yyyy'}}</h6> 
+                <h6>{{date  | date: 'dd MMMM yyyy'}}</h6> 
             </div>
         </div>
     </div>

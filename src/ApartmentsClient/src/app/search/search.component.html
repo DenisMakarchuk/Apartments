@@ -84,7 +84,13 @@
                 Search</button>
     </form>
 
-    <div class="col">
+    <div *ngIf="!isResult" class="col-8 text-center align-self-center">
+        <div class="alert alert-success h-100 display-4 align-self-center" role="alert">
+            Select search options and click "Search".<br> You can order an apartment only if the dates in the search are selected!    
+        </div>
+    </div>
+
+    <div *ngIf="isResult" class="col">
         <router-outlet></router-outlet>
     </div>
 </div>

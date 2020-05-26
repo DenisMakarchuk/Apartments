@@ -126,7 +126,7 @@ namespace Apartments.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<IdentityUser> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -138,6 +138,8 @@ namespace Apartments.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            MyIdentityDataInitializer.SeedUsers(userManager);
 
             app.UseDefaultFiles();
             app.UseStaticFiles();

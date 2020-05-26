@@ -10,6 +10,8 @@ import { UserAdministrationService,
 })
 export class UserAdministrationComponent implements OnInit {
 
+  errorMessage: string;
+
   allUsers: IdentityUserAdministrationDTO[];
   usersOnPage: IdentityUserAdministrationDTO[];
   currentUserPage: number;
@@ -31,6 +33,8 @@ export class UserAdministrationComponent implements OnInit {
   }
 
   getUsers(){
+    this.errorMessage = null;
+
     this.adminService.getAllUsersInRole('User')
     .subscribe(users=>{
       this.allUsers = users;
@@ -38,6 +42,21 @@ export class UserAdministrationComponent implements OnInit {
       this.currentUserPage = 1;
 
       this.getPage(this.currentUserPage);
+    },
+    error=>{
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
+      }
     });
   }
 

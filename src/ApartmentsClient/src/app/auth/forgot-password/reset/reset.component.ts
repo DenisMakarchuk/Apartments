@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { UserService } from 'src/app/services/nswag.generated.service';
-import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-reset',
@@ -17,6 +17,7 @@ export class ResetComponent implements OnInit {
   token: string;
 
   resetForm: FormGroup;
+  confirmPasswordForm: FormGroup;
 
   isReseted = false;
 
@@ -31,19 +32,33 @@ export class ResetComponent implements OnInit {
     this.resetForm = this.fb.group({
       userId: this.userId,
       token: this.token,
-      password: '',
+      password: ['', [Validators.required, Validators.minLength(8)]],
       callBackUrl: 'http://localhost:4200/login'
     });
+
+    this.confirmPasswordForm = this.fb.group({
+      confirmPassword: ''
+    })
   }
 
   ngOnInit(): void {
+  }
+
+  get _password(){
+    return this.resetForm.get('password');
+  }
+
+  get _confirmPassword(){
+    return this.confirmPasswordForm.get('confirmPassword');
   }
 
   reset(){
     this.errorMessage = null;
     this.spinning = true;
 
-    if (this.resetForm.valid) {
+    if (this.resetForm.valid && 
+        this.resetForm.value.password === this.confirmPasswordForm.value.confirmPassword) {
+
       this.userService.resetPassword(this.resetForm.value)
       .subscribe(() => 
       {

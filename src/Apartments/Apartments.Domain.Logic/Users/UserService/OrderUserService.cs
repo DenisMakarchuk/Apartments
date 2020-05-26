@@ -119,6 +119,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         public async Task<Result<OrderDTO>>
             FormationOrderAsync(AddOrder order, CancellationToken cancellationToken = default(CancellationToken))
         {
+            //todo: rewrite, because there is no time to write as it should
             try
             {
                 var apartmentId = Guid.Parse(order.ApartmentId);

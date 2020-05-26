@@ -5,8 +5,7 @@
 </div>
 
 <div>
-    <div *ngIf="addressImage" class="col-8">
-        <img [src]="addressImage" class="card-img">
+    <div *ngIf="isUploaded" class="col-8">
         <div class="alert alert-success" role="alert">
           UPLOADED!
         </div>

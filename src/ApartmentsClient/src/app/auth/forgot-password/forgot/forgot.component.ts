@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { UserService } from 'src/app/services/nswag.generated.service';
 
@@ -26,11 +26,15 @@ export class ForgotComponent implements OnInit {
   ) { 
     this.forgotForm = this.fb.group({
       callBackUrl: 'http://localhost:4200/reset-password',
-      logInNameOrEmail: ''
+      logInNameOrEmail: ['', [Validators.required]]
     });
   }
 
   ngOnInit(): void {
+  }
+
+  get _logInNameOrEmail(){
+    return this.forgotForm.get('logInNameOrEmail');
   }
 
   sendForgotMessage(){

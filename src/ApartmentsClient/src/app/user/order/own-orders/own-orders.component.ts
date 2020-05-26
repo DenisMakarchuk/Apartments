@@ -94,10 +94,10 @@ export class OwnOrdersComponent implements OnInit {
   }
 
   getImages(id: string){
-    this.imageService.getImageNamesList(id)
+    this.imageService.getImageNamesList(id + 'Mini')
     .subscribe(allImages =>{
       if (allImages != null && allImages.length > 0) {
-        this.imageService.getImage(id, allImages[0])
+        this.imageService.getImage(id + 'Mini', allImages[0])
         .subscribe(currentImage => {
         this.mainImages[id] = currentImage;
         })

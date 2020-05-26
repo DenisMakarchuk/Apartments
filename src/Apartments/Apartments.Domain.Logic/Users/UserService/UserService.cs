@@ -123,7 +123,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         {
             Guid id = Guid.Parse(identityId);
 
-            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+            var user = await _db.Users.IgnoreQueryFilters()
+                                .Include(_=>_.Apartments).FirstOrDefaultAsync(_ => _.Id == id);
 
             if (user is null)
             {
@@ -132,7 +133,8 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             try
             {
-                _db.Users.Remove(user);
+                //todo: rewrite, because there is no time to write as it should
+                _db.Apartments.RemoveRange(user.Apartments);
                 await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());

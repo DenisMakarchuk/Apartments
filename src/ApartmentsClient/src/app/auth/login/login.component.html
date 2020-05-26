@@ -5,8 +5,8 @@
 </div>
 
 <div>
-    <form class="was-validated" novalidate [formGroup]="loginForm" (ngSubmit)="login()">
-        <h3>Please sign in</h3>
+    <form novalidate [formGroup]="loginForm" (ngSubmit)="login()">
+        <h3 class="text-center">Please sign in</h3>
 
         <div class="form-group">
             <label for="inputName">Name</label>
@@ -14,14 +14,12 @@
                    id="inputName" 
                    class="form-control" 
                    formControlName="userName" 
-                   placeholder="Enter unique Name" 
-                   required>
+                   placeholder="Enter unique Name">
 
-            <div class="valid-feedback">
-                Looks good!
-            </div>
-            <div class="invalid-feedback">
-                Please, enter the unique Name!
+            <div class="text-danger"
+                 *ngIf="_userName.invalid && 
+                        (_userName.touched || _userName.dirty || errorMessage)">
+                <small>Please, enter the unique Name!</small>
             </div>
         </div>
 
@@ -31,15 +29,17 @@
                    id="inputPassword" 
                    class="form-control" 
                    formControlName="password" 
-                   placeholder="Password" 
-                   required
-                   minlength="8">
+                   placeholder="Password">
 
-            <div class="valid-feedback">
-                Looks good!
+            <div class="text-success"
+                 *ngIf="_password.valid && 
+                        (_password.touched || _password.dirty)">
+                <small>Looks good!</small>
             </div>
-            <div class="invalid-feedback">
-                Please, enter the password!
+            <div class="text-danger"
+                 *ngIf="_password.invalid && 
+                        (_password.touched || _password.dirty || errorMessage)">
+                <small>Please, enter the password!</small>
             </div>
         </div>
 

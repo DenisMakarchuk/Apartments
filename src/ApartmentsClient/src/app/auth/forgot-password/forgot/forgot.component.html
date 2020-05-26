@@ -5,21 +5,19 @@
 </div>
 
 <div *ngIf="!isOk">
-    <form  class="was-validated" novalidate [formGroup]="forgotForm" (ngSubmit)="sendForgotMessage()">
+    <form novalidate [formGroup]="forgotForm" (ngSubmit)="sendForgotMessage()">
         <div class="form-group">
             <label for="inputLogInNameOrEmail">Plese, enter your Log In Name or Email</label>
             <input type="password"
                    id="inputLogInNameOrEmail" 
                    class="form-control" 
                    formControlName="logInNameOrEmail" 
-                   placeholder="Log In Name or Email" 
-                   required>
+                   placeholder="Log In Name or Email">
 
-            <div class="valid-feedback">
-                Looks good!
-            </div>
-            <div class="invalid-feedback">
-                Please, enter your Log In Name or Email!
+            <div class="text-danger"
+                *ngIf="_logInNameOrEmail.invalid && 
+                    (_logInNameOrEmail.touched || _logInNameOrEmail.dirty || errorMessage)">
+                <small>Please, enter your Log In Name or Email!</small>
             </div>
         </div>
 
@@ -28,7 +26,7 @@
                       class="spinner-border spinner-border customSpin" 
                       role="status" 
                       aria-hidden="true"></span>
-                      Reset Password</button>
+                      Send password reset message</button>
     </form>
 </div>
 

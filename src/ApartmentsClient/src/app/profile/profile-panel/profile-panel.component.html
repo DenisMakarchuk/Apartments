@@ -1,11 +1,75 @@
-<div class="row">
-    <div class="col col-lg-3">
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div>
+    <form *ngIf="isDeletion" novalidate [formGroup]="deletionForm" (ngSubmit)="deleteAccount()">
+        <h3 class="text-center">Deletion panel</h3>
+
+        <div class="form-group">
+            <label for="inputName">Name</label>
+            <input type="string" 
+                   id="inputName" 
+                   class="form-control" 
+                   formControlName="userName" 
+                   placeholder="Enter unique Name">
+
+            <div class="text-danger"
+                 *ngIf="_userName.invalid && 
+                        (_userName.touched || _userName.dirty || errorMessage)">
+                <small>Please, enter your Log In Name!</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" 
+                   id="inputPassword" 
+                   class="form-control" 
+                   formControlName="password" 
+                   placeholder="Password">
+
+            <div class="text-success"
+                 *ngIf="_password.valid && 
+                        (_password.touched || _password.dirty)">
+                <small>Looks good!</small>
+            </div>
+            <div class="text-danger"
+                 *ngIf="_password.invalid && 
+                        (_password.touched || _password.dirty || errorMessage)">
+                <small>Please, enter the password!</small>
+            </div>
+        </div>
+
+        <div class="btn-group btn-block form-group" role="group">
+            <button class="btn btn-success" (click)="goBack()">
+                <span *ngIf="spinning" 
+                        class="spinner-border spinner-border customSpin" 
+                        role="status" 
+                        aria-hidden="true"></span>
+                Go back</button>
+               
+            <button type="submit" class="btn btn-danger">
+                <span *ngIf="spinning" 
+                        class="spinner-border spinner-border customSpin" 
+                        role="status" 
+                        aria-hidden="true"></span>
+                Delete Profile</button>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="!isDeletion" class="row">
+    <div [ngClass]="(clicker1 || clicker2 || clicker3) ? 'col-lg-3':'col-12'">
         <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
             <button class="btn btn-dark"  
             type="button" 
             data-toggle="collapse" 
             data-target="#collapseApartments" 
             aria-expanded="false" 
+            (click)="changeClicker1()"
             aria-controls="collapseApartments">My Apartments</button>
 
             <button class="btn btn-dark"
@@ -13,14 +77,20 @@
             data-toggle="collapse" 
             data-target="#collapseComments" 
             aria-expanded="false" 
+            (click)="changeClicker2()"
             aria-controls="collapseComments">My Comments</button>
 
             <button class="btn btn-dark"
             type="button" 
             data-toggle="collapse" 
             data-target="#collapseOrders" 
-            aria-expanded="false" 
+            aria-expanded="false"
+            (click)="changeClicker3()"
             aria-controls="collapseOrders">My Orders</button>
+        </div>
+
+        <div class="text-center m-3">
+            <button (click)="goDelete()" class="badge badge-pill badge-danger">Delete account</button>
         </div>
     </div>
 

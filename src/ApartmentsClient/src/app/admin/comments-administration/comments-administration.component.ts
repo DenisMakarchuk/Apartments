@@ -13,6 +13,8 @@ import { CommentAdministrationService,
 })
 export class CommentsAdministrationComponent implements OnInit {
 
+  errorMessage: string;
+
   response: PagedResponseOfCommentDTOAdministration;
   requestForm: FormGroup;
   pages: number[] = [];
@@ -37,6 +39,8 @@ export class CommentsAdministrationComponent implements OnInit {
   }
 
   getComments(){
+    this.errorMessage = null;
+
     this.commentService.getAllCommentsByUserId(this.requestForm.value)
     .subscribe(response => {
       this.response = response;
@@ -44,6 +48,21 @@ export class CommentsAdministrationComponent implements OnInit {
       this.pages = [];
       for (let index = 1; index <= response.totalPages; index++) {
         this.pages.push(index);
+      }
+    },
+    error=>{
+ 
+      if (error.status ===  500) {
+        this.errorMessage = "Error 500: Internal Server Error";
+      }
+      if (error.status ===  400) {
+        this.errorMessage = "Error 400: " + error.response;
+      }
+      if (error.status ===  403) {
+        this.errorMessage = "Error 403: You are not authorized";
+      }
+      else{
+        this.errorMessage = "An error occurred.";
       }
     })
   }

@@ -4,182 +4,11 @@
     </div>
 </div>
 
-<!-- <div  class="form-group">
-    <label class="text-danger">*</label> - required
-    <form  [formGroup]="apartmentForm" (ngSubmit)="add()" #formDir="ngForm" novalidate>
-      
-        <div  class="form-group text-center">
-            <label for="inputDescription" class="h4">Description</label><label class="h4 text-danger">*</label>
-
-            <textarea formControlName="text" 
-                      type="text" 
-                      id="inputDescription"
-                      class="form-control" 
-                      placeholder="Text"></textarea>
-
-            <div class="text-danger"
-                 *ngIf="_text.invalid && 
-                        (_text.touched || _text.dirty || errorMessage)">
-                <small>Description must have from 5 till 500 items!</small>
-            </div>
-        </div>
-
-        <form [formGroup]="addressForm" (ngSubmit)="add()" #formDir="ngForm" novalidate>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="inputCountry">Country</label><label class="text-danger">*</label>
-        
-                    <select class="form-control" 
-                            formControlName="countryId" 
-                            id="inputCountry">
-                        <option value="">Choose country</option>
-                        <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
-                    </select>
-    
-                    <div class="text-danger"
-                         *ngIf="_country.invalid && 
-                              (_country.touched || _country.dirty || errorMessage)">
-                        <small>Please, choose the country!</small>
-                    </div>
-                </div>
-              
-                <div class="form-group col-md-6">
-                    <label for="inputCity">City</label><label class="text-danger">*</label>
-            
-                    <input formControlName="city" 
-                           type="text" 
-                           class="form-control" 
-                           placeholder="City" 
-                           id="inputCity">
-    
-                    <div class="text-danger"
-                         *ngIf="_city.invalid && 
-                                (_city.touched || _city.dirty || errorMessage)">
-                        <small>Please, enter the city!</small>
-                    </div>
-                </div>
-            </div>
-    
-            <div class="form-row">
-                <div class="form-group col-md-4">
-                    <label for="inputStreet">Street</label><label class="text-danger">*</label>
-        
-                    <input formControlName="street" 
-                           type="text" 
-                           id="inputStreet"
-                           class="form-control" 
-                           placeholder="Street">
-                    
-                    <div class="text-danger"
-                         *ngIf="_street.invalid && 
-                               (_street.touched || _street.dirty || errorMessage)">
-                        <small>Please, enter the Street!</small>
-                    </div>
-                </div>
-        
-                <div class="form-group col-md-4">
-                    <label for="inputHome">Home</label>
-        
-                    <input formControlName="home" 
-                           type="text" 
-                           id="inputHome"
-                           class="form-control" 
-                           placeholder="Home">      
-                </div>
-
-                <div class="form-group col-md-4">
-                    <label for="inputNumberOfApartment">Number Of Apartment</label>
-        
-                    <input formControlName="numberOfApartment" 
-                           type="number" 
-                           id="inputNumberOfApartment"
-                           class="form-control" 
-                           placeholder="Number Of Apartment">      
-                </div>            
-            </div>
-        </form>
-    
-        <div class="form-row">
-            <div class="form-group col-md-3">
-                <label for="inputArea">Area</label>
-
-                <input formControlName="area" 
-                       type="number" 
-                       class="form-control" 
-                       id="inputArea"
-                       placeholder="Area"/>
-            </div>
-    
-            <div class="form-group col-md-3">
-                <label for="inputRooms">Number Of Rooms</label><label class="text-danger">*</label>
-
-                <input formControlName="numberOfRooms" 
-                       type="number" 
-                       class="form-control" 
-                       placeholder="Number Of Rooms"  
-                       id="inputRooms"/>
-    
-                <div class="text-danger" 
-                     *ngIf="_numberOfRooms.invalid && 
-                            (_numberOfRooms.touched || _numberOfRooms.dirty || errorMessage)">
-                    <small>Number of Rooms must be greater than 0</small>
-                </div>
-            </div>
-
-            <div class="form-group col-md-3">
-                <label for="inputPrice">Price ($)</label><label class="text-danger">*</label>
-
-                <input formControlName="price" 
-                       type="number" 
-                       class="form-control" 
-                       placeholder="Price" 
-                       id="inputPrice"/>
-    
-                <div class="text-danger" 
-                     *ngIf="_price.invalid && 
-                           (_price.touched || _price.dirty || errorMessage)">
-                    <small>Price must be greater than 0!</small>
-                </div>
-            </div>
-
-            <div class="form-group col-md-3 text-center">
-                <label>Is Open?</label>
-                <div class="custom-control custom-radio">
-                    <input  type="radio" 
-                            value="true" 
-                            formControlName="isOpen" 
-                            name="isOpen"
-                            id="customRadio1" 
-                            class="custom-control-input"
-                            checked>
-                    <label class="custom-control-label" for="customRadio1">Open</label>
-                  </div>
-                  <div class="custom-control custom-radio">
-                    <input type="radio" 
-                           value="false" 
-                           formControlName="isOpen" 
-                           name="isOpen"
-                           id="customRadio2" 
-                           class="custom-control-input">
-                    <label class="custom-control-label" for="customRadio2">Close</label>
-                </div>
-            </div>            
-        </div>
-      
-        <div class="btn-group my-2 my-sm-0 btn-lg btn-block" role="group">
-            <button class="btn btn-success" type="submit">
-                <span *ngIf="spinning" 
-                class="spinner-border spinner-border customSpin" 
-                role="status" 
-                aria-hidden="true"></span>
-    
-                Save</button>
-            <button class="btn btn-warning" (click)="goBack()">Go back</button>
-        </div>
-    </form>
-</div> -->
-
 <div *ngIf="apartment">
+    <div *ngIf="isUpdating">
+        <label class="text-danger">*</label> - required
+    </div>
+
     <div class="row" *ngIf="!isUpdating">
         <div class="col col-lg-3">
             <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
@@ -203,8 +32,8 @@
         <app-apartment-all-images-names></app-apartment-all-images-names>
     </div>
 
-    <div class="text-center">
-        <label *ngIf="isUpdating">Title:</label><label *ngIf="isUpdating" class="text-danger">*</label>            
+    <div class="text-center shadow mb-3 bg-white rounded">
+        <label *ngIf="isUpdating">Title: </label><label *ngIf="isUpdating" class="text-danger">*</label>            
         <label class="h1">{{apartment.apartment.title | uppercase}}</label>
     </div>
 
@@ -224,8 +53,8 @@
         </div>
     </div>
   
-    <div class="text-center">
-        <label *ngIf="isUpdating">Description:</label><label *ngIf="isUpdating" class="text-danger">*</label>            
+    <div class="text-center shadow mb-3 bg-white rounded">
+        <label *ngIf="isUpdating">Description: </label><label *ngIf="isUpdating" class="text-danger">*</label>            
         <label class="h4">{{apartment.apartment.text}}</label>
     </div>
 
@@ -244,121 +73,197 @@
         <div class="text-danger" 
              *ngIf="text.invalid && 
                    (text.touched || text.dirty || errorMessage)">
-            <small>Description must have from 5 till 500 items!</small>
+            <small>Description must have from 5 till 500 characters!</small>
+        </div>
+    </div>
+
+    <div class="form-row shadow mb-3 bg-white rounded">
+        <div class="form-group col-md-6">
+
+            <label >Country</label><label *ngIf="isUpdating" class="text-danger">*</label>
+            <label class="h5">: {{apartment.country.name}}</label>
+
+            <div *ngIf="isUpdating">
+                <select [(ngModel)]="apartment.country.id" 
+                        #countryId="ngModel"
+                        class="form-control"
+                        required>
+                    <option value="">Choose country</option>
+                    <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
+                </select>
+
+                <div class="text-danger"
+                    *ngIf="countryId.invalid && 
+                        (countryId.touched || countryId.dirty || errorMessage)">
+                    <small>Please, choose the country!</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-md-6">
+
+            <label >City</label><label *ngIf="isUpdating" class="text-danger">*</label>
+            <label class="h5">: {{apartment.address.city}}</label>
+    
+            <div *ngIf="isUpdating">
+                <input [(ngModel)]="apartment.address.city" 
+                        type="text" 
+                        #city="ngModel"
+                        class="form-control" 
+                        placeholder="City" 
+                        required/>
+
+                <div class="text-danger"
+                    *ngIf="city.invalid && 
+                           (city.touched || city.dirty || errorMessage)">
+                    <small>Please, enter the city!</small>
+                </div>
+            </div>
         </div>
     </div>
   
-    <div *ngIf="apartment.apartment.area || isUpdating">
-        <h4>Area: {{apartment.apartment.area}}</h4>
-        <div *ngIf="isUpdating">
-            <input [(ngModel)]="apartment.apartment.area" type="number" placeholder="Area"/>
-        </div>
-    </div>
- 
-    <div *ngIf="isUpdating">
-        <label>Is Open?:</label>
-        {{apartment.apartment.isOpen}}
-        <div class="form-check">
-            <input [(ngModel)]="apartment.apartment.isOpen" 
-                class="form-check-input" 
-                type="boolean" 
-                type="radio" 
-                name="isOpen" 
-                id="true" 
-                value="true" 
-                checked/>
-            <label class="form-check-label" for="true">Open</label>
-        </div>
-        <div class="form-check">
-            <input [(ngModel)]="apartment.apartment.isOpen" 
-                class="form-check-input" 
-                type="boolean" 
-                type="radio" 
-                name="isOpen" 
-                id="false" 
-                value="false"/>
-            <label class="form-check-label" for="false">Close</label>
-        </div>
-    </div>
- 
-    <h4>Price: {{apartment.apartment.price}}</h4>
-    <div *ngIf="isUpdating" class="was-validated">
-        <input [(ngModel)]="apartment.apartment.price"  
-               type="number" 
-               placeholder="Price"
-               required 
-               min="1"/>
+    <div class="form-row shadow mb-3 bg-white rounded">
+        <div class="form-group col-md-4">
 
-        <div class="invalid-feedback">
-            Price must be greater than 0!
-        </div>
-    </div>
-  
-    <h4>Number Of Rooms: {{apartment.apartment.numberOfRooms}}</h4>
-    <div *ngIf="isUpdating" class="was-validated">
-        <input [(ngModel)]="apartment.apartment.numberOfRooms"  
-               type="number" 
-               placeholder="Number Of Rooms"
-               required min="1"/>
+            <label >Street</label><label *ngIf="isUpdating" class="text-danger">*</label>
+            <label class="h5">: {{apartment.address.street}}</label>
 
-        <div class="invalid-feedback">
-            Number of Rooms must be greater than 0
-        </div>
-    </div>
+            <div *ngIf="isUpdating">
+                <input [(ngModel)]="apartment.address.street"
+                        #street="ngModel"
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Street"
+                        required/>
             
-    <h2>Addpess</h2>
-   
-    <h4>Country: {{apartment.country.name}}</h4>
-    <div *ngIf="isUpdating" class="col was-validated" required>
-        <select class="form-control" [(ngModel)]="apartment.country.id">
-            <option value="">Choose country</option>
-            <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
-        </select>
+                <div class="text-danger"
+                    *ngIf="street.invalid && 
+                            (street.touched || street.dirty || errorMessage)">
+                    <small>Please, enter the Street!</small>
+                </div>
+            </div>
+        </div>
 
-        <div class="invalid-feedback">
-            Please, choose the country!
-        </div>
-    </div>
-  
-    <h4>City: {{apartment.address.city}}</h4>
-    <div *ngIf="isUpdating" class="was-validated">
-        <input [(ngModel)]="apartment.address.city" 
-               placeholder="title"
-               required/>
+        <div class="form-group col-md-4" *ngIf="apartment.address.home || isUpdating">
 
-       <div class="invalid-feedback">
-            Please, enter the city!
-        </div>
-    </div>
-  
-    <h4>Street: {{apartment.address.street}}</h4>
-    <div *ngIf="isUpdating" class="was-validated">
-        <input [(ngModel)]="apartment.address.street" 
-               placeholder="title"
-               required/>
+            <label>Home</label>
+            <label class="h5">: {{apartment.address.home}}</label>
 
-        <div class="invalid-feedback">
-            Please, enter the Street!
+            <div *ngIf="isUpdating">
+                <input [(ngModel)]="apartment.address.home" 
+                        class="form-control" 
+                        type="text" 
+                        placeholder="Home"/>
+            </div>
         </div>
+
+        <div class="form-group col-md-4" *ngIf="apartment.address.numberOfApartment || isUpdating">
+
+            <label>Number Of Apartment</label>
+            <label class="h5">: {{apartment.address.numberOfApartment}}</label>
+
+            <div *ngIf="isUpdating">
+                <input [(ngModel)]="apartment.address.numberOfApartment" 
+                        type="number" 
+                        class="form-control" 
+                        placeholder="Number Of Apartment"/>
+            </div>
+        </div>            
     </div>
-  
-    <div *ngIf="apartment.address.home || isUpdating">
-        <h4>Home: {{apartment.address.home}}</h4>
-        <div *ngIf="isUpdating">
-            <input [(ngModel)]="apartment.address.home" placeholder="Home"/>
+
+    <div class="form-row shadow mb-3 bg-white rounded">
+        <div class="form-group col-md-3" *ngIf="apartment.apartment.area || isUpdating">
+
+            <label>Area</label>
+            <label class="h5">: {{apartment.apartment.area}}</label>
+
+            <div *ngIf="isUpdating">
+                <input [(ngModel)]="apartment.apartment.area" 
+                        type="number" 
+                        class="form-control" 
+                        placeholder="Area"/>
+            </div>
         </div>
-    </div>
-  
-    <div *ngIf="apartment.address.numberOfApartment || isUpdating">
-        <h4>Number Of Apartment:{{apartment.address.numberOfApartment}}</h4>
-        <div *ngIf="isUpdating">
-            <input [(ngModel)]="apartment.address.numberOfApartment" type="number" placeholder="title"/>
+
+        <div class="form-group col-md-3">
+
+            <label >Number Of Rooms</label><label *ngIf="isUpdating" class="text-danger">*</label>
+            <label class="h5">: {{apartment.apartment.numberOfRooms}}</label>
+
+            <div *ngIf="isUpdating">
+                <input [(ngModel)]="apartment.apartment.numberOfRooms"
+                        #numberOfRooms="ngModel"
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Number Of Rooms"
+                        required min="1"/>
+            
+                <div class="text-danger"
+                    *ngIf="numberOfRooms.invalid && 
+                            (numberOfRooms.touched || numberOfRooms.dirty || errorMessage)">
+                    <small>Number of Rooms must be greater than 0</small>
+                </div>
+            </div>
         </div>
+
+        <div class="form-group col-md-3">
+
+            <label >Price</label><label *ngIf="isUpdating" class="text-danger">*</label>
+            <label class="h5">: {{apartment.apartment.price}} $</label>
+
+            <div *ngIf="isUpdating">
+                <input [(ngModel)]="apartment.apartment.price"
+                        #price="ngModel"
+                        type="text" 
+                        class="form-control" 
+                        placeholder="Price"
+                        required min="1"/>
+            
+                <div class="text-danger"
+                    *ngIf="price.invalid && 
+                            (price.touched || price.dirty || errorMessage)">
+                    <small>Price must be greater than 0!</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group col-md-3 text-center">
+
+            <div *ngIf="!isUpdating">
+                <div *ngIf="apartment.apartment.isOpen">
+                    <h3>Open</h3>
+                </div>
+                <div *ngIf="!apartment.apartment.isOpen">
+                    <h3>Closed</h3>
+                </div>
+            </div>
+
+            <div *ngIf="isUpdating">
+                <label>Is Open?</label>
+                <div class="custom-control custom-radio">
+                    <input  type="radio" 
+                            value="true" 
+                            [(ngModel)]="apartment.apartment.isOpen" 
+                            id="customRadio1" 
+                            class="custom-control-input"
+                            checked>
+                    <label class="custom-control-label" for="customRadio1">Open</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" 
+                           value="false" 
+                           [(ngModel)]="apartment.apartment.isOpen" 
+                           id="customRadio2" 
+                           class="custom-control-input">
+                    <label class="custom-control-label" for="customRadio2">Close</label>
+                </div>
+            </div>
+        </div>            
     </div>
-  
-    <div class="btn-group-vertical col-4 form-group" role="group">
+
+    <div class="btn-group btn-block form-group" role="group">
         <button class="btn btn-warning" (click)="goBack()">Go back</button>
-        <button *ngIf="!isUpdating" class="btn btn-success" (click)="updating()">Edit</button>
+        <button *ngIf="!isUpdating" class="btn btn-success" (click)="updating()">Edit Apartment</button>
 
         <button *ngIf="isUpdating" class="btn btn-success" (click)="save()">
             <span *ngIf="spinning" 
@@ -366,7 +271,7 @@
                     role="status" 
                     aria-hidden="true"></span>
 
-            Save</button>
+            Save Changes</button>
        
         <button *ngIf="!isUpdating" class="btn btn-danger" (click)="delete()">
             <span *ngIf="spinningDel" 
@@ -374,7 +279,7 @@
             role="status" 
             aria-hidden="true"></span>
 
-            Delete</button>
+            Delete Apartment</button>
     </div>
 
     <app-apartment-orders></app-apartment-orders>
@@ -398,5 +303,4 @@
         </div>
 
     </div>
-
 </div>

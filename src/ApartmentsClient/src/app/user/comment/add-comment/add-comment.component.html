@@ -4,18 +4,23 @@
     </div>
 </div>
 
+<div *ngIf="isAdded && !_comment.touched && !_comment.dirty" class="col-8">
+    <div class="alert alert-success" role="alert">
+        Your comment has been added!
+    </div>
+</div>
+
 <div>
-    <form [formGroup]="commentForm" (ngSubmit)="add()" #formDir="ngForm" class="was-validated" novalidate>
+    <form [formGroup]="commentForm" (ngSubmit)="add()" #formDir="ngForm" novalidate>
         <div class="form-group">
             <textarea formControlName="text" 
                       type="text" 
                       class="form-control" 
-                      placeholder="Text"
-                      required
-                      minlength="4"
-                      maxlength="255"></textarea>
+                      placeholder="Text"></textarea>
 
-            <div class="invalid-feedback">
+            <div class="text-danger"
+                 *ngIf="_comment.invalid && 
+                        (_comment.touched || _comment.dirty || errorMessage)">
                 Comment must have from 4 till 255 items!
             </div>
         </div>
