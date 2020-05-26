@@ -1,0 +1,72 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div class="form-group">
+    <form [formGroup]="requestForm" #formDir="ngForm" novalidate>
+        <div class="col-12">
+            <button class="btn btn-warning btn-block form-group" routerLink="/addapartment">Add Apartment</button>
+
+            <div class="input-group  was-validated">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Apartments on the page</div>
+                </div>
+
+                <input type="number" formControlName="pageSize" class="col" required min="1">
+
+                <div class="input-group-append">
+                    <button class="btn btn-success" (click)="getOwnApartments()">Show apartments</button>
+                </div>
+
+                <div class="invalid-feedback">
+                    Pages must be more than 0!
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="spinning"  class="d-flex justify-content-center">
+    <div class="spinner-border text-success" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div *ngIf="response">
+    <div class="form-group card" *ngFor="let ap of response.data">
+        <a class="btn btn-light text-left" routerLink="/apartment/{{ap.apartment.id}}">
+            <div class="row no-gutters">
+                <div *ngIf="mainImages[ap.apartment.id]" class="col-md-4">
+                    <img [src]="mainImages[ap.apartment.id]" class="card-img">
+                </div>
+                <div class="col">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ap.apartment.title}}</h4>
+                        <h6 class="card-text">Country: {{ap.country.name}}</h6>
+                        <h6 class="card-text">City: {{ap.address.city}}</h6>
+                        <h6 class="card-text">Rooms: {{ap.apartment.numberOfRooms}}</h6>
+                        <h6 class="card-text" *ngIf="ap.apartment.area">Area: {{ap.apartment.area}}</h6>
+                        <p class="card-text">Price: {{ap.apartment.price}} $</p>
+                        <p class="card-text"><small class="text-muted">Lust time updated at {{ap.apartment.update | date: 'dd.MMM.yyyy'}}</small></p>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<div *ngIf="response" class="form-group text-center">
+    <div class="form-group btn-group col-4">
+        <button class="btn btn-warning col-8" (click)="previousePage()">< Previous</button>
+        <button class="btn btn-warning col-8" (click)="nextPage()">Next ></button>
+    </div>
+    <br>
+    <div class="form-group btn-group mr-2">
+        <div *ngFor="let page of pages">
+            <button [ngClass]="page === response.pageNumber ? 'btn btn-success':'btn btn-warning'" 
+                (click)="getPage(page)">{{page}}</button>
+        </div>
+    </div>
+</div>

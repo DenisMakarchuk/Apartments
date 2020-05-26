@@ -16,9 +16,11 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
     public interface IApartmentUserService
     {
         /// <summary>
-        /// Put Apartment to the DataBase
+        /// Add Apartment to the DataBase
         /// </summary>
         /// <param name="apartment"></param>
+        /// <param name="ownerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<ApartmentView>> 
             CreateApartmentAsync(AddApartment apartment, string ownerId, CancellationToken cancellationToken = default(CancellationToken));
@@ -27,14 +29,17 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// Get all Apartments by User Id
         /// </summary>
         /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<IEnumerable<ApartmentDTO>>> 
-            GetAllApartmentByOwnerIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Result<PagedResponse<ApartmentView>>> 
+            GetAllApartmentByOwnerIdAsync(string userId, PagedRequest request, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Get Apartment by Apartment Id
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<ApartmentView>> 
             GetApartmentByIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken));
@@ -43,6 +48,7 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// Update Apartment in DataBase
         /// </summary>
         /// <param name="apartment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<ApartmentView>> 
             UpdateApartmentAsync(ApartmentView apartment, CancellationToken cancellationToken = default(CancellationToken));
@@ -50,7 +56,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Delete Apartment by Apartment Id
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="apartmentId"></param>
+        /// <param name="ownerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> 
             DeleteApartmentByIdAsync(string apartmentId, string ownerId, CancellationToken cancellationToken = default(CancellationToken));

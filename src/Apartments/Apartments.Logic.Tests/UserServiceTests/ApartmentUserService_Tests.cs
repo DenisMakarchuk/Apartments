@@ -145,18 +145,18 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 var apartmentsInBase = await context.Apartments.AsNoTracking().ToListAsync();
                 var userWithoutApartments = await context.Users.Where(_ => _.Id != userWithApartments.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllApartmentByOwnerIdAsync(userWithApartments.Id.ToString());
-                var resultNegative = await service.GetAllApartmentByOwnerIdAsync(userWithoutApartments.Id.ToString());
+                var resultPositive = await service.GetAllApartmentByOwnerIdAsync(userWithApartments.Id.ToString(), new Common.PagedRequest());
+                var resultNegative = await service.GetAllApartmentByOwnerIdAsync(userWithoutApartments.Id.ToString(), new Common.PagedRequest());
 
                 foreach (var item in apartmentsInBase)
                 {
-                    resultPositive.Data
-                        .Where(_ => _.Id == item.Id.ToString())
+                    resultPositive.Data.Data
+                        .Where(_ => _.Apartment.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Data.Should().BeEmpty();
             }
         }
 

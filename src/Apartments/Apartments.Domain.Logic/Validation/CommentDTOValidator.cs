@@ -17,7 +17,7 @@ namespace Apartments.Domain.Logic.Validation
             RuleFor(_ => _.AuthorId).Must(id => Guid.TryParse(id, out var _))
                 .WithMessage("Author Id can't parse to Guid type");
 
-            RuleFor(_ => _.Title).MinimumLength(4).MaximumLength(25)
+            RuleFor(_ => _.Title).MinimumLength(1).MaximumLength(50)
                 .WithMessage("Title must be from 4 till 25 characters");
 
             RuleFor(_ => _.Text).MinimumLength(4).MaximumLength(255)

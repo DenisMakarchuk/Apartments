@@ -8,6 +8,7 @@ using Apartments.Common;
 using Apartments.Domain.Logic;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users.AddDTO;
+using Apartments.Domain.Users.DTO;
 using Apartments.Domain.Users.ViewModels;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -36,10 +37,11 @@ namespace Apartments.Web.Controllers.Users
         /// Add Apartment to the DB
         /// </summary>
         /// <param name="apartment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -71,23 +73,24 @@ namespace Apartments.Web.Controllers.Users
         /// <summary>
         /// Get all own Apartments by User Id
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpGet]
-        [Route("owner/id")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPost]
+        [Route("ownerId")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<ApartmentView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
-            GetAllApartmentByOwnerIdAsync(CancellationToken cancellationToken = default(CancellationToken))
+            GetAllApartmentByOwnerIdAsync([FromBody] PagedRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             string ownerId = HttpContext.GetUserId();
 
             try
             {
-                var result = await _service.GetAllApartmentByOwnerIdAsync(ownerId);
+                var result = await _service.GetAllApartmentByOwnerIdAsync(ownerId, request);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
@@ -103,10 +106,11 @@ namespace Apartments.Web.Controllers.Users
         /// Get Apartment by Id
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{apartmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -140,10 +144,11 @@ namespace Apartments.Web.Controllers.Users
         /// Update own Apartment
         /// </summary>
         /// <param name="apartment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -181,6 +186,7 @@ namespace Apartments.Web.Controllers.Users
         /// Delete Apartment by Id
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("{apartmentId}")]

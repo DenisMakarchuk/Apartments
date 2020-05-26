@@ -33,6 +33,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Add Comment to the DataBase
         /// </summary>
         /// <param name="comment"></param>
+        /// <param name="authorId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<CommentDTO>> 
@@ -75,59 +77,83 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Get all User Comments by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="authorId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CommentDTO>>> 
-            GetAllCommentsByAuthorIdAsync(string authorId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<CommentDTO>>> 
+            GetAllCommentsByAuthorIdAsync(string authorId, PagedRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(authorId);
 
             try
             {
-                var comments = await _db.Comments.Where(_ => _.AuthorId == id).Select(_ => _)
-                    .AsNoTracking().ToListAsync(cancellationToken);
+                var count = await _db.Comments.Where(_ => _.AuthorId == id).CountAsync();
 
-                return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                    .Ok(_mapper.Map<IEnumerable<CommentDTO>>(comments));
+                var comments = await _db.Comments.Where(_ => _.AuthorId == id)
+                                                 .Skip((request.PageNumber - 1) * request.PageSize)
+                                                 .Take(request.PageSize)
+                                                 .AsNoTracking().ToListAsync(cancellationToken);
+
+                PagedResponse<CommentDTO> response
+                    = new PagedResponse<CommentDTO>(_mapper.Map<IEnumerable<CommentDTO>>(comments),
+                                                    count,
+                                                    request.PageNumber,
+                                                    request.PageSize);
+
+                return (Result<PagedResponse<CommentDTO>>)Result<PagedResponse<CommentDTO>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                    .Fail<IEnumerable<CommentDTO>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<CommentDTO>>)Result<PagedResponse<CommentDTO>>
+                    .Fail<PagedResponse<CommentDTO>>($"Source is null. {ex.Message}");
             }
         }
 
         /// <summary>
         /// Get all Comments by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="apartmentId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<CommentDTO>>> 
-            GetAllCommentsByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<CommentDTO>>> 
+            GetAllCommentsByApartmentIdAsync(PagedRequest<string> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Guid id = Guid.Parse(apartmentId);
+            Guid id = Guid.Parse(request.Data);
 
             try
             {
-                var comments = await _db.Comments.Where(_ => _.ApartmentId == id).Select(_ => _)
-                    .AsNoTracking().ToListAsync(cancellationToken);
+                var count = await _db.Comments.Where(_ => _.ApartmentId == id).CountAsync();
 
-                return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                    .Ok(_mapper.Map<IEnumerable<CommentDTO>>(comments));
+                var comments = await _db.Comments.Where(_ => _.ApartmentId == id)
+                                                 .Skip((request.PageNumber - 1) * request.PageSize)
+                                                 .Take(request.PageSize)
+                                                 .AsNoTracking().ToListAsync(cancellationToken);
+
+                PagedResponse<CommentDTO> response
+                    = new PagedResponse<CommentDTO>(_mapper.Map<IEnumerable<CommentDTO>>(comments),
+                                                    count,
+                                                    request.PageNumber,
+                                                    request.PageSize);
+
+                return (Result<PagedResponse<CommentDTO>>)Result<PagedResponse<CommentDTO>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<CommentDTO>>)Result<IEnumerable<CommentDTO>>
-                    .Fail<IEnumerable<CommentDTO>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<CommentDTO>>)Result<PagedResponse<CommentDTO>>
+                    .Fail<PagedResponse<CommentDTO>>($"Source is null. {ex.Message}");
             }
         }
 
         /// <summary>
         /// Get Comment by Comment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="orderId"></param>
+        /// <param name="commentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<CommentDTO>> 
@@ -159,6 +185,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Update Comment in DataBase
         /// </summary>
         /// <param name="comment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<CommentDTO>> 
@@ -194,7 +221,9 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Delete Comment by Comment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="commentId"></param>
+        /// <param name="authorId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 

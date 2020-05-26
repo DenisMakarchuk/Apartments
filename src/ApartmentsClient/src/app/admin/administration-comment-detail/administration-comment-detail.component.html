@@ -1,0 +1,22 @@
+<br>
+<br>
+
+<div *ngIf="errorMessage">
+  <div class="alert alert-danger" role="alert">
+      {{errorMessage}}
+  </div>
+</div>
+
+<div class="form-group text-center" *ngIf="comment">
+    <div class="form-group" *ngIf="isUpdating">
+      <label>Text:</label>
+      <textarea [(ngModel)]="comment.text" type="text" class="form-control" placeholder="Text"></textarea>
+    </div>
+    
+    <div class="btn-group-vertical col-4" role="group">
+      <button *ngIf="!isUpdating && isAdmin" class="btn btn-success btn-block" (click)="updating()">Edit</button>
+      <button *ngIf="isUpdating && isAdmin" class="btn btn-success btn-block" (click)="save()">Save</button>
+        
+      <button *ngIf="!isUpdating && isAdmin" class="btn btn-danger" (click)="delete()">Delete</button>
+    </div>
+</div>

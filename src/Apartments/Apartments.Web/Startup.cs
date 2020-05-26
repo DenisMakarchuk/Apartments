@@ -26,6 +26,8 @@ using Apartments.Domain.Logic.Options;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Logic.Users.UserService;
 using Apartments.Domain.Logic.Validation;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace Apartments.Web
 {
@@ -95,6 +97,7 @@ namespace Apartments.Web
             });
 
             services.AddControllers()
+                .AddNewtonsoftJson()
                 .AddFluentValidation(fv =>
                 {
                     fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
@@ -110,10 +113,20 @@ namespace Apartments.Web
                 });
 
             services.AddAutoMapper(typeof(Startup).Assembly);
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.WithOrigins("http://localhost:4200")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                        .SetIsOriginAllowedToAllowWildcardSubdomains());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<IdentityUser> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -121,13 +134,25 @@ namespace Apartments.Web
                 app.UseOpenApi().UseSwaggerUi3();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthentication();
-
             app.UseAuthorization();
+
+            MyIdentityDataInitializer.SeedUsers(userManager);
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "Resources")),
+                    RequestPath = "/Resources"
+            });
+
+            app.UseCors("CorsPolicy");
+            //app.UseCors(builder => builder.WithOrigins("http://localhost:4200"));
+            app.UseHttpsRedirection();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

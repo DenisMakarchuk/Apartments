@@ -1,0 +1,66 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div *ngIf="!isReseted">
+    <form novalidate [formGroup]="resetForm" (ngSubmit)="reset()">
+        <div class="form-group">
+            <label for="inputNewPassword">New Password</label>
+            <input type="password"
+                   id="inputNewPassword" 
+                   class="form-control" 
+                   formControlName="password" 
+                   placeholder="New Password">
+
+            <div class="text-success"
+                *ngIf="_password.valid && 
+                    (_password.touched || _password.dirty)">
+                <small>Looks good!</small>
+            </div>
+            <div class="text-danger"
+                 *ngIf="_password.invalid && 
+                        (_password.touched || _password.dirty || errorMessage)">
+                <small>Please, enter New Password!</small>
+                
+            </div>
+        </div>
+
+        <form novalidate [formGroup]="confirmPasswordForm">
+            <div class="form-group">
+                <label for="inputConfirmPassword">Confirm password</label>
+                <input type="password"
+                       id="inputConfirmPassword" 
+                       class="form-control" 
+                       formControlName="confirmPassword" 
+                       placeholder="New Password">
+    
+                <div class="text-success"
+                    *ngIf="_password.valid && resetForm.value.password === confirmPasswordForm.value.confirmPassword && 
+                        (_confirmPassword.touched || _confirmPassword.dirty)">
+                    <small>Looks good!</small>
+                </div>
+                <div class="text-danger"
+                     *ngIf="resetForm.value.password != confirmPasswordForm.value.confirmPassword && 
+                        (_confirmPassword.touched || _confirmPassword.dirty || errorMessage)">
+                    <small>Password mismatch or invalud data entry!</small>
+                    
+                </div>
+            </div>
+        </form>
+
+        <button type="submit" class="btn btn-block btn btn-success">
+            <span *ngIf="spinning" 
+                      class="spinner-border spinner-border customSpin" 
+                      role="status" 
+                      aria-hidden="true"></span>
+                      Reset Password</button>
+    </form>
+</div>
+
+<div *ngIf="isReseted">
+    <div class="alert alert-success text-center">
+        Your password has been changed!
+    </div>
+</div>

@@ -1,0 +1,38 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div *ngIf="!isOk">
+    <form novalidate [formGroup]="forgotForm" (ngSubmit)="sendForgotMessage()">
+        <div class="form-group">
+            <label for="inputLogInNameOrEmail">Plese, enter your Log In Name or Email</label>
+            <input type="password"
+                   id="inputLogInNameOrEmail" 
+                   class="form-control" 
+                   formControlName="logInNameOrEmail" 
+                   placeholder="Log In Name or Email">
+
+            <div class="text-danger"
+                *ngIf="_logInNameOrEmail.invalid && 
+                    (_logInNameOrEmail.touched || _logInNameOrEmail.dirty || errorMessage)">
+                <small>Please, enter your Log In Name or Email!</small>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-block btn btn-success">
+            <span *ngIf="spinning" 
+                      class="spinner-border spinner-border customSpin" 
+                      role="status" 
+                      aria-hidden="true"></span>
+                      Send password reset message</button>
+    </form>
+</div>
+
+<div *ngIf="isOk">
+    <div class="alert alert-success text-center">
+        Password reset link sent to your email!
+    </div>
+</div>
+

@@ -1,0 +1,37 @@
+<div class="row">
+    <div [ngClass]="(clicker1 || clicker2) ? 'col-lg-3':'col-12'">
+        <div class="btn-group-vertical my-2 my-sm-0 btn-lg btn-block">
+            <button class="btn btn-dark"  
+            type="button" 
+            data-toggle="collapse" 
+            data-target="#collapseAdmins" 
+            aria-expanded="false" 
+            (click)="changeClicker1()"
+            aria-controls="collapseAdmins">Admins</button>
+
+            <button class="btn btn-dark"
+            type="button" 
+            data-toggle="collapse" 
+            data-target="#collapseUsers" 
+            aria-expanded="false" 
+            (click)="changeClicker2()"
+            aria-controls="collapseUsers">Users</button>
+        </div>
+    </div>
+
+    <div *ngIf="!clicker1 && !clicker2" class="col-12 text-center align-self-center">
+        <div class="alert alert-success display-4 align-self-center" role="alert">
+            Here you can change user roles, delete users, change / delete their comments    
+        </div>
+    </div>
+
+    <div class="col">
+            <div class="collapse" id="collapseAdmins">
+                <app-admin-administration></app-admin-administration>
+            </div> 
+            
+            <div class="collapse" id="collapseUsers">
+                <app-user-administration></app-user-administration>
+            </div>    
+    </div>
+</div>

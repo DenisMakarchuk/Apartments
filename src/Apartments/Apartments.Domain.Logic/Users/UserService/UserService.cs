@@ -32,15 +32,18 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Create User profile with identityId
         /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>        
+        /// <param name="identityId"></param>
+        /// <param name="nick"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTO>> 
-            CreateUserProfileAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken))
+            CreateUserProfileAsync(string identityId, string nick, CancellationToken cancellationToken = default(CancellationToken))
         {
             AddUser newProfile = new AddUser()
             {
-                Id = identityId
+                Id = identityId,
+                NickName = nick
             };
 
             var addedUser = _mapper.Map<User>(newProfile);
@@ -78,7 +81,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Get User profile by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="identityId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTO>> 
@@ -110,7 +114,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Delete User by identityId. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="identityId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 
@@ -118,7 +123,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         {
             Guid id = Guid.Parse(identityId);
 
-            var user = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(_ => _.Id == id);
+            var user = await _db.Users.IgnoreQueryFilters()
+                                .Include(_=>_.Apartments).FirstOrDefaultAsync(_ => _.Id == id);
 
             if (user is null)
             {
@@ -127,7 +133,8 @@ namespace Apartments.Domain.Logic.Users.UserService
 
             try
             {
-                _db.Users.Remove(user);
+                //todo: rewrite, because there is no time to write as it should
+                _db.Apartments.RemoveRange(user.Apartments);
                 await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());

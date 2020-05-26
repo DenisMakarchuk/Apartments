@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore.Internal;
 using Apartments.Domain.Users.ViewModels;
 using System.Threading;
+using Apartments.Domain.Users;
 
 namespace Apartments.Web.Controllers.Users
 {
@@ -35,12 +36,13 @@ namespace Apartments.Web.Controllers.Users
         /// <summary>
         /// Add Identity User & Profile to the DB
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("registration")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -57,12 +59,49 @@ namespace Apartments.Web.Controllers.Users
 
             try
             {
-                var result = await _service.RegisterAsync(request.Email, request.Password, cancellationToken);
+                var result = await _service.RegisterAsync(request, cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
                     : result.IsSuccess
-                    ? (IActionResult)Ok(result.Data)
+                    ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Email confirmation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("confirm/email")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            ConfirmEmail([FromQuery]string userId, [FromQuery] string token)
+        {
+            if (userId == null || token == null)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var result = await _service.ConfirmEmail(userId, token);
+
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
                     : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
@@ -75,11 +114,12 @@ namespace Apartments.Web.Controllers.Users
         /// Login
         /// </summary>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [AllowAnonymous]
         [HttpPost]
         [Route("logIn")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserViewModel))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -88,7 +128,9 @@ namespace Apartments.Web.Controllers.Users
         {
             try
             {
-                var result = await _service.LoginAsync(request.Email, request.Password, cancellationToken);
+                var result = await _service.LoginAsync(request.UserName,
+                                                       request.Password,
+                                                       cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
@@ -108,20 +150,21 @@ namespace Apartments.Web.Controllers.Users
         /// <returns></returns>
         [HttpPost]
         [Route("logOut")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [LogAttribute]
-        public async Task<IActionResult> LogOut()
+        public IActionResult LogOut()
         {
             HttpContext.Session.Clear();
 
-            return (IActionResult)Ok(await Task.FromResult(Result.Ok()));
+            return (IActionResult)NoContent();
         }
 
         /// <summary>
         /// Delete account
         /// </summary>
         /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpDelete]
         [Route("delete")]
@@ -136,13 +179,85 @@ namespace Apartments.Web.Controllers.Users
         {
             try
             {
-                var result = await _service.DeleteAsync(request.Email, request.Password, cancellationToken);
+                var result = await _service.DeleteAsync(request.UserName,
+                                                        request.Password,
+                                                        cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
                     : result.IsSuccess
                     ? (IActionResult)NoContent()
                     : NotFound(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("forgot/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            ForgotPasswordAsync([FromBody]ForgotPasswordModel request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            if (request is null || string.IsNullOrEmpty(request.LogInNameOrEmail) || !ModelState.IsValid)
+            {
+                return BadRequest("Invalid data entry!");
+            }
+
+            try
+            {
+                var result = await _service.ForgotPasswordAsync(request,
+                                                        cancellationToken);
+
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [AllowAnonymous]
+        [HttpDelete]
+        [Route("reset/password")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            ResetPasswordAsync([FromBody]ResetPasswordModel model, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var result = await _service.ResetPasswordAsync(model, cancellationToken);
+
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)NoContent()
+                    : BadRequest(result.Message);
             }
             catch (InvalidOperationException ex)
             {

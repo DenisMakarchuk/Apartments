@@ -1,4 +1,5 @@
 ﻿using Apartments.Common;
+using Apartments.Domain.Users;
 using Apartments.Domain.Users.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -16,28 +17,57 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <summary>
         /// Create User profile & Identity User
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="password"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<Result<UserViewModel>> 
-            RegisterAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken));
+        Task<Result> 
+            RegisterAsync(UserRegistrationRequest request,
+                          CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Email confirmation
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        Task<Result> ConfirmEmail(string userId, string token);
 
         /// <summary>
         /// Login User
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserViewModel>> 
-            LoginAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken));
+            LoginAsync(string name, string password, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Delete User own profile & Identity User
         /// </summary>
-        /// <param name="email"></param>
+        /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> 
-            DeleteAsync(string email, string password, CancellationToken cancellationToken = default(CancellationToken));
+            DeleteAsync(string name, string password, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Send email for reset password
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result>
+            ForgotPasswordAsync(ForgotPasswordModel request, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Reser password and send email about it
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<Result>
+            ResetPasswordAsync(ResetPasswordModel model, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

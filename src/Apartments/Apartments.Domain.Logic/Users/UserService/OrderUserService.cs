@@ -79,6 +79,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             return view;
         }
 
+        [LogAttribute]
         private decimal MakeTotalCoast(decimal coastByDay, IEnumerable<DateTime> dates)
         {
             decimal totalCoast = 0m;
@@ -91,6 +92,7 @@ namespace Apartments.Domain.Logic.Users.UserService
             return totalCoast;
         }
 
+        [LogAttribute]
         private List<BusyDate> MakeListBusyDates(IEnumerable<DateTime> dates, Guid apartmentId)
         {
             List<BusyDate> busyDates = new List<BusyDate>();
@@ -110,9 +112,52 @@ namespace Apartments.Domain.Logic.Users.UserService
         }
 
         /// <summary>
+        /// Order formation
+        /// </summary>
+        /// <param name="order"></param>
+        /// <param name="customerId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [LogAttribute]
+        public async Task<Result<OrderDTO>>
+            FormationOrderAsync(AddOrder order, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            //todo: rewrite, because there is no time to write as it should
+            try
+            {
+                var apartmentId = Guid.Parse(order.ApartmentId);
+
+                if (!await IsApartmentFree(order.Dates, apartmentId))
+                {
+                    return (Result<OrderDTO>)Result<OrderDTO>
+                        .NotOk<OrderDTO>(null, $"Cannot add order. Dates are not free!");
+                };
+
+                var apartment = await _db.Apartments.Where(_ => _.Id == apartmentId)
+                                       .FirstOrDefaultAsync();
+
+                OrderDTO dto = new OrderDTO()
+                {
+                    TotalCoast = MakeTotalCoast(apartment.Price.Value, order.Dates),
+                    Dates = order.Dates
+                };
+
+                return (Result<OrderDTO>)Result<OrderDTO>
+                        .Ok(dto);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return (Result<OrderDTO>)Result<OrderDTO>
+                    .Fail<OrderDTO>($"Source is null. {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// Add Order to the DataBase
         /// </summary>
         /// <param name="order"></param>
+        /// <param name="customerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<OrderView>> 
@@ -147,7 +192,7 @@ namespace Apartments.Domain.Logic.Users.UserService
                 Order orderAfterAdding = await _db.Orders
                     .Where(_ => _.CustomerId == addedOrder.CustomerId)
                     .Where(_=>_.Dates
-                        .Where(_=>_.Date == order.Dates.First())
+                        .Where(_=>_.Date.Value.Date == order.Dates.First().Date)
                         .FirstOrDefault() != null)
                     .Include(_ => _.Dates)
                     .Include(_ => _.Apartment)
@@ -180,22 +225,28 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Get all own Orders by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="customerId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<OrderView>>> 
-            GetAllOrdersByCustomerIdAsync(string customerId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<OrderView>>> 
+            GetAllOrdersByCustomerIdAsync(string customerId, PagedRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(customerId);
 
             try
             {
+                var count = await _db.Orders.Where(_ => _.CustomerId == id).CountAsync();
+
                 var orders = await _db.Orders.Where(_ => _.CustomerId == id)
-                    .Include(_=>_.Dates)
-                    .Include(_=>_.Apartment)
-                    .Include(_ => _.Apartment.Address)
-                    .Include(_ => _.Apartment.Address.Country)
-                    .AsNoTracking().ToListAsync(cancellationToken);
+                                             .Skip((request.PageNumber - 1) * request.PageSize)
+                                             .Take(request.PageSize)
+                                             .Include(_=>_.Dates)
+                                             .Include(_=>_.Apartment)
+                                             .Include(_ => _.Apartment.Address)
+                                             .Include(_ => _.Apartment.Address.Country)
+                                             .AsNoTracking().ToListAsync(cancellationToken);
 
                 List<OrderView> result = new List<OrderView>();
 
@@ -206,32 +257,43 @@ namespace Apartments.Domain.Logic.Users.UserService
                     result.Add(view);
                 }
 
-                return (Result<IEnumerable<OrderView>>)Result<IEnumerable<OrderView>>
-                    .Ok(_mapper.Map<IEnumerable<OrderView>>(result));
+                PagedResponse<OrderView> response
+                = new PagedResponse<OrderView>(_mapper.Map<IEnumerable<OrderView>>(result),
+                                                              count,
+                                                              request.PageNumber,
+                                                              request.PageSize);
+
+                return (Result<PagedResponse<OrderView>>)Result<PagedResponse<OrderView>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<OrderView>>)Result<IEnumerable<OrderView>>
-                    .Fail<IEnumerable<OrderView>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<OrderView>>)Result<PagedResponse<OrderView>>
+                    .Fail<PagedResponse<OrderView>>($"Source is null. {ex.Message}");
             }
         }
 
         /// <summary>
         /// Get all Orders by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="apartmentId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<OrderDTO>>> 
-            GetAllOrdersByApartmentIdAsync(string apartmentId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<OrderDTO>>> 
+            GetAllOrdersByApartmentIdAsync(PagedRequest<string> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            Guid id = Guid.Parse(apartmentId);
+            Guid id = Guid.Parse(request.Data);
 
             try
             {
+                var count = await _db.Orders.Where(_ => _.ApartmentId == id).CountAsync();
+
                 var orders = await _db.Orders.Where(_ => _.ApartmentId == id)
-                    .Include(_ => _.Dates)
-                    .AsNoTracking().ToListAsync(cancellationToken);
+                                             .Skip((request.PageNumber - 1) * request.PageSize)
+                                             .Take(request.PageSize)
+                                             .Include(_ => _.Dates)
+                                             .AsNoTracking().ToListAsync(cancellationToken);
 
                 var result = _mapper.Map<IEnumerable<OrderDTO>>(orders) as List<OrderDTO>;
 
@@ -251,13 +313,19 @@ namespace Apartments.Domain.Logic.Users.UserService
                     item.Dates = notFreeDates;
                 }
 
-                return (Result<IEnumerable<OrderDTO>>)Result<IEnumerable<OrderDTO>>
-                    .Ok(result as IEnumerable<OrderDTO>);
+                PagedResponse<OrderDTO> response
+                = new PagedResponse<OrderDTO>(result as IEnumerable<OrderDTO>,
+                                              count,
+                                              request.PageNumber,
+                                              request.PageSize);
+
+                return (Result<PagedResponse<OrderDTO>>)Result<PagedResponse<OrderDTO>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<OrderDTO>>)Result<IEnumerable<OrderDTO>>
-                    .Fail<IEnumerable<OrderDTO>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<OrderDTO>>)Result<PagedResponse<OrderDTO>>
+                    .Fail<PagedResponse<OrderDTO>>($"Source is null. {ex.Message}");
             }
         }
 
@@ -265,6 +333,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Get Order by Order Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="orderId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<OrderView>> 
@@ -303,6 +372,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Update Order in DataBase
         /// </summary>
         /// <param name="order"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<OrderView>> 
@@ -381,6 +451,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Delete own Order by Order Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="orderId"></param>
+        /// <param name="customerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 

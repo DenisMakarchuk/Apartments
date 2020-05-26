@@ -17,6 +17,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Get User profile by User Id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result<UserDTOAdministration>> 
             GetUserProfileByIdentityIdAsync(string id, CancellationToken cancellationToken);
@@ -25,6 +26,7 @@ namespace Apartments.Domain.Logic.Admin.AdminServiceInterfaces
         /// Delete User profile by User Id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task<Result> 
             DeleteUserProfileByIdentityIdAsync(string id, CancellationToken cancellationToken);

@@ -14,7 +14,7 @@ namespace Apartments.Domain.Logic.Validation
             RuleFor(_=>_.ApartmentId).Must(id => Guid.TryParse(id, out var _))
                 .WithMessage("ApartmentId can't parse to Guid type");
 
-            RuleFor(_ => _.Dates).Must(_ => _.Any())
+            RuleFor(_ => _.Dates).Must(_=>_ != null).Must(_ => _.Any())
                 .WithMessage("You must select rental dates");
         }
     }

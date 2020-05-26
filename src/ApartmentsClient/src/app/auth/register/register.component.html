@@ -1,0 +1,111 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div *ngIf="!isregistered">
+    <form novalidate [formGroup]="registerForm" (ngSubmit)="register()">
+        <h3 class="text-center">Please sign up</h3>
+
+        <div class="form-group">
+            <label for="inputName">Log In Name</label>
+            <input type="string" 
+                   id="inputName" 
+                   class="form-control" 
+                   formControlName="userName" 
+                   placeholder="Enter unique Log In Name">
+
+            <div class="text-danger"
+                 *ngIf="_userName.invalid && 
+                        (_userName.touched || _userName.dirty || errorMessage)">
+                <small>Please, enter the unique Log In Name!</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputNick">Display Name</label>
+            <input type="string" 
+                   id="inputNick" 
+                   class="form-control" 
+                   formControlName="nickName" 
+                   placeholder="Enter Display Name">
+
+            <div class="text-danger"
+                 *ngIf="_nickName.invalid && 
+                        (_nickName.touched || _nickName.dirty || errorMessage)">
+                <small>Please, enter Display Name!</small>
+            </div>
+        </div>
+<br>
+        <div class="form-group">
+            <label for="inputEmail">Email address</label>
+            <input type="email" 
+                   id="inputEmail" 
+                   class="form-control" 
+                   formControlName="email" 
+                   placeholder="Enter email">
+
+            <div class="text-danger"
+                *ngIf="_email.invalid && 
+                    (_email.touched || _email.dirty || errorMessage)">
+                <small>Please, enter valid email!</small>
+            </div>
+        </div>
+<br>
+        <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password"
+                   id="inputPassword" 
+                   class="form-control" 
+                   formControlName="password" 
+                   placeholder="Password">
+
+            <div class="text-success"
+                 *ngIf="_password.valid && 
+                        (_password.touched || _password.dirty)">
+                <small>Looks good!</small>
+            </div>
+            <div class="text-danger"
+                 *ngIf="_password.invalid && 
+                        (_password.touched || _password.dirty || errorMessage)">
+                <small>Please, enter the password!</small>
+            </div>
+        </div>
+
+        <form novalidate [formGroup]="confirmPasswordForm">
+            <div class="form-group">
+                <label for="inputConfirmPassword">Confirm password</label>
+                <input type="password"
+                       id="inputConfirmPassword" 
+                       class="form-control" 
+                       formControlName="confirmPassword" 
+                       placeholder="New Password">
+    
+                <div class="text-success"
+                    *ngIf="_password.valid && registerForm.value.password === confirmPasswordForm.value.confirmPassword && 
+                        (_confirmPassword.touched || _confirmPassword.dirty)">
+                    <small>Looks good!</small>
+                </div>
+                <div class="text-danger"
+                     *ngIf="registerForm.value.password != confirmPasswordForm.value.confirmPassword && 
+                        (_confirmPassword.touched || _confirmPassword.dirty || errorMessage)">
+                    <small>Password mismatch or invalud data entry!</small>
+                </div>
+            </div>
+        </form>
+
+        <button type="submit" class="btn btn-block btn btn-success">
+            <span *ngIf="spinning" 
+                      class="spinner-border spinner-border customSpin" 
+                      role="status" 
+                      aria-hidden="true"></span>
+                      Sign up</button>
+    </form>
+</div>
+
+<div *ngIf="isregistered">
+    <div class="alert alert-success text-center">
+        Please, confirm your email!
+    </div>
+</div>

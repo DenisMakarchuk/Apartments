@@ -37,6 +37,9 @@ namespace Apartments.Web
             Host.CreateDefaultBuilder(args)
                 .ConfigureLogging(builder => builder.ClearProviders()
                     .AddSerilog().AddDebug().AddConsole())
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+                .ConfigureWebHostDefaults(webBuilder => 
+                { 
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

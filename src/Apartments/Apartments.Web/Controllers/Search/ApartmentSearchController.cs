@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Apartments.Common;
 using Apartments.Domain.Logic.Search.SearchServiceInterfaces;
+using Apartments.Domain.Search.DTO;
 using Apartments.Domain.Search.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -30,25 +31,26 @@ namespace Apartments.Web.Controllers.Search
         /// <summary>
         /// Get all Apartments by Parameters
         /// </summary>
-        /// <param name="search"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("parameters")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResponse<ApartmentSearchView>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
         public async Task<IActionResult> 
-            GetAllApartmentsAsync([FromBody] SearchParameters search, CancellationToken cancellationToken = default(CancellationToken))
+            GetAllApartmentsAsync([FromBody] PagedRequest<SearchParameters> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (search is null)
+            if (request is null)
             {
                 return BadRequest();
             }
 
             try
             {
-                var result = await _service.GetAllApartmentsAsync(search, cancellationToken);
+                var result = await _service.GetAllApartmentsAsync(request, cancellationToken);
 
                 return result.IsError
                     ? throw new InvalidOperationException(result.Message)
@@ -64,10 +66,11 @@ namespace Apartments.Web.Controllers.Search
         /// Get Apartment by Id
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{apartmentId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApartmentSearchView))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -99,10 +102,11 @@ namespace Apartments.Web.Controllers.Search
         /// <summary>
         /// Get all countries from DB
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("countries")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<CountrySearchDTO>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [LogAttribute]
@@ -127,10 +131,11 @@ namespace Apartments.Web.Controllers.Search
         /// Get Country by Id
         /// </summary>
         /// <param name="countryId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("countries/{countryId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CountrySearchDTO))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

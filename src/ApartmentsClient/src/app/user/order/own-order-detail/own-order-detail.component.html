@@ -1,0 +1,84 @@
+<div *ngIf="errorMessage">
+  <div class="alert alert-danger" role="alert">
+      {{errorMessage}}
+  </div>
+</div>
+
+<div *ngIf="spinning"  class="d-flex justify-content-center">
+  <div class="spinner-border text-success" role="status">
+      <span class="sr-only">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="order">
+  <div class="text-center shadow mb-3 bg-white rounded">
+    <label class="h1">{{order.apartment.title | uppercase}}</label>
+  </div>
+
+  <div class="form-row">
+    <div class="shadow mb-3 bg-white rounded col-md-3">
+      <h4>Dates:</h4>
+      <div *ngFor="let date of order.order.dates">
+        {{date  | date: 'dd MMMM yyyy'}}  
+      </div>
+    </div>
+
+    <div class="shadow text-center mb-3 bg-white rounded col-md-3">
+      <h4>Total price: {{order.order.totalCoast}} $</h4>
+    </div>
+
+    <div class="shadow text-center mb-3 bg-white rounded col-md-3">
+      <h4 *ngIf="order?.apartment?.area">Area: {{order.apartment.area}}</h4>
+    </div>
+    <div class="shadow text-center mb-3 bg-white rounded col-md-3">
+      <h4>Rooms: {{order.apartment.numberOfRooms}}</h4>
+    </div>
+  </div>
+
+
+
+  
+      <h2 class="text-center">Addpess:</h2>
+
+      <div class="form-row shadow mb-3 bg-white rounded">
+        <div class="form-group col-md-6">
+          <h4>Country: {{order.country.name}}</h4>
+        </div>
+
+        <div class="form-group col-md-6">
+          <h4>City: {{order.address.city}}</h4>
+        </div>
+    </div>
+  
+    <div class="form-row shadow mb-3 bg-white rounded">
+        <div class="form-group col-md-4">
+          <h4>Street: {{order.address.street}}</h4>
+        </div>
+
+        <div class="form-group col-md-4" *ngIf="order?.address?.home">
+          <h4>Home: {{order.address.home}}</h4>
+        </div>
+
+        <div class="form-group col-md-4" *ngIf="order?.address?.numberOfApartment">
+          <h4>Apartmewnt № {{order.address.numberOfApartment}}</h4>
+        </div>            
+    </div>
+  
+      <div class="text-center shadow mb-3 bg-white rounded">
+        <h2 class="text-center">About the apartment:</h2>
+        <label class="h4">{{order.apartment.text}}</label>
+      </div>
+  
+      <div class="btn-group btn-block" role="group">
+        <button class="btn btn-warning my-2 my-sm-0 btn-lg btn-block" (click)="goBack()">Go back</button>
+      
+        <button class="btn btn-danger" (click)="delete()">
+          <span *ngIf="spinningDel" 
+          class="spinner-border spinner-border customSpin" 
+          role="status" 
+          aria-hidden="true"></span>
+          
+          Delete</button>
+      </div>
+  
+</div>

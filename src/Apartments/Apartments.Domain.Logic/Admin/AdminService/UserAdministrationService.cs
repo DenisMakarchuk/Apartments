@@ -31,6 +31,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get User profile by Id. Id must be verified to convert to Guid at the web level 
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserDTOAdministration>> 
@@ -64,6 +65,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Delete User by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 
@@ -72,7 +74,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             Guid identityId = Guid.Parse(id);
 
             var profile = await _db.Users.IgnoreQueryFilters()
-                .FirstOrDefaultAsync(_=>_.Id == identityId, cancellationToken);
+                    .Include(_ => _.Apartments).FirstOrDefaultAsync(_ => _.Id == identityId, cancellationToken);
+
 
             if (profile is null)
             {
@@ -81,7 +84,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             try
             {
-                _db.Users.Remove(profile);
+                //todo: rewrite, because there is no time to write as it should
+                _db.Apartments.RemoveRange(profile.Apartments);
                 await _db.SaveChangesAsync(cancellationToken);
 
                 return await Task.FromResult(Result.Ok());

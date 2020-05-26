@@ -48,6 +48,8 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Add Apartment to the DataBase
         /// </summary>
         /// <param name="apartment"></param>
+        /// <param name="ownerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<ApartmentView>> 
@@ -92,27 +94,49 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Get all User Apartments by User Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="ownerId"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<ApartmentDTO>>> 
-            GetAllApartmentByOwnerIdAsync(string ownerId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<ApartmentView>>> 
+            GetAllApartmentByOwnerIdAsync(string ownerId, PagedRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
             Guid id = Guid.Parse(ownerId);
 
             try
             {
-                var apartments = await _db.Apartments.Where(_ => _.OwnerId == id)
-                    .Select(_ => _)
-                    .AsNoTracking().ToListAsync(cancellationToken);
+                var count = await _db.Apartments.Where(_ => _.OwnerId == id).CountAsync();
 
-                return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
-                    .Ok(_mapper.Map<IEnumerable<ApartmentDTO>>(apartments));
+                var apartments = await _db.Apartments.Where(_ => _.OwnerId == id)
+                                                     .Skip((request.PageNumber - 1) * request.PageSize)
+                                                     .Take(request.PageSize)
+                                                     .Include(_ => _.Address.Country)
+                                                     .Include(_ => _.Address)
+                                                     .AsNoTracking().ToListAsync(cancellationToken);
+
+                List<ApartmentView> result = new List<ApartmentView>();
+
+                foreach (var apartment in apartments)
+                {
+                    var view = MakeApartmentView(apartment);
+
+                    result.Add(view);
+                }
+
+                PagedResponse<ApartmentView> response
+                    = new PagedResponse<ApartmentView>(result,
+                                                       count,
+                                                       request.PageNumber,
+                                                       request.PageSize);
+
+                return (Result<PagedResponse<ApartmentView>>)Result<PagedResponse<ApartmentView>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<ApartmentDTO>>)Result<IEnumerable<ApartmentDTO>>
-                    .Fail<IEnumerable<ApartmentDTO>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<ApartmentView>>)Result<PagedResponse<ApartmentView>>
+                    .Fail<PagedResponse<ApartmentView>>($"Source is null. {ex.Message}");
             }
         }
 
@@ -120,6 +144,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Get Apartment by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<ApartmentView>> 
@@ -155,6 +180,7 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// Update Apartment in DataBase
         /// </summary>
         /// <param name="apartment"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<ApartmentView>> 
@@ -203,7 +229,9 @@ namespace Apartments.Domain.Logic.Users.UserService
         /// <summary>
         /// Delete Apartment by Apartment Id. Id must be verified to convert to Guid at the web level
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="apartmentId"></param>
+        /// <param name="ownerId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 

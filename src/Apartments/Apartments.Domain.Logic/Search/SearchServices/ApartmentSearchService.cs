@@ -32,49 +32,50 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// <summary>
         /// Get all Apartments by Parameters
         /// </summary>
-        /// <param name="search"></param>
+        /// <param name="request"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
-        public async Task<Result<IEnumerable<ApartmentSearchDTO>>> 
-            GetAllApartmentsAsync(SearchParameters search, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Result<PagedResponse<ApartmentSearchView>>> 
+            GetAllApartmentsAsync(PagedRequest<SearchParameters> request, CancellationToken cancellationToken = default(CancellationToken))
         {
             IQueryable<Apartment> apartments = _db.Apartments.Where(_=>_.IsOpen == true);
 
-            if (!string.IsNullOrEmpty(search.CountryId) && Guid.TryParse(search.CountryId, out var _))
+            if (!string.IsNullOrEmpty(request.Data.CountryId) && Guid.TryParse(request.Data.CountryId, out var _))
             {
-                Guid id = Guid.Parse(search.CountryId);
+                Guid id = Guid.Parse(request.Data.CountryId);
 
                 apartments = apartments.Where(_ => _.Address.CountryId == id);
             }
 
-            if (!string.IsNullOrEmpty(search.CityName))
+            if (!string.IsNullOrEmpty(request.Data.CityName))
             {
-                apartments = apartments.Where(_ => _.Address.City.Contains(search.CityName));
+                apartments = apartments.Where(_ => _.Address.City.Contains(request.Data.CityName));
             }
 
-            if (search.RoomsFrom > 0)
+            if (request.Data.RoomsFrom > 0)
             {
-                apartments = apartments.Where(_ => _.NumberOfRooms >= search.RoomsFrom);
+                apartments = apartments.Where(_ => _.NumberOfRooms >= request.Data.RoomsFrom);
             }
 
-            if (search.RoomsTill > 0 && search.RoomsTill >= search.RoomsFrom)
+            if (request.Data.RoomsTill > 0 && request.Data.RoomsTill >= request.Data.RoomsFrom)
             {
-                apartments = apartments.Where(_ => _.NumberOfRooms <= search.RoomsTill);
+                apartments = apartments.Where(_ => _.NumberOfRooms <= request.Data.RoomsTill);
             }
 
-            if (search.PriceFrom > 0)
+            if (request.Data.PriceFrom > 0)
             {
-                apartments = apartments.Where(_ => _.Price >= search.PriceFrom);
+                apartments = apartments.Where(_ => _.Price >= request.Data.PriceFrom);
             }
 
-            if (search.PriceTill > 0 && search.PriceTill >= search.PriceFrom)
+            if (request.Data.PriceTill > 0 && request.Data.PriceTill >= request.Data.PriceFrom)
             {
-                apartments = apartments.Where(_ => _.Price <= search.PriceTill);
+                apartments = apartments.Where(_ => _.Price <= request.Data.PriceTill);
             }
 
-            if (search.NeedDates != null && search.NeedDates.Any())
+            if (request.Data.NeedDates != null && request.Data.NeedDates.Any())
             {
-                foreach (var item in search.NeedDates)
+                foreach (var item in request.Data.NeedDates)
                 {
                     apartments = apartments.Where(_ => _.Dates.Where(_ => _.Date == item.Date).FirstOrDefault() == null);
                 }
@@ -82,15 +83,44 @@ namespace Apartments.Domain.Logic.Search.SearchServices
 
             try
             {
-                var result = _mapper.Map<IEnumerable<ApartmentSearchDTO>>(await apartments.ToListAsync(cancellationToken));
+                var count = await apartments.CountAsync();
 
-                return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
-                    .Ok(result);
+                var searchResult = await apartments.Include(_ => _.Address.Country)
+                                               .Include(_ => _.Address)
+                                               .Skip((request.PageNumber - 1) * request.PageSize)
+                                               .Take(request.PageSize)
+                                               .AsNoTracking().ToListAsync(cancellationToken);
+
+                List<ApartmentSearchView> result = new List<ApartmentSearchView>();
+
+                foreach (var apartment in searchResult)
+                {
+                    ApartmentSearchView view = new ApartmentSearchView()
+                    {
+
+                        Apartment = _mapper.Map<ApartmentSearchDTO>(apartment),
+
+                        Address = _mapper.Map<AddressSearchDTO>(apartment.Address),
+
+                        Country = _mapper.Map<CountrySearchDTO>(apartment.Address.Country)
+                    };
+
+                    result.Add(view);
+                }
+
+                PagedResponse<ApartmentSearchView> response
+                = new PagedResponse<ApartmentSearchView>(_mapper.Map<IEnumerable<ApartmentSearchView>>(result),
+                                                          count,
+                                                          request.PageNumber,
+                                                          request.PageSize);
+
+                return (Result<PagedResponse<ApartmentSearchView>>)Result<PagedResponse<ApartmentSearchView>>
+                    .Ok(response);
             }
             catch (ArgumentNullException ex)
             {
-                return (Result<IEnumerable<ApartmentSearchDTO>>)Result<IEnumerable<ApartmentSearchDTO>>
-                    .Fail<IEnumerable<ApartmentSearchDTO>>($"Source is null. {ex.Message}");
+                return (Result<PagedResponse<ApartmentSearchView>>)Result<PagedResponse<ApartmentSearchView>>
+                    .Fail<PagedResponse<ApartmentSearchView>>($"Source is null. {ex.Message}");
             }
         }
 
@@ -98,6 +128,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// Get Apartment by Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="apartmentId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<ApartmentSearchView>> 
@@ -140,6 +171,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// <summary>
         /// Get all countries from DB
         /// </summary>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<IEnumerable<CountrySearchDTO>>> 
@@ -147,7 +179,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         {
             try
             {
-                var countries = await _db.Countries.AsNoTracking().ToListAsync(cancellationToken);
+                var countries = await _db.Countries.OrderBy(s=>s.Name).AsNoTracking().ToListAsync(cancellationToken);
 
                 return (Result<IEnumerable<CountrySearchDTO>>)Result<IEnumerable<CountrySearchDTO>>
                     .Ok(_mapper.Map<IEnumerable<CountrySearchDTO>>(countries));
@@ -163,6 +195,7 @@ namespace Apartments.Domain.Logic.Search.SearchServices
         /// Get Country by Id. Id must be verified to convert to Guid at the web level
         /// </summary>
         /// <param name="countryId"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<CountrySearchDTO>> 

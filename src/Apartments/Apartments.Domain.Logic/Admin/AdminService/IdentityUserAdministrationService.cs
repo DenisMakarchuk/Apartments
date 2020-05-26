@@ -2,6 +2,7 @@
 using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Admin.ViewModel;
 using Apartments.Domain.Logic.Admin.AdminServiceInterfaces;
+using Apartments.Domain.Logic.Email;
 using Apartments.Domain.Logic.Options;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
@@ -23,14 +24,17 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IUserAdministrationService _service;
         private readonly IMapper _mapper;
+        private readonly IEmailSender _emailSender;
 
         public IdentityUserAdministrationService(UserManager<IdentityUser> userManager, 
                                                  IUserAdministrationService service,
-                                                 IMapper mapper)
+                                                 IMapper mapper,
+                                                 IEmailSender emailSender)
         {
             _userManager = userManager;
             _service = service;
             _mapper = mapper;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -52,6 +56,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Get IdentityUser with User Profile by IdentityId
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserAdministrationView>> 
@@ -67,6 +72,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
@@ -74,7 +81,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 UserAdministrationView failView = new UserAdministrationView()
                 {
                     Profile = null,
-                    IdentityUser = identityUser
+                    IdentityUser = identityUser,
+                    Roles = roles.ToList<string>()
                 };
 
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -84,7 +92,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                IdentityUser = identityUser
+                IdentityUser = identityUser,
+                Roles = roles.ToList<string>()
             };
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -95,6 +104,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Add User to Admin role
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserAdministrationView>> 
@@ -112,6 +122,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
@@ -119,7 +131,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 UserAdministrationView failView = new UserAdministrationView()
                 {
                     Profile = null,
-                    IdentityUser = identityUser
+                    IdentityUser = identityUser,
+                    Roles = roles.ToList<string>()
                 };
 
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -129,8 +142,20 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                IdentityUser = identityUser
+                IdentityUser = identityUser,
+                Roles = roles.ToList<string>()
             };
+
+            var sendingResult = await _emailSender.SendEmailAsync(user.Email,
+                                            "Changed role",
+                                            "You have been added the administrator role! Do not reply to this message, it was generated automatically!", 
+                                            cancellationToken);
+
+            if (sendingResult.IsError)
+            {
+                return (Result<UserAdministrationView>)Result<UserAdministrationView>
+                    .Fail<UserAdministrationView>(sendingResult.Message);
+            }
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
                 .Ok(view);
@@ -140,6 +165,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Remove User from Admin role
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result<UserAdministrationView>> 
@@ -157,6 +183,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
 
             var identityUser = _mapper.Map<IdentityUserAdministrationDTO>(user);
 
+            var roles = await _userManager.GetRolesAsync(user);
+
             var profile = await _service.GetUserProfileByIdentityIdAsync(id, cancellationToken);
 
             if (profile.IsError || !profile.IsSuccess)
@@ -164,7 +192,8 @@ namespace Apartments.Domain.Logic.Admin.AdminService
                 UserAdministrationView failView = new UserAdministrationView()
                 {
                     Profile = null,
-                    IdentityUser = identityUser
+                    IdentityUser = identityUser,
+                    Roles = roles.ToList<string>()
                 };
 
                 return (Result<UserAdministrationView>)Result<UserAdministrationView>
@@ -174,8 +203,20 @@ namespace Apartments.Domain.Logic.Admin.AdminService
             UserAdministrationView view = new UserAdministrationView()
             {
                 Profile = profile.Data,
-                IdentityUser = identityUser
+                IdentityUser = identityUser,
+                Roles = roles.ToList<string>()
             };
+
+            var sendingResult = await _emailSender.SendEmailAsync(user.Email,
+                                            "Changed role",
+                                            "You have been removed from the administrator role! Do not reply to this message, it was generated automatically!",
+                                            cancellationToken);
+
+            if (sendingResult.IsError)
+            {
+                return (Result<UserAdministrationView>)Result<UserAdministrationView>
+                    .Fail<UserAdministrationView>(sendingResult.Message);
+            }
 
             return (Result<UserAdministrationView>)Result<UserAdministrationView>
                 .Ok(view);
@@ -185,6 +226,7 @@ namespace Apartments.Domain.Logic.Admin.AdminService
         /// Delete IdentityUser & User Profile
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
         [LogAttribute]
         public async Task<Result> 

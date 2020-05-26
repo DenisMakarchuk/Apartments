@@ -88,7 +88,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().BeNull();
+                resultNegative.Message.Should().Contain("not exist");
             }
         }
     }

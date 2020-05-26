@@ -8,6 +8,8 @@ namespace Apartments.Data.DataModels
     {
         public Guid Id { get; set; }
 
+        public string NickName { get; set; }
+
         public HashSet<Apartment> Apartments { get; set; }
 
         public HashSet<Order> Orders { get; set; }

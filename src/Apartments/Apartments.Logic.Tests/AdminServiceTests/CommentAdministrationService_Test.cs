@@ -11,6 +11,7 @@ using AutoMapper;
 using Apartments.Domain.Admin.DTO;
 using Apartments.Domain.Logic.Admin.AdminService;
 using FluentAssertions;
+using Apartments.Common;
 
 namespace Apartments.Logic.Tests.AdminServiceTests
 {
@@ -78,18 +79,18 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
                 var userWithoutComments = await context.Users.Where(_ => _.Id != userWithComments.Id).FirstOrDefaultAsync();
 
-                var resultPositive = await service.GetAllCommentsByUserIdAsync(userWithComments.Id.ToString());
-                var resultNegative = await service.GetAllCommentsByUserIdAsync(userWithoutComments.Id.ToString());
+                var resultPositive = await service.GetAllCommentsByUserIdAsync(new PagedRequest<string>(userWithComments.Id.ToString()));
+                var resultNegative = await service.GetAllCommentsByUserIdAsync(new PagedRequest<string>(userWithoutComments.Id.ToString()));
 
                 foreach (var item in commentsInBase)
                 {
-                    resultPositive.Data
+                    resultPositive.Data.Data
                         .Where(_ => _.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Data.Should().BeEmpty();
             }
         }
 
@@ -125,18 +126,18 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 var commentsInBase = await context.Comments.AsNoTracking().ToListAsync();
                 var apartmentWithoutComments = context.Apartments.Where(_ => _.Id != apartmentWithComments.Id).FirstOrDefault();
 
-                var resultPositive = await service.GetAllCommentsByApartmentIdAsync(apartmentWithComments.Id.ToString());
-                var resultNegative = await service.GetAllCommentsByApartmentIdAsync(apartmentWithoutComments.Id.ToString());
+                var resultPositive = await service.GetAllCommentsByApartmentIdAsync(new PagedRequest<string>(apartmentWithComments.Id.ToString()));
+                var resultNegative = await service.GetAllCommentsByApartmentIdAsync(new PagedRequest<string>(apartmentWithoutComments.Id.ToString()));
 
                 foreach (var item in commentsInBase)
                 {
-                    resultPositive.Data
+                    resultPositive.Data.Data
                         .Where(_ => _.Id == item.Id.ToString())
                         .FirstOrDefault()
                         .Should().NotBeNull();
                 }
 
-                resultNegative.IsSuccess.Should().BeFalse();
+                resultNegative.Data.Data.Should().BeEmpty();
             }
         }
 
@@ -240,7 +241,7 @@ namespace Apartments.Logic.Tests.AdminServiceTests
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().BeNull();
+                resultNegative.Message.Should().Contain("not exist");
             }
         }
     }

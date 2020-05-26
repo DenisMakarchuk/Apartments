@@ -56,7 +56,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                     Id = user.Id
                 };
 
-                var resultPositive = await service.CreateUserProfileAsync(user.Id);
+                var resultPositive = await service.CreateUserProfileAsync(user.Id, user.NickName);
                 //var resultNegative = await service.CreateUserProfileAsync(failAddUser.Id);
 
                 resultPositive.Data.Id.Should().BeEquivalentTo(user.Id);
@@ -121,7 +121,7 @@ namespace Apartments.Logic.Tests.UserServiceTests
                 resultPositive.Message.Should().BeNull();
 
                 resultNegative.IsSuccess.Should().BeFalse();
-                resultNegative.Message.Should().BeNull();
+                resultNegative.Message.Should().Contain("not exist");
             }
         }
     }

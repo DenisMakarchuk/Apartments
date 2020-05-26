@@ -1,0 +1,63 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div class="form-group">
+    <form [formGroup]="requestForm" #formDir="ngForm" novalidate>
+        <div class="col-12">
+            <div class="input-group was-validated">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Comments on the page</div>
+                </div>
+
+                <input type="number" formControlName="pageSize" class="col" required min="1">
+
+                <div class="input-group-append">
+                    <button class="btn btn-success" (click)="getOwnComments()">Show comments</button>
+                </div>
+
+                <div class="invalid-feedback">
+                    Pages must be more than 0!
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="response">
+    <div class="form-group card" *ngFor="let comm of response.data">
+        <a class="btn btn-light text-left" routerLink="/comment/{{comm.id}}">
+            <div class="card-body">
+                <small  class="card-title">{{comm.title}}</small>
+                <h4>{{comm.text}}</h4> 
+             </div>
+        </a>
+    </div>
+</div>
+
+<div *ngIf="spinning && !response"  class="d-flex justify-content-center">
+    <div class="spinner-border text-success" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>
+
+<div *ngIf="response" class="form-group text-center">
+    <div class="form-group btn-group col-4">
+        <button class="btn btn-warning col-8" (click)="previousePage()">< Previous</button>
+        <button class="btn btn-warning col-8" (click)="nextPage()">Next ></button>
+    </div>
+    <br>
+    <div class="form-group btn-group mr-2">
+        <div *ngFor="let page of pages">
+            <button [ngClass]="page === response.pageNumber ? 'btn btn-success':'btn btn-warning'" 
+                (click)="getPage(page)">
+                <span *ngIf="spinning && page === requestForm.value.pageNumber" 
+                class="spinner-border spinner-border customSpin" 
+                role="status" 
+                aria-hidden="true"></span>
+                {{page}}</button>
+        </div>
+    </div>
+</div>

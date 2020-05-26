@@ -1,0 +1,196 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div  class="form-group">
+    <label class="text-danger">*</label> - required
+    <form  [formGroup]="apartmentForm" (ngSubmit)="add()" #formDir="ngForm" novalidate>
+        <div  class="form-group text-center">
+            <label for="inputTitle" class="h1">Title</label><label class="h1 text-danger">*</label>
+
+            <input formControlName="title" 
+                   id="inputTitle"
+                   type="text" 
+                   class="form-control" 
+                   placeholder="Title"/>
+
+            <div class="text-danger" 
+                 *ngIf="_title.invalid && 
+                        (_title.touched || _title.dirty || errorMessage)">
+                <small>Title must have from 5 till 120 characters!</small>
+            </div>
+        </div>
+      
+        <div  class="form-group text-center">
+            <label for="inputDescription" class="h4">Description</label><label class="h4 text-danger">*</label>
+
+            <textarea formControlName="text" 
+                      type="text" 
+                      id="inputDescription"
+                      class="form-control" 
+                      placeholder="Text"></textarea>
+
+            <div class="text-danger"
+                 *ngIf="_text.invalid && 
+                        (_text.touched || _text.dirty || errorMessage)">
+                <small>Description must have from 5 till 500 items!</small>
+            </div>
+        </div>
+
+        <form [formGroup]="addressForm" (ngSubmit)="add()" #formDir="ngForm" novalidate>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="inputCountry">Country</label><label class="text-danger">*</label>
+        
+                    <select class="form-control" 
+                            formControlName="countryId" 
+                            id="inputCountry">
+                        <option value="">Choose country</option>
+                        <option *ngFor="let c of countries" value="{{c.id}}">{{c.name}}</option>
+                    </select>
+    
+                    <div class="text-danger"
+                         *ngIf="_country.invalid && 
+                              (_country.touched || _country.dirty || errorMessage)">
+                        <small>Please, choose the country!</small>
+                    </div>
+                </div>
+              
+                <div class="form-group col-md-6">
+                    <label for="inputCity">City</label><label class="text-danger">*</label>
+            
+                    <input formControlName="city" 
+                           type="text" 
+                           class="form-control" 
+                           placeholder="City" 
+                           id="inputCity">
+    
+                    <div class="text-danger"
+                         *ngIf="_city.invalid && 
+                                (_city.touched || _city.dirty || errorMessage)">
+                        <small>Please, enter the city!</small>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="form-row">
+                <div class="form-group col-md-4">
+                    <label for="inputStreet">Street</label><label class="text-danger">*</label>
+        
+                    <input formControlName="street" 
+                           type="text" 
+                           id="inputStreet"
+                           class="form-control" 
+                           placeholder="Street">
+                    
+                    <div class="text-danger"
+                         *ngIf="_street.invalid && 
+                               (_street.touched || _street.dirty || errorMessage)">
+                        <small>Please, enter the Street!</small>
+                    </div>
+                </div>
+        
+                <div class="form-group col-md-4">
+                    <label for="inputHome">Home</label>
+        
+                    <input formControlName="home" 
+                           type="text" 
+                           id="inputHome"
+                           class="form-control" 
+                           placeholder="Home">      
+                </div>
+
+                <div class="form-group col-md-4">
+                    <label for="inputNumberOfApartment">Number Of Apartment</label>
+        
+                    <input formControlName="numberOfApartment" 
+                           type="number" 
+                           id="inputNumberOfApartment"
+                           class="form-control" 
+                           placeholder="Number Of Apartment">      
+                </div>            
+            </div>
+        </form>
+    
+        <div class="form-row">
+            <div class="form-group col-md-3">
+                <label for="inputArea">Area</label>
+
+                <input formControlName="area" 
+                       type="number" 
+                       class="form-control" 
+                       id="inputArea"
+                       placeholder="Area"/>
+            </div>
+    
+            <div class="form-group col-md-3">
+                <label for="inputRooms">Number Of Rooms</label><label class="text-danger">*</label>
+
+                <input formControlName="numberOfRooms" 
+                       type="number" 
+                       class="form-control" 
+                       placeholder="Number Of Rooms"  
+                       id="inputRooms"/>
+    
+                <div class="text-danger" 
+                     *ngIf="_numberOfRooms.invalid && 
+                            (_numberOfRooms.touched || _numberOfRooms.dirty || errorMessage)">
+                    <small>Number of Rooms must be greater than 0</small>
+                </div>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label for="inputPrice">Price ($)</label><label class="text-danger">*</label>
+
+                <input formControlName="price" 
+                       type="number" 
+                       class="form-control" 
+                       placeholder="Price" 
+                       id="inputPrice"/>
+    
+                <div class="text-danger" 
+                     *ngIf="_price.invalid && 
+                           (_price.touched || _price.dirty || errorMessage)">
+                    <small>Price must be greater than 0!</small>
+                </div>
+            </div>
+
+            <div class="form-group col-md-3 text-center">
+                <label>Is Open?</label>
+                <div class="custom-control custom-radio">
+                    <input  type="radio" 
+                            value="true" 
+                            formControlName="isOpen" 
+                            name="isOpen"
+                            id="customRadio1" 
+                            class="custom-control-input"
+                            checked>
+                    <label class="custom-control-label" for="customRadio1">Open</label>
+                  </div>
+                  <div class="custom-control custom-radio">
+                    <input type="radio" 
+                           value="false" 
+                           formControlName="isOpen" 
+                           name="isOpen"
+                           id="customRadio2" 
+                           class="custom-control-input">
+                    <label class="custom-control-label" for="customRadio2">Close</label>
+                </div>
+            </div>            
+        </div>
+      
+        <div class="btn-group my-2 my-sm-0 btn-lg btn-block" role="group">
+            <button class="btn btn-success" type="submit">
+                <span *ngIf="spinning" 
+                class="spinner-border spinner-border customSpin" 
+                role="status" 
+                aria-hidden="true"></span>
+    
+                Save</button>
+            <button class="btn btn-warning" (click)="goBack()">Go back</button>
+        </div>
+    </form>
+</div>
+  

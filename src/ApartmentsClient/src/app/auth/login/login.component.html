@@ -1,0 +1,57 @@
+<div *ngIf="errorMessage">
+    <div class="alert alert-danger" role="alert">
+        {{errorMessage}}
+    </div>
+</div>
+
+<div>
+    <form novalidate [formGroup]="loginForm" (ngSubmit)="login()">
+        <h3 class="text-center">Please sign in</h3>
+
+        <div class="form-group">
+            <label for="inputName">Name</label>
+            <input type="string" 
+                   id="inputName" 
+                   class="form-control" 
+                   formControlName="userName" 
+                   placeholder="Enter unique Name">
+
+            <div class="text-danger"
+                 *ngIf="_userName.invalid && 
+                        (_userName.touched || _userName.dirty || errorMessage)">
+                <small>Please, enter the unique Name!</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="inputPassword">Password</label>
+            <input type="password" 
+                   id="inputPassword" 
+                   class="form-control" 
+                   formControlName="password" 
+                   placeholder="Password">
+
+            <div class="text-success"
+                 *ngIf="_password.valid && 
+                        (_password.touched || _password.dirty)">
+                <small>Looks good!</small>
+            </div>
+            <div class="text-danger"
+                 *ngIf="_password.invalid && 
+                        (_password.touched || _password.dirty || errorMessage)">
+                <small>Please, enter the password!</small>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-block btn btn-success">
+            <span *ngIf="spinning" 
+            class="spinner-border spinner-border customSpin" 
+            role="status" 
+            aria-hidden="true"></span>
+            Sign In</button>
+    </form>
+</div>
+
+<div class="text-center m-3">
+    <button [routerLink]="['/forgot-password']" class="btn btn-outline-dark">Forgot password</button>
+</div>
