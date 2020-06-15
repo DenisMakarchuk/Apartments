@@ -264,5 +264,33 @@ namespace Apartments.Web.Controllers.Users
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("refresh/token")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserViewModel))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [LogAttribute]
+        public async Task<IActionResult>
+            RefreshToken([FromBody]TokenRefrashRequest request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var result = await _service.ExchangeRefreshToken(request.AccessToken,
+                                                       request.RefreshToken,
+                                                       cancellationToken);
+
+                return result.IsError
+                    ? throw new InvalidOperationException(result.Message)
+                    : result.IsSuccess
+                    ? (IActionResult)Ok(result.Data)
+                    : BadRequest(result.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
     }
 }

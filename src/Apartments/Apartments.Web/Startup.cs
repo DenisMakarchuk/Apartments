@@ -141,6 +141,11 @@ namespace Apartments.Web
 
             MyIdentityDataInitializer.SeedUsers(userManager);
 
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "Resources")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "Resources"));
+            }
+
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions

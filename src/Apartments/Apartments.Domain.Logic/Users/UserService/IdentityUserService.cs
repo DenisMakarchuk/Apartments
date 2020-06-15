@@ -1,6 +1,7 @@
 ﻿using Apartments.Common;
 using Apartments.Domain.Logic.Email;
 using Apartments.Domain.Logic.Options;
+using Apartments.Domain.Logic.TokenValidation;
 using Apartments.Domain.Logic.Users.UserServiceInterfaces;
 using Apartments.Domain.Users;
 using Apartments.Domain.Users.ViewModels;
@@ -13,6 +14,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -29,14 +31,16 @@ namespace Apartments.Domain.Logic.Users.UserService
         private readonly JwtSettings _jwtSettings;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IEmailMaker _emailMaker;
+        private readonly IJwtTokenValidator _jwtTokenValidator;
 
-        IUserService _service;
+        private readonly IUserService _service;
 
         public IdentityUserService(UserManager<IdentityUser> userManager, 
                                     JwtSettings jwtSettings, 
                                     IUserService service,
                                     RoleManager<IdentityRole> roleManager,
-                                    IEmailMaker emailMaker)
+                                    IEmailMaker emailMaker,
+                                    IJwtTokenValidator jwtTokenValidator)
         {
             _userManager = userManager;
             _jwtSettings = jwtSettings;
@@ -45,6 +49,8 @@ namespace Apartments.Domain.Logic.Users.UserService
             _roleManager = roleManager;
 
             _emailMaker = emailMaker;
+
+            _jwtTokenValidator = jwtTokenValidator;
         }
 
         /// <summary>
@@ -92,6 +98,16 @@ namespace Apartments.Domain.Logic.Users.UserService
             catch (RegexMatchTimeoutException)
             {
                 return false;
+            }
+        }
+
+        private static string GenerateRefrashToken(int size = 32)
+        {
+            var randomNumber = new byte[size];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                return Convert.ToBase64String(randomNumber);
             }
         }
 
@@ -294,8 +310,17 @@ namespace Apartments.Domain.Logic.Users.UserService
             UserViewModel result = new UserViewModel()
             {
                 Profile = profile.Data,
-                Token = token.Data
+                Token = token.Data,
+                RefreshToken = GenerateRefrashToken(),
+                ExpiresIn = 3300
             };
+
+            var isRefrashToketAdded = await _service.AddRefrashTokenAsync(result.RefreshToken, Guid.Parse(result.Profile.Id));
+
+            if (isRefrashToketAdded.IsError)
+            {
+                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>(isRefrashToketAdded.Message);
+            }
 
             return (Result<UserViewModel>)Result<UserViewModel>.Ok(result);
         }
@@ -405,6 +430,72 @@ namespace Apartments.Domain.Logic.Users.UserService
                 return Result.Fail(result.Errors.Select(x => x.Description)
                                             .Join("\n"));
             }
+        }
+
+        public async Task<Result<UserViewModel>> ExchangeRefreshToken(string accessToken, string refrashToken, CancellationToken cancellationToken = default)
+        {
+            var cp = _jwtTokenValidator.GetPrincipalFromToken(accessToken, _jwtSettings.Secret);
+
+            if (cp != null)
+            {
+                var userId = cp.Claims.First(c => c.Type == "id");
+
+                Guid id = Guid.Parse(userId.Value);
+
+                var isRemovedRefrashToken = await _service.DeleteRefreshTokenAsync(refrashToken, id, cancellationToken);
+
+                if (isRemovedRefrashToken.IsSuccess)
+                {
+                    var user = await _userManager.FindByIdAsync(userId.Value);
+
+                    if (user == null)
+                    {
+                        return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "User with this id does not exist");
+                    }
+
+                    var profile = await _service.GetUserProfileByIdentityIdAsync(user.Id, cancellationToken);
+
+                    var token = await GenerateAuthanticationResult(user, profile?.Data?.NickName);
+
+                    if (profile.IsError || string.IsNullOrEmpty(token.Data))
+                    {
+                        return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>($"{profile.Message}\n" +
+                                $"or token is null");
+                    }
+
+                    if (!profile.IsSuccess)
+                    {
+                        UserViewModel notOkResult = new UserViewModel()
+                        {
+                            Profile = null,
+                            Token = token.Data
+                        };
+
+                        return (Result<UserViewModel>)Result<UserViewModel>.Ok<UserViewModel>(notOkResult);
+                    }
+
+                    UserViewModel result = new UserViewModel()
+                    {
+                        Profile = profile.Data,
+                        Token = token.Data,
+                        RefreshToken = GenerateRefrashToken(),
+                        ExpiresIn = 3300
+                    };
+
+                    var isRefrashToketAdded = await _service.AddRefrashTokenAsync(result.RefreshToken, Guid.Parse(result.Profile.Id));
+
+                    if (isRefrashToketAdded.IsError)
+                    {
+                        return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>(isRefrashToketAdded.Message);
+                    }
+
+                    return (Result<UserViewModel>)Result<UserViewModel>.Ok(result);
+                }
+
+                return (Result<UserViewModel>)Result<UserViewModel>.Fail<UserViewModel>(isRemovedRefrashToken.Message);
+            }
+
+            return (Result<UserViewModel>)Result<UserViewModel>.NotOk<UserViewModel>(null, "Fail principal");
         }
     }
 }

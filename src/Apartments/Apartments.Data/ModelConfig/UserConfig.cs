@@ -31,6 +31,10 @@ namespace Apartments.Data.ModelConfig
             builder.HasMany(_ => _.Comments).WithOne(_ => _.Author)
                 .HasForeignKey(_ => _.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(_ => _.RefreshTokens).WithOne(_ => _.User)
+                .HasForeignKey(_ => _.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

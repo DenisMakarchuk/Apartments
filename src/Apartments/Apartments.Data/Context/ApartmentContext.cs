@@ -34,6 +34,8 @@ namespace Apartments.Data.Context
 
         public DbSet<BusyDate> BusyDates { get; set; }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -45,6 +47,7 @@ namespace Apartments.Data.Context
             modelBuilder.ApplyConfiguration(new OrderConfig());
             modelBuilder.ApplyConfiguration(new UserConfig());
             modelBuilder.ApplyConfiguration(new DatesConfig());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfig());
 
             modelBuilder.Entity<Country>().HasData(GetCountries());
         }
@@ -68,7 +71,8 @@ namespace Apartments.Data.Context
                 if (entry.Entity is Order ||
                     entry.Entity is BusyDate ||
                     entry.Entity is Country ||
-                    entry.Entity is User)
+                    entry.Entity is User ||
+                    entry.Entity is RefreshToken)
                 {
                     continue;
                 };

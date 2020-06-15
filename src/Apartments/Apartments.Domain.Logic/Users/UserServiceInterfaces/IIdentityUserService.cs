@@ -69,5 +69,8 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <returns></returns>
         Task<Result>
             ResetPasswordAsync(ResetPasswordModel model, CancellationToken cancellationToken = default(CancellationToken));
+
+        Task<Result<UserViewModel>>
+            ExchangeRefreshToken(string accessToken, string refrashToken, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

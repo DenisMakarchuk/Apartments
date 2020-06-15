@@ -43,5 +43,9 @@ namespace Apartments.Domain.Logic.Users.UserServiceInterfaces
         /// <returns></returns>
         Task<Result>
             DeleteUserProfileByIdentityIdAsync(string identityId, CancellationToken cancellationToken = default(CancellationToken));
+
+        Task<Result> AddRefrashTokenAsync(string refrashToken, Guid id, CancellationToken cancellationToken = default(CancellationToken));
+
+        Task<Result> DeleteRefreshTokenAsync(string refrashToken, Guid id, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

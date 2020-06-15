@@ -16,6 +16,7 @@ using Apartments.Domain.Logic.Images.ImageInterfaces;
 using Apartments.Domain.Logic.Images.ImageServices;
 using Apartments.Domain.Users;
 using Apartments.Domain.Logic.Email;
+using Apartments.Domain.Logic.TokenValidation;
 
 namespace Apartments.Domain.Logic
 {
@@ -42,6 +43,9 @@ namespace Apartments.Domain.Logic
 
             services.AddScoped<IImageWriter, ImageWriter>();
             services.AddScoped<IExistsImahesOperator, ExistsImahesOperator>();
+
+            services.AddScoped<IJwtTokenHandler, JwtTokenHandler>();
+            services.AddScoped<IJwtTokenValidator, JwtTokenValidator>();
 
             services.AddTransient<IEmailSender, EmailSender>();
             services.AddTransient<IEmailMaker, EmailMaker>();

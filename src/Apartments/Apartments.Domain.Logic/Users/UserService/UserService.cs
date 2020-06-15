@@ -148,5 +148,50 @@ namespace Apartments.Domain.Logic.Users.UserService
                 return await Task.FromResult(Result.Fail($"Cannot delete User. {ex.Message}"));
             }
         }
+
+        public async Task<Result> AddRefrashTokenAsync(string refrashToken, Guid id, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                _db.RefreshTokens.Add(new RefreshToken(refrashToken, DateTime.UtcNow.AddDays(5), id));
+                await _db.SaveChangesAsync();
+
+                return await Task.FromResult(Result.Ok());
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot save changes. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot save changes. {ex.Message}"));
+            }
+        }
+
+        public async Task<Result> DeleteRefreshTokenAsync(string refrashToken, Guid id, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            try
+            {
+                var user = await _db.Users.Where(_ => _.Id == id).Include(_=>_.RefreshTokens).AsNoTracking().FirstOrDefaultAsync(cancellationToken);
+
+                if (user.RefreshTokens.Any(rt => rt.Token == refrashToken && rt.Active))
+                {
+                    _db.RefreshTokens.Remove(user.RefreshTokens.First(t => t.Token == refrashToken));
+                    await _db.SaveChangesAsync();
+
+                    return await Task.FromResult(Result.Ok());
+                }
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot save changes. {ex.Message}"));
+            }
+            catch (DbUpdateException ex)
+            {
+                return await Task.FromResult(Result.Fail($"Cannot save changes. {ex.Message}"));
+            }
+
+            return await Task.FromResult(Result.Fail($"Invalid refrash token"));
+        }
     }
 }
